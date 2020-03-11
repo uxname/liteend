@@ -12,6 +12,7 @@ const compression = require('compression');
 const cors = require('cors');
 const helmet = require('helmet');
 const Datastore = require('nedb-promises');
+const db = Datastore.create('./data.db');
 
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req, res) {
@@ -38,7 +39,7 @@ const server = new CostAnalysisApolloServer({
     context: async ({req}) => {
         GraphqlRequestLogger.log(req);
         return {
-            db: Datastore.create('./data.db')
+            db: db
         }
     }
 });
