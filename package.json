@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "init": "cp src/config/config_example.js src/config/config.js"
   },
   "dependencies": {
     "apollo-server-express": "^2.11.0",
