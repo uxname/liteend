@@ -116,7 +116,13 @@ module.exports = {
         max: 100000,
         message: '{ "error": "Too many requests" }'
     },
-    graphql_path: '/graphql',
+    graphql: {
+        path: '/graphql',
+        introspection: true,
+        playground: true,
+        tracing: true,
+        debug: true,
+    },
     cost_analysis: {
         maximumCost: 120,
         defaultCost: 1

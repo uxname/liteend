@@ -33,9 +33,11 @@ class CostAnalysisApolloServer extends ApolloServer {
 const server = new CostAnalysisApolloServer({
     typeDefs,
     resolvers,
-    tracing: true,
+    tracing: config.graphql.tracing,
     mockEntireSchema: undefined,
-    debug: true,
+    introspection: config.graphql.introspection,
+    playground: config.graphql.playground,
+    debug: config.graphql.debug,
     context: async ({req}) => {
         GraphqlRequestLogger.log(req);
         return {
@@ -65,7 +67,7 @@ app.use((req, res, next) => {
     }
 });
 
-server.applyMiddleware({app, path: config.graphql_path});
+server.applyMiddleware({app, path: config.graphql.path});
 
 app.listen({port: config.port}, () => {
     log.info(`🚀 Server ready at http://0.0.0.0:${config.port}${server.graphqlPath}`)
