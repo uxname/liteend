@@ -49,7 +49,7 @@ const server = new CostAnalysisApolloServer({
 app.use(rateLimit(config.rate_limit));
 app.use(compression(config.compression));
 if (config.cors_enabled === true) app.use(cors());
-app.use(helmet());
+// app.use(helmet());
 app.use((req, res, next) => {
     if (!config.maintenance_mode.maintenance_mode_enabled) {
         next();
