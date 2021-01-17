@@ -11,8 +11,8 @@ const GraphqlRequestLogger = require('./tools/GraphqlRequestLogger');
 const compression = require('compression');
 const cors = require('cors');
 const helmet = require('helmet');
-const Datastore = require('nedb-promises');
-const db = Datastore.create('./data.db');
+const {PrismaClient} = require('@prisma/client');
+const prisma = new PrismaClient();
 
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req, res) {
@@ -44,16 +44,14 @@ const server = new CostAnalysisApolloServer({
     },
     context: async ({req}) => {
         GraphqlRequestLogger.log(req);
-        return {
-            db: db
-        }
+        return {prisma}
     }
 });
 
 app.use(rateLimit(config.rate_limit));
 app.use(compression(config.compression));
 if (config.cors_enabled === true) app.use(cors());
-app.use(helmet());
+app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
     if (!config.maintenance_mode.maintenance_mode_enabled) {
         next();

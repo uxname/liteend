@@ -6,22 +6,27 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "init": "cp src/config/config_example.js src/config/config.js"
+    "init": "cp src/config/config_example.js src/config/config.js",
+    "prisma:up": "npx prisma migrate dev --preview-feature",
+    "prisma:gen": "npx prisma generate",
+    "prisma:studio": "npx prisma studio",
+    "postinstall": "npm run prisma:gen",
+    "postprisma:up": "npm run prisma:gen"
   },
   "dependencies": {
+    "@prisma/client": "^2.14.0",
     "apollo-server-express": "^2.19.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "cuid": "^2.1.8",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
     "graphql": "^15.4.0",
     "graphql-cost-analysis": "^1.0.3",
     "helmet": "^4.3.1",
-    "log4js": "^6.3.0",
-    "nedb-promises": "^4.1.1"
+    "log4js": "^6.3.0"
   },
   "devDependencies": {
+    "@prisma/cli": "^2.14.0",
     "nodemon": "^2.0.7"
   }
 }

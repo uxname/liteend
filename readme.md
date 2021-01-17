@@ -4,7 +4,7 @@ Simple lightweight GraphQL server on Node.JS
 
 # Get started
 - `git clone https://github.com/uxname/liteend.git`
-- `yarn install`
-- `yarn run init`
-- Development: `yarn dev`
-- Production: `yarn start`
+- `npm install`
+- `npm run init`
+- Development: `npm run dev`
+- Production: `npm start`

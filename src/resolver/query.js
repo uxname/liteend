@@ -7,7 +7,7 @@ module.exports = {
     error: () => {
         throw new ApolloError("Some error", 500);
     },
-    getAllTexts: async (parent, args, ctx) => {
-        return ctx.db.find({});
+    getAllPosts: async (parent, args, {prisma}) => {
+        return prisma.post.findMany();
     }
 };
