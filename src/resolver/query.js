@@ -8,6 +8,6 @@ module.exports = {
         throw new ApolloError("Some error", 500);
     },
     getAllTexts: async (parent, args, ctx) => {
-        return await ctx.db.find({});
+        return ctx.db.find({});
     }
 };
