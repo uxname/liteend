@@ -74,3 +74,4 @@ fabric.properties
 /src/config/config.js
 .idea/
 data.db
+data.db-journal

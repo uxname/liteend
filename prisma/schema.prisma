@@ -2,19 +2,19 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:../data.db"
+  provider = "sqlite"
+  url      = "file:../data.db"
 }
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model Post {
-    id        Int      @default(autoincrement()) @id
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    title     String
-    content   String?
+  title   String
+  content String?
 }
