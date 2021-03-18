@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "init": "cp src/config/config_example.js src/config/config.js",
-    "prisma:deploy": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy",
     "prisma:create": "npx prisma migrate dev --create-only",
     "prisma:gen": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
