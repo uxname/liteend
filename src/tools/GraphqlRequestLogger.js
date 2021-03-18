@@ -8,7 +8,7 @@ module.exports = class GraphqlRequestLogger {
         request.definitions.forEach(definition => {
             definition.selectionSet.selections.forEach(selection => {
                 result.push(selection.name.value);
-            })
+            });
         });
 
         log.trace(`Requested root paths: [${result.join(', ')}]`);

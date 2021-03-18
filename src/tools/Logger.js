@@ -8,10 +8,10 @@ log4js.configure(config.logger_config);
  * Add warning on using default console object
  */
 function addWarnings() {
-    const log = log4js.getLogger(`[console]`);
+    const log = log4js.getLogger('[console]');
 
-    ['trace', 'debug', 'log', 'info', 'warn', 'error'].forEach(function (method) {
-        console[method] = function (...args) {
+    ['trace', 'debug', 'log', 'info', 'warn', 'error'].forEach(method => {
+        console[method] = (...args) => {
             log.warn(`Console deprecated, use Logger. [${method}]:`, ...args);
         };
     });
@@ -36,8 +36,8 @@ function getLogger(name) {
     if (!name) {
         throw Error('Logger name is required');
     }
-    let cluster_id = cluster.isMaster ? `master` : `worker ${cluster.worker.id}`;
-    return log4js.getLogger(`[${name}] [${cluster_id}]`)
+    let clusterId = cluster.isMaster ? 'master' : `worker ${cluster.worker.id}`;
+    return log4js.getLogger(`[${name}] [${clusterId}]`);
 }
 
 module.exports.getLogger = getLogger;

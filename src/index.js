@@ -1,9 +1,9 @@
 const express = require('express');
 const {ApolloServer} = require('apollo-server-express');
-const typeDefs = require("./schema");
-const resolvers = require("./resolver");
+const typeDefs = require('./schema');
+const resolvers = require('./resolver');
 const log = require('./tools/Logger').getLogger('server');
-const rateLimit = require("express-rate-limit");
+const rateLimit = require('express-rate-limit');
 const config = require('./config/config');
 const app = express();
 const costAnalysis = require('graphql-cost-analysis').default;
@@ -44,13 +44,15 @@ const server = new CostAnalysisApolloServer({
     },
     context: async ({req}) => {
         GraphqlRequestLogger.log(req);
-        return {prisma}
+        return {prisma};
     }
 });
 
 app.use(rateLimit(config.rate_limit));
 app.use(compression(config.compression));
-if (config.cors_enabled === true) app.use(cors());
+if (config.cors_enabled === true) {
+    app.use(cors());
+}
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
     if (!config.maintenance_mode.maintenance_mode_enabled) {
@@ -72,5 +74,5 @@ app.use((req, res, next) => {
 server.applyMiddleware({app, path: config.graphql.path});
 
 app.listen({port: config.port}, () => {
-    log.info(`🚀 Server ready at http://0.0.0.0:${config.port}${server.graphqlPath}`)
+    log.info(`🚀 Server ready at http://0.0.0.0:${config.port}${server.graphqlPath}`);
 });

@@ -13,7 +13,8 @@
     "prisma:studio": "npx prisma studio",
     "prisma:format": "npx prisma format",
     "postinstall": "npm run prisma:gen",
-    "postprisma:deploy": "npm run prisma:gen"
+    "postprisma:deploy": "npm run prisma:gen",
+    "lint": "./node_modules/.bin/eslint --ignore-path .gitignore . --fix --quiet"
   },
   "dependencies": {
     "@prisma/client": "^2.19.0",
@@ -28,7 +29,9 @@
     "log4js": "^6.3.0"
   },
   "devDependencies": {
+    "@jetbrains/eslint-config": "^5.3.1",
     "@prisma/cli": "^2.19.0",
+    "eslint": "^7.22.0",
     "nodemon": "^2.0.7"
   }
 }
