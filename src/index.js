@@ -21,9 +21,9 @@ class CostAnalysisApolloServer extends ApolloServer {
         options.validationRules = options.validationRules ? options.validationRules.slice() : [];
         options.validationRules.push(costAnalysis({
             variables: req.body.variables,
-            maximumCost: config.cost_analysis.maximumCost,
-            defaultCost: config.cost_analysis.defaultCost,
-            onComplete: (costs) => log.trace(`costs: ${costs} (max: ${config.cost_analysis.maximumCost})`)
+            maximumCost: config.costAnalysis.maximumCost,
+            defaultCost: config.costAnalysis.defaultCost,
+            onComplete: (costs) => log.trace(`costs: ${costs} (max: ${config.costAnalysis.maximumCost})`)
         }));
 
         return options;
@@ -48,25 +48,25 @@ const server = new CostAnalysisApolloServer({
     }
 });
 
-app.use(rateLimit(config.rate_limit));
+app.use(rateLimit(config.rateLimit));
 app.use(compression(config.compression));
-if (config.cors_enabled === true) {
+if (config.corsEnabled === true) {
     app.use(cors());
 }
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
-    if (!config.maintenance_mode.maintenance_mode_enabled) {
+    if (!config.maintenanceMode.maintenanceModeEnabled) {
         next();
         return;
     }
     const ip = req.connection.remoteAddress;
 
-    if (config.maintenance_mode.allowed_hosts.indexOf(ip) >= 0) {
+    if (config.maintenanceMode.allowedHosts.indexOf(ip) >= 0) {
         log.info(`Maintenance mode enabled. Disable it in config. Got request from: [${ip}]`);
         next();
     } else {
         res.status(503).json({
-            status: config.maintenance_mode.message
+            status: config.maintenanceMode.message
         });
     }
 });

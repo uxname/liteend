@@ -2,7 +2,7 @@ const log4js = require('log4js');
 const config = require('../config/config');
 const cluster = require('cluster');
 
-log4js.configure(config.logger_config);
+log4js.configure(config.loggerConfig);
 
 /**
  * Add warning on using default console object
