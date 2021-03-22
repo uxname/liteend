@@ -21,9 +21,9 @@ class CostAnalysisApolloServer extends ApolloServer {
         options.validationRules = options.validationRules ? options.validationRules.slice() : [];
         options.validationRules.push(costAnalysis({
             variables: req.body.variables,
-            maximumCost: config.costAnalysis.maximumCost,
-            defaultCost: config.costAnalysis.defaultCost,
-            onComplete: (costs) => log.trace(`costs: ${costs} (max: ${config.costAnalysis.maximumCost})`)
+            maximumCost: config.server.costAnalysis.maximumCost,
+            defaultCost: config.server.costAnalysis.defaultCost,
+            onComplete: (costs) => log.trace(`costs: ${costs} (max: ${config.server.costAnalysis.maximumCost})`)
         }));
 
         return options;
@@ -33,11 +33,11 @@ class CostAnalysisApolloServer extends ApolloServer {
 const server = new CostAnalysisApolloServer({
     typeDefs,
     resolvers,
-    tracing: config.graphql.tracing,
+    tracing: config.server.graphql.tracing,
     mockEntireSchema: undefined,
-    introspection: config.graphql.introspection,
-    playground: config.graphql.playground,
-    debug: config.graphql.debug,
+    introspection: config.server.graphql.introspection,
+    playground: config.server.graphql.playground,
+    debug: config.server.graphql.debug,
     formatError: (err) => {
         log.debug(err);
         return err;
@@ -48,31 +48,31 @@ const server = new CostAnalysisApolloServer({
     }
 });
 
-app.use(rateLimit(config.rateLimit));
-app.use(compression(config.compression));
-if (config.corsEnabled === true) {
+app.use(rateLimit(config.server.rateLimit));
+app.use(compression(config.server.compression));
+if (config.server.corsEnabled === true) {
     app.use(cors());
 }
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
-    if (!config.maintenanceMode.maintenanceModeEnabled) {
+    if (!config.server.maintenanceMode.maintenanceModeEnabled) {
         next();
         return;
     }
     const ip = req.connection.remoteAddress;
 
-    if (config.maintenanceMode.allowedHosts.indexOf(ip) >= 0) {
+    if (config.server.maintenanceMode.allowedHosts.indexOf(ip) >= 0) {
         log.info(`Maintenance mode enabled. Disable it in config. Got request from: [${ip}]`);
         next();
     } else {
         res.status(503).json({
-            status: config.maintenanceMode.message
+            status: config.server.maintenanceMode.message
         });
     }
 });
 
-server.applyMiddleware({app, path: config.graphql.path});
+server.applyMiddleware({app, path: config.server.graphql.path});
 
-app.listen({port: config.port}, () => {
-    log.info(`🚀 Server ready at http://0.0.0.0:${config.port}${server.graphqlPath}`);
+app.listen({port: config.server.port}, () => {
+    log.info(`🚀 Server ready at http://0.0.0.0:${config.server.port}${server.graphqlPath}`);
 });
