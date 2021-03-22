@@ -9,7 +9,7 @@
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:create": "npx prisma migrate dev --create-only",
     "prisma:gen": "npx prisma generate",
-    "prisma:studio": "npx prisma studio",
+    "prisma:studio": "npx prisma studio --browser none",
     "prisma:format": "npx prisma format",
     "postinstall": "npm run prisma:gen",
     "postprisma:deploy": "npm run prisma:gen",
