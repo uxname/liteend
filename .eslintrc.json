@@ -4,16 +4,23 @@
         "commonjs": true,
         "es2021": true
     },
+    "plugins": [
+        "sonarjs"
+    ],
     "extends": [
         "@jetbrains",
         "@jetbrains/eslint-config/node",
-        "plugin:node/recommended"
+        "plugin:node/recommended",
+        "plugin:sonarjs/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": 2020
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": [
+            "error",
+            4
+        ],
         "max-len": "off",
         "no-return-assign": "off",
         "no-magic-numbers": "warn",
@@ -22,17 +29,6 @@
         "no-native-reassign": "off",
         "multiline-ternary": "off",
         "no-shadow": "warn",
-        "no-multiple-empty-lines": "error",
-
-        // eslint-plugin-node
-        "node/exports-style": ["error", "module.exports"],
-        "node/file-extension-in-import": ["error", "always"],
-        "node/prefer-global/buffer": ["error", "always"],
-        "node/prefer-global/console": ["error", "always"],
-        "node/prefer-global/process": ["error", "always"],
-        "node/prefer-global/url-search-params": ["error", "always"],
-        "node/prefer-global/url": ["error", "always"],
-        "node/prefer-promises/dns": "error",
-        "node/prefer-promises/fs": "error"
+        "no-multiple-empty-lines": "error"
     }
 }
