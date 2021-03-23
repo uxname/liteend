@@ -6,10 +6,11 @@
     },
     "extends": [
         "@jetbrains",
-        "@jetbrains/eslint-config/node"
+        "@jetbrains/eslint-config/node",
+        "plugin:node/recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 12
+        "ecmaVersion": 2020
     },
     "rules": {
         "indent": ["error", 4],
@@ -21,6 +22,17 @@
         "no-native-reassign": "off",
         "multiline-ternary": "off",
         "no-shadow": "warn",
-        "no-multiple-empty-lines": "error"
+        "no-multiple-empty-lines": "error",
+
+        // eslint-plugin-node
+        "node/exports-style": ["error", "module.exports"],
+        "node/file-extension-in-import": ["error", "always"],
+        "node/prefer-global/buffer": ["error", "always"],
+        "node/prefer-global/console": ["error", "always"],
+        "node/prefer-global/process": ["error", "always"],
+        "node/prefer-global/url-search-params": ["error", "always"],
+        "node/prefer-global/url": ["error", "always"],
+        "node/prefer-promises/dns": "error",
+        "node/prefer-promises/fs": "error"
     }
 }

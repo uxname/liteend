@@ -4,6 +4,7 @@ const typeDefs = require('./schema');
 const resolvers = require('./resolver');
 const log = require('./tools/Logger').getLogger('server');
 const rateLimit = require('express-rate-limit');
+// eslint-disable-next-line node/no-unpublished-require
 const config = require('./config/config');
 const app = express();
 const costAnalysis = require('graphql-cost-analysis').default;

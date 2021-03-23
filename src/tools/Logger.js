@@ -1,4 +1,5 @@
 const log4js = require('log4js');
+// eslint-disable-next-line node/no-unpublished-require
 const config = require('../config/config');
 const cluster = require('cluster');
 
