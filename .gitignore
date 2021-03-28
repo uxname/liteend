@@ -75,3 +75,4 @@ fabric.properties
 .idea/
 data.db
 data.db-journal
+telemetry.json
