@@ -3,12 +3,15 @@
         "commonjs": true,
         "es2021": true
     },
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-        "sonarjs"
+        "sonarjs",
+        "@typescript-eslint"
     ],
     "extends": [
         "@jetbrains",
         "@jetbrains/eslint-config/node",
+        "plugin:@typescript-eslint/recommended",
         "plugin:node/recommended",
         "plugin:sonarjs/recommended"
     ],
