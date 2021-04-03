@@ -3,13 +3,14 @@ import {ApolloError} from 'apollo-server-express';
 
 const resolvers: Resolvers = {
     Query: {
-        echo: (parent, args, context, info) => {
+        echo: (parent, args, ctx, info) => {
+            console.log(ctx, info);
             return args.text;
         },
-        error: (parent, args, context, info) => {
+        error: () => {
             throw new ApolloError('Some error', '500');
         },
-        getAllPosts: (parent, args, {prisma}, info) => {
+        getAllPosts: (parent, args, {prisma}) => {
             return prisma.post.findMany();
         }
     }

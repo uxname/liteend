@@ -6,7 +6,7 @@ const mutation: Resolvers = {
             console.log(ctx, info);
             return args.text;
         },
-        addPost: async (parent, {title, content}, {prisma}, info) => {
+        addPost: async (parent, {title, content}, {prisma}) => {
             await prisma.post.create({data: {title, content}});
             return true;
         }

@@ -1,4 +1,4 @@
-import log4js from 'log4js';
+import log4js, {Logger} from 'log4js';
 import config from '../config/config';
 import cluster from 'cluster';
 
@@ -32,7 +32,7 @@ addWarnings();
  *
  * @return Logger
  */
-export function getLogger(name) {
+export function getLogger(name: string): Logger {
     if (!name) {
         throw Error('Logger name is required');
     }
