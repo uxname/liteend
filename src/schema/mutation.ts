@@ -1,6 +1,6 @@
-const {gql} = require('apollo-server-express');
+import {gql} from 'apollo-server-express';
 
-module.exports = gql`
+export default gql`
     type Mutation {
         echo(text: String!): String!
         addPost(title: String!, content: String): Boolean!

@@ -1,19 +1,21 @@
-require('./tools/telemetry');
-const express = require('express');
-const {ApolloServer} = require('apollo-server-express');
-const typeDefs = require('./schema');
-const resolvers = require('./resolver');
-const log = require('./tools/Logger').getLogger('server');
-const rateLimit = require('express-rate-limit');
-// eslint-disable-next-line node/no-unpublished-require
-const config = require('./config/config');
+import './tools/telemetry';
+import config from './config/config';
+import express from 'express';
+import {ApolloServer} from 'apollo-server-express';
+import typeDefs from './schema';
+import resolvers from './resolver';
+import {getLogger} from './tools/Logger';
+import rateLimit from 'express-rate-limit';
+import costAnalysis from 'graphql-cost-analysis';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import {PrismaClient} from '@prisma/client';
+import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
+
+const log = getLogger('server');
 const app = express();
-const costAnalysis = require('graphql-cost-analysis').default;
-const GraphqlRequestLogger = require('./tools/GraphqlRequestLogger');
-const compression = require('compression');
-const cors = require('cors');
-const helmet = require('helmet');
-const {PrismaClient} = require('@prisma/client');
+
 const prisma = new PrismaClient();
 
 class CostAnalysisApolloServer extends ApolloServer {

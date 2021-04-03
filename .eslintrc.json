@@ -1,23 +1,34 @@
 {
     "env": {
-        "commonjs": true,
+        "browser": false,
         "es2021": true
     },
+    "extends": [
+        "eslint:recommended",
+        "@jetbrains",
+        "@jetbrains/eslint-config/node",
+        "plugin:sonarjs/recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2021,
+        "sourceType": "module"
+    },
+    "settings": {
+        "node": {
+            "tryExtensions": [
+                ".js",
+                ".json",
+                ".node",
+                ".ts"
+            ]
+        }
+    },
     "plugins": [
         "sonarjs",
         "@typescript-eslint"
     ],
-    "extends": [
-        "@jetbrains",
-        "@jetbrains/eslint-config/node",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:node/recommended",
-        "plugin:sonarjs/recommended"
-    ],
-    "parserOptions": {
-        "ecmaVersion": 2020
-    },
     "rules": {
         "indent": [
             "error",

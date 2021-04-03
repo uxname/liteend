@@ -1,9 +1,10 @@
-const {gql} = require('apollo-server-express');
+import {gql} from 'apollo-server-express';
 
-module.exports = gql`
+export default gql`
     type Query {
         echo(text: String!): String! @cost(complexity: 5)
         error: Int
         getAllPosts: [Post]
     }
 `;
+

@@ -1,7 +1,6 @@
-const log4js = require('log4js');
-// eslint-disable-next-line node/no-unpublished-require
-const config = require('../config/config');
-const cluster = require('cluster');
+import log4js from 'log4js';
+import config from '../config/config';
+import cluster from 'cluster';
 
 log4js.configure(config.server.loggerConfig);
 
@@ -33,13 +32,12 @@ addWarnings();
  *
  * @return Logger
  */
-function getLogger(name) {
+export function getLogger(name) {
     if (!name) {
         throw Error('Logger name is required');
     }
-    let clusterId = cluster.isMaster ? 'master' : `worker ${cluster.worker.id}`;
+    const clusterId = cluster.isMaster ? 'master' : `worker ${cluster.worker.id}`;
     return log4js.getLogger(`[${name}] [${clusterId}]`);
 }
 
-module.exports.getLogger = getLogger;
-module.exports.log4js = log4js;
+export * as log4js from 'log4js';

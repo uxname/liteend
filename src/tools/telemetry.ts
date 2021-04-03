@@ -1,11 +1,12 @@
 /* eslint-disable no-magic-numbers */
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const http = require('https');
-const packageJson = require(path.join(__dirname, '..', '..', 'package.json'));
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import http from 'https';
+import crypto from 'crypto';
+import packageJson from '../../package.json';
+
 const telemetryFilepath = path.join(__dirname, '..', '..', 'telemetry.json');
-const crypto = require('crypto');
 const telemetryFileExists = fs.existsSync(telemetryFilepath);
 
 function getTelemetryData() {
