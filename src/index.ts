@@ -12,6 +12,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import {PrismaClient} from '@prisma/client';
 import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
+import StatusCodes from './tools/StatusCodes';
 
 const log = getLogger('server');
 const app = express();
@@ -69,7 +70,7 @@ app.use((req, res, next) => {
         log.info(`Maintenance mode enabled. Disable it in config. Got request from: [${ip}]`);
         next();
     } else {
-        res.status(503).json({
+        res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
             status: config.server.maintenanceMode.message
         });
     }
