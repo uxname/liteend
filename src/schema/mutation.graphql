@@ -1,0 +1,4 @@
+type Mutation {
+    echo(text: String!): String!
+    addPost(title: String!, content: String): Boolean!
+}

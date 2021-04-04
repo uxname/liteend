@@ -1,7 +1,6 @@
 overwrite: true
 schema:
-    - 'src/schema/*.ts'
-    - '!src/schema/index.ts'
+    - 'src/schema/*.graphql'
 generates:
     src/generated/graphql_api.ts:
         plugins:
