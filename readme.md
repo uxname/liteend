@@ -10,6 +10,7 @@ others DBMS available too) uses as base for data storage.
 - `npm install`
 - `cp src/config/config_example.ts src/config/config.ts`
   - Edit `config.ts`
+- Generate types: `npm run gen`
 - Development run: `npm run dev`
 - Production run: `npm start`
 
