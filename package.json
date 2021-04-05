@@ -34,6 +34,7 @@
         "log4js": "^6.3.0"
     },
     "devDependencies": {
+        "@graphql-codegen/add": "^2.0.2",
         "@graphql-codegen/cli": "1.21.3",
         "@graphql-codegen/introspection": "1.18.1",
         "@graphql-codegen/typescript": "1.21.1",

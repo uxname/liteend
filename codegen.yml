@@ -4,5 +4,10 @@ schema:
 generates:
     src/generated/graphql_api.ts:
         plugins:
+            - add:
+                content:
+                    - "import { GraphQLContext } from '../../src/IContext';"
             - "typescript"
             - "typescript-resolvers"
+        config:
+            contextType: GraphQLContext
