@@ -16,6 +16,18 @@ export type Scalars = {
 };
 
 
+export type Account = {
+  __typename?: 'Account';
+  id: Scalars['Int'];
+  username: Scalars['String'];
+};
+
+export type AuthResult = {
+  __typename?: 'AuthResult';
+  account: Account;
+  token: Scalars['String'];
+};
+
 export type CostComplexity = {
   min?: Maybe<Scalars['Int']>;
   max?: Maybe<Scalars['Int']>;
@@ -25,7 +37,9 @@ export type CostComplexity = {
 export type Mutation = {
   __typename?: 'Mutation';
   echo: Scalars['String'];
-  addPost: Scalars['Boolean'];
+  register: AuthResult;
+  login: AuthResult;
+  changePassword: AuthResult;
 };
 
 
@@ -34,24 +48,28 @@ export type MutationEchoArgs = {
 };
 
 
-export type MutationAddPostArgs = {
-  title: Scalars['String'];
-  content?: Maybe<Scalars['String']>;
+export type MutationRegisterArgs = {
+  username: Scalars['String'];
+  password: Scalars['String'];
 };
 
-export type Post = {
-  __typename?: 'Post';
-  id: Scalars['Int'];
-  createdAt: Scalars['Date'];
-  title: Scalars['String'];
-  content?: Maybe<Scalars['String']>;
+
+export type MutationLoginArgs = {
+  username: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationChangePasswordArgs = {
+  password: Scalars['String'];
+  newPassword: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
   echo: Scalars['String'];
   error?: Maybe<Scalars['Int']>;
-  getAllPosts?: Maybe<Array<Maybe<Post>>>;
+  whoami: Account;
 };
 
 
@@ -137,26 +155,28 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  CostComplexity: CostComplexity;
+  Account: ResolverTypeWrapper<Account>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  String: ResolverTypeWrapper<Scalars['String']>;
+  AuthResult: ResolverTypeWrapper<AuthResult>;
+  CostComplexity: CostComplexity;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Mutation: ResolverTypeWrapper<{}>;
-  String: ResolverTypeWrapper<Scalars['String']>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  CostComplexity: CostComplexity;
+  Account: Account;
   Int: Scalars['Int'];
+  String: Scalars['String'];
+  AuthResult: AuthResult;
+  CostComplexity: CostComplexity;
   Date: Scalars['Date'];
   Mutation: {};
-  String: Scalars['String'];
-  Boolean: Scalars['Boolean'];
-  Post: Post;
   Query: {};
+  Boolean: Scalars['Boolean'];
 };
 
 export type CostDirectiveArgs = {   multipliers?: Maybe<Array<Maybe<Scalars['String']>>>;
@@ -165,33 +185,40 @@ export type CostDirectiveArgs = {   multipliers?: Maybe<Array<Maybe<Scalars['Str
 
 export type CostDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = CostDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
+export type AccountResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AuthResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuthResult'] = ResolversParentTypes['AuthResult']> = {
+  account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
 }
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
-  addPost?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddPostArgs, 'title'>>;
-};
-
-export type PostResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'username' | 'password'>>;
+  login?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'username' | 'password'>>;
+  changePassword?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'password' | 'newPassword'>>;
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryEchoArgs, 'text'>>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  getAllPosts?: Resolver<Maybe<Array<Maybe<ResolversTypes['Post']>>>, ParentType, ContextType>;
+  whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {
+  Account?: AccountResolvers<ContextType>;
+  AuthResult?: AuthResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
-  Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };
 

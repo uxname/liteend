@@ -22,16 +22,19 @@
         "gen": "npm run ts:gen && npm run prisma:gen"
     },
     "dependencies": {
-        "@prisma/client": "^2.20.1",
-        "apollo-server-express": "^2.22.2",
+        "@prisma/client": "^2.21.2",
+        "@prisma/client": "^2.21.2",
+        "apollo-server-express": "^2.23.0",
+        "bcrypt": "^5.0.1",
         "compression": "^1.7.4",
         "cors": "^2.8.5",
         "express": "^4.17.1",
         "express-rate-limit": "^5.2.6",
         "graphql": "^15.5.0",
         "graphql-cost-analysis": "^1.0.3",
-        "helmet": "^4.4.1",
-        "log4js": "^6.3.0"
+        "helmet": "^4.5.0",
+        "log4js": "^6.3.0",
+        "validate.js": "^0.13.1"
     },
     "devDependencies": {
         "@graphql-codegen/add": "^2.0.2",
@@ -40,15 +43,15 @@
         "@graphql-codegen/typescript": "1.21.1",
         "@graphql-codegen/typescript-resolvers": "1.19.0",
         "@jetbrains/eslint-config": "^5.3.1",
-        "@types/node": "^14.14.37",
-        "@typescript-eslint/eslint-plugin": "^4.20.0",
-        "@typescript-eslint/parser": "^4.20.0",
-        "eslint": "^7.23.0",
+        "@types/node": "^14.14.41",
+        "@typescript-eslint/eslint-plugin": "^4.22.0",
+        "@typescript-eslint/parser": "^4.22.0",
+        "eslint": "^7.24.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-sonarjs": "^0.6.0",
-        "prisma": "^2.20.1",
+        "prisma": "^2.21.2",
         "ts-node": "^9.1.1",
         "ts-node-dev": "^1.1.6",
-        "typescript": "^4.2.3"
+        "typescript": "^4.2.4"
     }
 }

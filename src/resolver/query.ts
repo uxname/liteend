@@ -12,9 +12,6 @@ const resolvers: Resolvers = {
         },
         error: () => {
             throw new ApolloError('Some error', StatusCodes.INTERNAL_SERVER_ERROR.toString());
-        },
-        getAllPosts: (parent, args, {prisma}) => {
-            return prisma.post.findMany();
         }
     }
 };

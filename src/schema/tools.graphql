@@ -10,3 +10,13 @@ input CostComplexity {
     min: Int = 1,
     max: Int
 }
+
+type Account {
+    id: Int!
+    username: String!
+}
+
+type AuthResult {
+    account: Account!
+    token: String!
+}
