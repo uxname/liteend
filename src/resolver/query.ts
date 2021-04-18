@@ -12,6 +12,15 @@ const resolvers: Resolvers = {
         },
         error: () => {
             throw new ApolloError('Some error', StatusCodes.INTERNAL_SERVER_ERROR.toString());
+        },
+        whoami: (parent, args, {user}) => {
+            if (!user) {
+                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+            }
+            return {
+                id: user.id,
+                username: user.username
+            };
         }
     }
 };

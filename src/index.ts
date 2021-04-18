@@ -13,6 +13,7 @@ import helmet from 'helmet';
 import {PrismaClient} from '@prisma/client';
 import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
 import StatusCodes from './tools/StatusCodes';
+import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
 
 const log = getLogger('server');
 const app = express();
@@ -49,7 +50,16 @@ const server = new CostAnalysisApolloServer({
     },
     context: async ({req}) => {
         GraphqlRequestLogger.log(req);
-        return {prisma};
+        let user: SecureJwtUser;
+        const authHeader = req.header('authorization');
+        if (authHeader) {
+            try {
+                user = await AuthUtils.decodeJwtToken(authHeader);
+            } catch (e) {
+                log.warn('Decode jwt failed:', authHeader);
+            }
+        }
+        return {prisma, user};
     }
 });
 

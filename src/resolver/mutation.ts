@@ -33,6 +33,47 @@ const mutation: Resolvers = {
                 log.warn(`Register "${username}" failed:`, e);
                 throw new ApolloError('Register fail, user may be already exists', String(StatusCodes.CONFLICT));
             }
+        },
+        login: async (parent, {username, password}, {prisma}) => {
+            const account = await prisma.account.findFirst({where: {username}});
+            if (!account) {
+                throw new ApolloError('Wrong password or user not found', String(StatusCodes.FORBIDDEN));
+            }
+            if (await AuthUtils.checkHash({
+                hash: account.passwordHash,
+                text: password + config.server.salt
+            })) {
+                const token = AuthUtils.createJwtToken(account);
+                return {
+                    account: {
+                        ...account,
+                        balances: undefined
+                    },
+                    token
+                };
+            } else {
+                throw new ApolloError('Wrong password or user not found', String(StatusCodes.FORBIDDEN));
+            }
+        },
+        changePassword: async (parent, {password, newPassword}, {prisma, user}) => {
+            if (!user) {
+                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+            }
+            const account = await prisma.account.findFirst({where: {id: user.id}});
+            if (await AuthUtils.checkHash({
+                hash: account.passwordHash,
+                text: password + config.server.salt
+            })) {
+                const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
+                await prisma.account.update({where: {id: user.id}, data: {passwordHash}});
+                const token = AuthUtils.createJwtToken(account);
+                return {
+                    account,
+                    token
+                };
+            } else {
+                throw new ApolloError('Wrong password', String(StatusCodes.FORBIDDEN));
+            }
         }
     }
 };
