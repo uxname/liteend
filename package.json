@@ -9,7 +9,7 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "dev": "ts-node-dev src/index.ts",
+        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
         "prisma:deploy": "npx prisma migrate deploy",
         "prisma:create": "npx prisma migrate dev --create-only",
         "prisma:gen": "npx prisma generate",
