@@ -1,4 +1,3 @@
-import './tools/telemetry';
 import config from './config/config';
 import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
