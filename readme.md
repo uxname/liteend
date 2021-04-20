@@ -34,13 +34,3 @@ More info about using Prisma: https://www.prisma.io
     ├── resolver              // GraphQL API resolvers
     └── schema                // GraphQL API schema
 ```
-
-# Telemetry
-
-Telemetry helps better understand how many users are using the product.
-Unlike many telemetry services, this telemetry implementation is 
-intentionally limited in scope.
-
-Data is collected in two scenarios that are described below.
-- Information is only sent every 12 hours (sending is paused for 12 hours after any invocation)
-- The data does not include any private data
