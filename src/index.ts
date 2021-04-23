@@ -9,15 +9,14 @@ import costAnalysis from 'graphql-cost-analysis';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import {PrismaClient} from '@prisma/client';
 import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
 import StatusCodes from './tools/StatusCodes';
 import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
+import {prisma} from './tools/Prisma';
 
 const log = getLogger('server');
 const app = express();
 
-const prisma = new PrismaClient();
 
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req, res) {
