@@ -19,7 +19,8 @@
         "postprisma:deploy": "npm run prisma:gen",
         "lint": "./node_modules/.bin/eslint . --fix --quiet",
         "ts:gen": "graphql-codegen --config codegen.yml",
-        "gen": "npm run ts:gen && npm run prisma:gen"
+        "gen": "npm run ts:gen && npm run prisma:gen",
+        "ncu": "npx ncu -u"
     },
     "dependencies": {
         "@prisma/client": "^2.21.2",
@@ -47,7 +48,8 @@
         "@typescript-eslint/parser": "^4.22.0",
         "eslint": "^7.24.0",
         "eslint-plugin-node": "^11.1.0",
-        "eslint-plugin-sonarjs": "^0.6.0",
+        "eslint-plugin-sonarjs": "^0.7.0",
+        "npm-check-updates": "^11.5.1",
         "prisma": "^2.21.2",
         "ts-node": "^9.1.1",
         "ts-node-dev": "^1.1.6",
