@@ -22,7 +22,10 @@ const mutation: Resolvers = {
             try {
                 const passwordHash = await AuthUtils.hash(password + config.server.salt);
                 const account = await prisma.account.create({
-                    data: {username: username.trim(), passwordHash}
+                    data: {
+                        username: username.trim().toLowerCase(),
+                        passwordHash
+                    }
                 });
                 const token = AuthUtils.createJwtToken(account);
                 return {
@@ -35,7 +38,7 @@ const mutation: Resolvers = {
             }
         },
         login: async (parent, {username, password}, {prisma}) => {
-            const account = await prisma.account.findFirst({where: {username}});
+            const account = await prisma.account.findFirst({where: {username: username.trim().toLowerCase()}});
             if (!account) {
                 throw new ApolloError('Wrong password or user not found', String(StatusCodes.FORBIDDEN));
             }
