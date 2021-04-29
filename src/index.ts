@@ -17,7 +17,6 @@ import {prisma} from './tools/Prisma';
 const log = getLogger('server');
 const app = express();
 
-
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req, res) {
         const options = await super.createGraphQLServerOptions(req, res);

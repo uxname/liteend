@@ -1,8 +1,8 @@
 overwrite: true
-schema:
-    - 'src/schema/*.graphql'
 generates:
     src/generated/graphql_api.ts:
+        schema:
+            - 'src/schema/*.graphql'
         plugins:
             - add:
                 content:

@@ -81,7 +81,7 @@ export default {
             introspection: true,
             playground: true,
             tracing: true,
-            debug: true
+            debug: process.env.NODE_ENV !== 'production'
         },
         costAnalysis: {
             maximumCost: 120,
