@@ -2,6 +2,7 @@ import {Resolvers} from '../generated/graphql_api';
 import {ApolloError} from 'apollo-server-express';
 import {getLogger} from '../tools/Logger';
 import StatusCodes from '../tools/StatusCodes';
+
 const log = getLogger('query');
 
 const resolvers: Resolvers = {

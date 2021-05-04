@@ -1,4 +1,5 @@
 /* eslint-disable no-magic-numbers,no-shadow */
+
 // noinspection JSUnusedGlobalSymbols
 enum StatusCodes {
     /**

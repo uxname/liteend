@@ -3,8 +3,6 @@ import config from '../config/config';
 import bcrypt from 'bcrypt';
 import topMostCommonPasswords from './topMostCommonPasswords.json';
 import Validate from 'validate.js';
-import {ApolloError} from 'apollo-server-express';
-import StatusCodes from './StatusCodes';
 
 export type SecureJwtUser = {
     id: number,
