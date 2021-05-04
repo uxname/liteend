@@ -71,7 +71,7 @@ app.use((req, res, next) => {
         next();
         return;
     }
-    const ip = req.connection.remoteAddress;
+    const ip = req.socket.remoteAddress;
 
     if (config.server.maintenanceMode.allowedHosts.indexOf(ip) >= 0) {
         log.info(`Maintenance mode enabled. Disable it in config. Got request from: [${ip}]`);
