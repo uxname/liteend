@@ -9,7 +9,7 @@ for (const fileName of files) {
         continue;
     }
     const schema = fs.readFileSync(path.join(__dirname, fileName)).toString('utf-8');
-    result += '\n' + schema;
+    result += `\n${ schema}`;
 }
 
 export default result;

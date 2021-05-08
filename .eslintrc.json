@@ -47,6 +47,11 @@
         "no-native-reassign": "off",
         "multiline-ternary": "off",
         "no-shadow": "warn",
-        "no-multiple-empty-lines": "error"
+        "no-multiple-empty-lines": "error",
+        "prefer-template": "error",
+        "prefer-spread": "error",
+        "prefer-arrow-callback": "error",
+        "no-var": "error",
+        "arrow-spacing": "error"
     }
 }
