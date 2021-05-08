@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        volumes:
+            - ./data.db:/src/data.db:rw
+            - ./logs:/src/logs:rw
+            - ./src/config/config.ts:/src/src/config/config.ts:ro
+        ports:
+            - "4000:4000"
