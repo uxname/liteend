@@ -4,10 +4,13 @@ generates:
         schema:
             - 'src/schema/*.graphql'
         plugins:
-            - add:
-                content:
-                    - "import { GraphQLContext } from '../../src/IContext';"
+            -   add:
+                    content:
+                        - "/* eslint-disable */"
+                        - "// @ts-nocheck"
+                        - "import { GraphQLContext } from '../IContext';"
             - "typescript"
             - "typescript-resolvers"
         config:
             contextType: GraphQLContext
+            useIndexSignature: true

@@ -19,7 +19,9 @@
         "postprisma:deploy": "npm run prisma:gen",
         "lint": "./node_modules/.bin/eslint . --fix --quiet",
         "ts:gen": "graphql-codegen --config codegen.yml",
+        "ts:check": "tsc --noEmit",
         "gen": "npm run ts:gen && npm run prisma:gen",
+        "check": "npm run ts:check && npm run lint",
         "ncu": "npx ncu -u"
     },
     "dependencies": {
