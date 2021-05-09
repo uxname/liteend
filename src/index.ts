@@ -13,6 +13,7 @@ import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
 import StatusCodes from './tools/StatusCodes';
 import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
+import packageJson from '../package.json';
 
 const log = getLogger('server');
 const app = express();
@@ -86,5 +87,5 @@ app.use((req, res, next) => {
 server.applyMiddleware({app, path: config.server.graphql.path});
 
 app.listen({port: config.server.port}, () => {
-    log.info(`🚀 Server ready at http://0.0.0.0:${config.server.port}${server.graphqlPath}`);
+    log.info(`*** ${packageJson.name} ready at http://0.0.0.0:${config.server.port}${server.graphqlPath} ***`);
 });
