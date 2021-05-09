@@ -158,28 +158,28 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Account: ResolverTypeWrapper<Account>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
-  String: ResolverTypeWrapper<Scalars['String']>;
-  AuthResult: ResolverTypeWrapper<AuthResult>;
-  CostComplexity: CostComplexity;
-  Date: ResolverTypeWrapper<Scalars['Date']>;
+  Account: ResolverTypeWrapper<Partial<Account>>;
+  Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
+  String: ResolverTypeWrapper<Partial<Scalars['String']>>;
+  AuthResult: ResolverTypeWrapper<Partial<AuthResult>>;
+  CostComplexity: ResolverTypeWrapper<Partial<CostComplexity>>;
+  Date: ResolverTypeWrapper<Partial<Scalars['Date']>>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Account: Account;
-  Int: Scalars['Int'];
-  String: Scalars['String'];
-  AuthResult: AuthResult;
-  CostComplexity: CostComplexity;
-  Date: Scalars['Date'];
+  Account: Partial<Account>;
+  Int: Partial<Scalars['Int']>;
+  String: Partial<Scalars['String']>;
+  AuthResult: Partial<AuthResult>;
+  CostComplexity: Partial<CostComplexity>;
+  Date: Partial<Scalars['Date']>;
   Mutation: {};
   Query: {};
-  Boolean: Scalars['Boolean'];
+  Boolean: Partial<Scalars['Boolean']>;
 }>;
 
 export type CostDirectiveArgs = {   multipliers?: Maybe<Array<Maybe<Scalars['String']>>>;

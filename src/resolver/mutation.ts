@@ -48,10 +48,7 @@ const mutation: Resolvers = {
             })) {
                 const token = AuthUtils.createJwtToken(account);
                 return {
-                    account: {
-                        ...account,
-                        balances: undefined
-                    },
+                    account,
                     token
                 };
             } else {

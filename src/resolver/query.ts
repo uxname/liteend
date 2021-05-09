@@ -18,10 +18,7 @@ const resolvers: Resolvers = {
             if (!user) {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
-            return {
-                id: user.id,
-                username: user.username
-            };
+            return user;
         }
     }
 };

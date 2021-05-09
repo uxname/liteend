@@ -14,3 +14,4 @@ generates:
         config:
             contextType: GraphQLContext
             useIndexSignature: true
+            defaultMapper: Partial<{T}>
