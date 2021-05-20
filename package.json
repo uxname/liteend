@@ -44,7 +44,7 @@
         "@graphql-codegen/typescript": "1.22.0",
         "@graphql-codegen/typescript-resolvers": "1.19.1",
         "@jetbrains/eslint-config": "^5.3.1",
-        "@types/node": "^15.3.0",
+        "@types/node": "^15.3.1",
         "@typescript-eslint/eslint-plugin": "^4.24.0",
         "@typescript-eslint/parser": "^4.24.0",
         "eslint": "^7.26.0",
