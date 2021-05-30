@@ -76,3 +76,5 @@ fabric.properties
 data.db
 data.db-journal
 telemetry.json
+package-lock.json
+pnpm-lock.yaml
