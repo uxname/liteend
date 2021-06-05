@@ -24,7 +24,7 @@
         "ncu": "npx ncu -u"
     },
     "dependencies": {
-        "@prisma/client": "^2.24.0",
+        "@prisma/client": "^2.24.1",
         "apollo-server-express": "^2.25.0",
         "bcrypt": "^5.0.1",
         "compression": "^1.7.4",
@@ -44,15 +44,15 @@
         "@graphql-codegen/typescript": "1.22.1",
         "@graphql-codegen/typescript-resolvers": "1.19.2",
         "@jetbrains/eslint-config": "^5.3.1",
-        "@types/node": "^15.6.1",
+        "@types/node": "^15.12.1",
         "@typescript-eslint/eslint-plugin": "^4.26.0",
         "@typescript-eslint/parser": "^4.26.0",
-        "eslint": "^7.27.0",
+        "eslint": "^7.28.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-security": "^1.4.0",
         "eslint-plugin-sonarjs": "^0.7.0",
         "npm-check-updates": "^11.6.0",
-        "prisma": "^2.24.0",
+        "prisma": "^2.24.1",
         "ts-node": "^10.0.0",
         "ts-node-dev": "^1.1.6",
         "typescript": "^4.3.2"
