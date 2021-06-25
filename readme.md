@@ -1,7 +1,7 @@
 ![](.github/img.png)
 
 Simple lightweight GraphQL server on Node.JS 
-which can be used as a basis backend for new a new projects.
+which can be used as a basis backend for a new projects.
 [Prisma.io](https://www.prisma.io) and SQLite (postgres and 
 others DBMS available too) uses as base for data storage. 
 
