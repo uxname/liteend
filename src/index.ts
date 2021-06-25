@@ -14,6 +14,7 @@ import StatusCodes from './tools/StatusCodes';
 import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
 import packageJson from '../package.json';
+import {mocks} from './tools/mocks';
 
 const log = getLogger('server');
 const app = express();
@@ -38,7 +39,8 @@ const server = new CostAnalysisApolloServer({
     typeDefs,
     resolvers,
     tracing: config.server.graphql.tracing,
-    mockEntireSchema: undefined,
+    mocks: config.server.graphql.mocksEnabled ? mocks : undefined,
+    mockEntireSchema: config.server.graphql.mocksEnabled ? true : undefined,
     introspection: config.server.graphql.introspection,
     playground: config.server.graphql.playground,
     debug: config.server.graphql.debug,

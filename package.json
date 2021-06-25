@@ -34,6 +34,7 @@
         "graphql": "^15.5.1",
         "graphql-cost-analysis": "^1.0.3",
         "helmet": "^4.6.0",
+        "lodash": "^4.17.21",
         "log4js": "^6.3.0",
         "validate.js": "^0.13.1"
     },
@@ -44,6 +45,7 @@
         "@graphql-codegen/typescript": "1.22.3",
         "@graphql-codegen/typescript-resolvers": "1.19.4",
         "@jetbrains/eslint-config": "^5.3.1",
+        "@types/lodash": "^4.14.170",
         "@types/node": "^15.12.4",
         "@typescript-eslint/eslint-plugin": "^4.28.0",
         "@typescript-eslint/parser": "^4.28.0",

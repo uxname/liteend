@@ -81,6 +81,7 @@ export default {
             introspection: true,
             playground: true,
             tracing: true,
+            mocksEnabled: false,
             debug: process.env.NODE_ENV !== 'production'
         },
         costAnalysis: {
