@@ -190,5 +190,5 @@ dist
 .pnp.*
 
 .idea
-data.db
-data.db-journal
+data.sqlite3
+data.sqlite3-journal

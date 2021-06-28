@@ -6,7 +6,7 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         volumes:
-            - ./data.db:/app/data.db:rw
+            - ./data.sqlite3:/app/data.sqlite3:rw
             - ./logs:/app/logs:rw
             - ./src/config/config.ts:/app/src/config/config.ts:ro
         ports:
