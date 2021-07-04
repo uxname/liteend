@@ -76,5 +76,3 @@ fabric.properties
 data.sqlite3
 data.sqlite3-journal
 telemetry.json
-package-lock.json
-pnpm-lock.yaml
