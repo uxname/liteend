@@ -69,9 +69,7 @@ app.use(compression(config.server.compression));
 if (config.server.corsEnabled === true) {
     app.use(cors());
 }
-//todo uncomment
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
     if (!config.server.maintenanceMode.maintenanceModeEnabled) {
