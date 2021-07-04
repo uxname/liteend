@@ -9,7 +9,7 @@ import costAnalysis from 'graphql-cost-analysis';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import GraphqlRequestLogger from './tools/GraphqlRequestLogger';
+import RequestLogger from './tools/RequestLogger';
 import StatusCodes from './tools/StatusCodes';
 import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
@@ -49,7 +49,7 @@ const server = new CostAnalysisApolloServer({
         return err;
     },
     context: async ({req}) => {
-        GraphqlRequestLogger.log(req);
+        RequestLogger.logGraphQL(req);
         let user: SecureJwtUser;
         const authHeader = req.header('authorization');
         if (authHeader) {
@@ -63,6 +63,7 @@ const server = new CostAnalysisApolloServer({
     }
 });
 
+app.use(RequestLogger.logHttp);
 app.use(rateLimit(config.server.rateLimit));
 app.use(compression(config.server.compression));
 if (config.server.corsEnabled === true) {

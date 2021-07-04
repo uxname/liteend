@@ -1,11 +1,12 @@
 import {getLogger} from './Logger';
 import * as graphql from 'graphql';
-import express from 'express';
+import express, {RequestHandler} from 'express';
+import {AddressInfo} from 'net';
 
 const log = getLogger('graphql_request_logger');
 
-export default class GraphqlRequestLogger {
-    public static log(httpRequest: express.Request): void {
+export default class RequestLogger {
+    public static logGraphQL(httpRequest: express.Request): void {
         const result = [];
         const request = graphql.parse(httpRequest.body.query);
         request.definitions.forEach(definition => {
@@ -18,7 +19,12 @@ export default class GraphqlRequestLogger {
             }
         });
 
-        log.trace(`Requested root paths: [${result.join(', ')}]`);
+        log.trace(`GraphQL: [${result.join(', ')}]`);
+    }
+
+    public static logHttp: RequestHandler = (request, _, next) => {
+        log.trace(`HTTP: ${request.method} ${request.path} ${(<AddressInfo>request.socket.address()).address} ${request.headers['user-agent']}`);
+        next();
     }
 }
 
