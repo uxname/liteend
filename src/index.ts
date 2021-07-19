@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 import config from './config/config';
 import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
@@ -15,6 +16,10 @@ import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
 import packageJson from '../package.json';
 import {mocks} from './tools/mocks';
+import {
+    ApolloServerPluginLandingPageDisabled,
+    ApolloServerPluginLandingPageGraphQLPlayground
+} from 'apollo-server-core';
 
 const log = getLogger('server');
 const app = express();
@@ -38,11 +43,9 @@ class CostAnalysisApolloServer extends ApolloServer {
 const server = new CostAnalysisApolloServer({
     typeDefs,
     resolvers,
-    tracing: config.server.graphql.tracing,
     mocks: config.server.graphql.mocksEnabled ? mocks : undefined,
     mockEntireSchema: config.server.graphql.mocksEnabled ? true : undefined,
     introspection: config.server.graphql.introspection,
-    playground: config.server.graphql.playground,
     debug: config.server.graphql.debug,
     formatError: (err) => {
         log.debug(err);
@@ -60,7 +63,20 @@ const server = new CostAnalysisApolloServer({
             }
         }
         return {prisma, user};
-    }
+    },
+    plugins: [
+        config.server.graphql.playground
+            ? ApolloServerPluginLandingPageGraphQLPlayground({
+                settings: {
+                    'tracing.hideTracingResponse': !config.server.graphql.debug,
+                    'queryPlan.hideQueryPlanResponse': !config.server.graphql.debug,
+                    'editor.theme': 'light'
+                }
+            })
+            : ApolloServerPluginLandingPageDisabled(),
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        config.server.graphql.tracing ? require('apollo-tracing').plugin() : {}
+    ]
 });
 
 app.use(RequestLogger.logHttp);
@@ -88,8 +104,13 @@ app.use((req, res, next) => {
     }
 });
 
-server.applyMiddleware({app, path: config.server.graphql.path});
+async function main() {
+    await server.start();
+    server.applyMiddleware({app, path: config.server.graphql.path});
 
-app.listen({port: config.server.port}, () => {
-    log.info(`*** ${packageJson.name} ready at http://0.0.0.0:${config.server.port}${server.graphqlPath} ***`);
-});
+    app.listen({port: config.server.port}, () => {
+        log.info(`*** ${packageJson.name} ready at http://0.0.0.0:${config.server.port}${server.graphqlPath} ***`);
+    });
+}
+
+main();
