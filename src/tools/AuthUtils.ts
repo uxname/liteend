@@ -31,8 +31,9 @@ export class AuthUtils {
     }
 
     static async hash(text: string): Promise<string> {
+        const SALT_ROUNDS = 10;
         return new Promise((resolve, reject) => {
-            bcrypt.hash(text, 10, (err, hash: string) => {
+            bcrypt.hash(text, SALT_ROUNDS, (err, hash: string) => {
                 if (err) {
                     reject(err);
                 }

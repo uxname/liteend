@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import path from 'path';
 
 export default {

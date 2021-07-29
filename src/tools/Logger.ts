@@ -11,6 +11,7 @@ function addWarnings() {
     const log = log4js.getLogger('[console]');
 
     ['trace', 'debug', 'log', 'info', 'warn', 'error'].forEach(method => {
+        // eslint-disable-next-line security/detect-object-injection
         console[method] = (...args) => {
             log.warn(`Console deprecated, use Logger. [${method}]:`, ...args);
         };
