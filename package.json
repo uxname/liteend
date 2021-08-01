@@ -8,8 +8,8 @@
         "node": ">=13.0.0"
     },
     "scripts": {
-        "start": "NODE_ENV=production ts-node src/index.ts",
-        "dev": "ts-node-dev --respawn src/index.ts",
+        "start": "NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true ts-node src/index.ts",
+        "dev": "TS_NODE_TRANSPILE_ONLY=true ts-node-dev --respawn src/index.ts",
         "prisma:deploy": "npx prisma migrate deploy",
         "prisma:create": "npx prisma migrate dev --create-only",
         "prisma:gen": "npx prisma generate",
