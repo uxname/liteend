@@ -1,5 +1,5 @@
 {
-    "name": "LiteEnd",
+    "name": "liteend",
     "version": "1.0.0",
     "main": "src/index.ts",
     "license": "MIT",
@@ -8,8 +8,8 @@
         "node": ">=13.0.0"
     },
     "scripts": {
-        "start": "NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true ts-node src/index.ts",
-        "dev": "TS_NODE_TRANSPILE_ONLY=true ts-node-dev --respawn src/index.ts",
+        "start": "NODE_ENV=production ts-node src/index.ts",
+        "dev": "ts-node-dev --respawn src/index.ts",
         "prisma:deploy": "npx prisma migrate deploy",
         "prisma:create": "npx prisma migrate dev --create-only",
         "prisma:gen": "npx prisma generate",
@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@prisma/client": "^2.28.0",
-        "apollo-server-express": "^3.1.1",
+        "apollo-server-express": "^3.1.2",
         "apollo-tracing": "^0.15.0",
         "bcrypt": "^5.0.1",
         "compression": "^1.7.4",
@@ -40,16 +40,16 @@
         "validate.js": "^0.13.1"
     },
     "devDependencies": {
-        "@graphql-codegen/add": "^2.0.2",
-        "@graphql-codegen/cli": "1.21.8",
-        "@graphql-codegen/introspection": "1.18.2",
-        "@graphql-codegen/typescript": "1.23.0",
-        "@graphql-codegen/typescript-resolvers": "1.20.0",
+        "@graphql-codegen/add": "^3.0.0",
+        "@graphql-codegen/cli": "2.0.1",
+        "@graphql-codegen/introspection": "2.0.0",
+        "@graphql-codegen/typescript": "2.0.0",
+        "@graphql-codegen/typescript-resolvers": "2.0.0",
         "@jetbrains/eslint-config": "^5.3.1",
-        "@types/lodash": "^4.14.171",
-        "@types/node": "^16.4.10",
-        "@typescript-eslint/eslint-plugin": "^4.28.5",
-        "@typescript-eslint/parser": "^4.28.5",
+        "@types/lodash": "^4.14.172",
+        "@types/node": "^16.4.13",
+        "@typescript-eslint/eslint-plugin": "^4.29.0",
+        "@typescript-eslint/parser": "^4.29.0",
         "eslint": "^7.32.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-security": "^1.4.0",

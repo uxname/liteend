@@ -7,8 +7,8 @@ const log = getLogger('query');
 
 const resolvers: Resolvers = {
     Query: {
-        echo: (parent, args, ctx, info) => {
-            log.trace(ctx, info);
+        echo: (parent, args) => {
+            log.trace({args});
             return args.text;
         },
         error: () => {

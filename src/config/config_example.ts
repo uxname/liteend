@@ -81,7 +81,7 @@ export default {
             path: '/graphql',
             introspection: true,
             playground: true,
-            tracing: true,
+            tracing: process.env.NODE_ENV !== 'production',
             mocksEnabled: false,
             debug: process.env.NODE_ENV !== 'production'
         },

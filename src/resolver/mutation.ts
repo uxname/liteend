@@ -9,8 +9,8 @@ const log = getLogger('mutation');
 
 const mutation: Resolvers = {
     Mutation: {
-        echo: (parent, args, ctx, info) => {
-            log.trace(ctx, info);
+        echo: (parent, args) => {
+            log.trace({args});
             return args.text;
         },
         register: async (parent, {username, password}, {prisma}) => {
