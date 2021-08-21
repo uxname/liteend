@@ -11,7 +11,7 @@
         "start": "NODE_ENV=production ts-node src/index.ts",
         "dev": "ts-node-dev --respawn src/index.ts",
         "prisma:deploy": "npx prisma migrate deploy",
-        "prisma:create": "npx prisma migrate dev --create-only",
+        "prisma:create": "npx prisma migrate dev",
         "prisma:gen": "npx prisma generate",
         "prisma:studio": "npx prisma studio --browser none",
         "prisma:format": "npx prisma format",

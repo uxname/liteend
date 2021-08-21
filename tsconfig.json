@@ -6,6 +6,7 @@
         "sourceMap": true,
         "outDir": "dist",
         "resolveJsonModule": true,
+        "skipLibCheck": true
     },
     "lib": [
         "es2015"
