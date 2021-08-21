@@ -37,7 +37,7 @@ export class AuthUtils {
     static async hash(text: string): Promise<string> {
         const SALT_ROUNDS = 10;
         return new Promise((resolve, reject) => {
-            bcrypt.hash(text, SALT_ROUNDS, (err, hash: string) => {
+            bcrypt.hash(text, SALT_ROUNDS, (err: Error | undefined, hash: string) => {
                 if (err) {
                     reject(err);
                 }
@@ -48,7 +48,7 @@ export class AuthUtils {
 
     static async checkHash(params: { hash: string, text: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            bcrypt.compare(params.text, params.hash, (err, result) => {
+            bcrypt.compare(params.text, params.hash, (err: Error | undefined, result: boolean) => {
                 if (err) {
                     reject(err);
                 }
@@ -83,7 +83,7 @@ export class AuthUtils {
                 }
             }
         };
-        Validate.validators.noSpaces = (value): string | null => {
+        Validate.validators.noSpaces = (value: string): string | null => {
             const illegalChars = /\W/; // allow letters, numbers, and underscores
             if (illegalChars.test(value)) {
                 return 'has illegal chars';

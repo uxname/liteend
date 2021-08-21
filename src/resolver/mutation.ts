@@ -60,6 +60,11 @@ const mutation: Resolvers = {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
             const account = await prisma.account.findFirst({where: {id: user.id}});
+
+            if (!account) {
+                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+            }
+
             if (await AuthUtils.checkHash({
                 hash: account.passwordHash,
                 text: password + config.server.salt

@@ -7,7 +7,7 @@ const log = getLogger('graphql_request_logger');
 
 export default class RequestLogger {
     public static logGraphQL(httpRequest: express.Request): void {
-        const result = [];
+        const result: string[] = [];
         const request = graphql.parse(httpRequest.body.query);
         request.definitions.forEach(definition => {
             if ('selectionSet' in definition) {
@@ -25,7 +25,7 @@ export default class RequestLogger {
     public static logHttp: RequestHandler = (request, _, next) => {
         log.trace(`HTTP: ${request.method} ${request.path} ${(<AddressInfo>request.socket.address()).address} ${request.headers['user-agent']}`);
         next();
-    }
+    };
 }
 
 

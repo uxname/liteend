@@ -11,8 +11,10 @@ function addWarnings() {
     const log = log4js.getLogger('[console]');
 
     ['trace', 'debug', 'log', 'info', 'warn', 'error'].forEach(method => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         // eslint-disable-next-line security/detect-object-injection
-        console[method] = (...args) => {
+        console[method] = (...args: unknown[]) => {
             log.warn(`Console deprecated, use Logger. [${method}]:`, ...args);
         };
     });
@@ -37,7 +39,7 @@ export function getLogger(name: string): Logger {
     if (!name) {
         throw Error('Logger name is required');
     }
-    const clusterId = cluster.isMaster ? 'master' : `worker ${cluster.worker.id}`;
+    const clusterId = cluster.isMaster ? 'master' : `worker ${cluster?.worker?.id}`;
     return log4js.getLogger(`[${name}] [${clusterId}]`);
 }
 

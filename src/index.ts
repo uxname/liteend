@@ -6,7 +6,11 @@ import typeDefs from './schema';
 import resolvers from './resolver';
 import {getLogger} from './tools/Logger';
 import rateLimit from 'express-rate-limit';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import costAnalysis from 'graphql-cost-analysis';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -25,7 +29,7 @@ const log = getLogger('server');
 const app = express();
 
 class CostAnalysisApolloServer extends ApolloServer {
-    async createGraphQLServerOptions(req, res) {
+    async createGraphQLServerOptions(req: express.Request, res: express.Response) {
         const options = await super.createGraphQLServerOptions(req, res);
 
         options.validationRules = options.validationRules ? options.validationRules.slice() : [];
@@ -33,7 +37,7 @@ class CostAnalysisApolloServer extends ApolloServer {
             variables: req.body.variables,
             maximumCost: config.server.costAnalysis.maximumCost,
             defaultCost: config.server.costAnalysis.defaultCost,
-            onComplete: (costs) => log.trace(`costs: ${costs} (max: ${config.server.costAnalysis.maximumCost})`)
+            onComplete: (costs: number) => log.trace(`costs: ${costs} (max: ${config.server.costAnalysis.maximumCost})`)
         }));
 
         return options;
@@ -53,7 +57,7 @@ const server = new CostAnalysisApolloServer({
     },
     context: async ({req}) => {
         RequestLogger.logGraphQL(req);
-        let user: SecureJwtUser;
+        let user: SecureJwtUser | null = null;
         const authHeader = req.header('authorization');
         if (authHeader) {
             try {
@@ -92,7 +96,7 @@ app.use((req, res, next) => {
         next();
         return;
     }
-    const ip = req.socket.remoteAddress;
+    const ip: string = req.socket.remoteAddress || 'unknown';
 
     if (config.server.maintenanceMode.allowedHosts.indexOf(ip) >= 0) {
         log.info(`Maintenance mode enabled. Disable it in config. Got request from: [${ip}]`);
