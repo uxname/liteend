@@ -192,3 +192,4 @@ dist
 .idea
 data.sqlite3
 data.sqlite3-journal
+/src/config/config.ts
