@@ -11,7 +11,11 @@ export type SecureJwtUser = {
 
 export class AuthUtils {
     static createJwtToken(user: SecureJwtUser): string {
-        return jwt.sign(user, config.server.jwtSecret, {expiresIn: config.server.jwtExpiresIn, algorithm: 'HS512'});
+        const safeUser: SecureJwtUser = {
+            id: user.id,
+            username: user.username
+        };
+        return jwt.sign(safeUser, config.server.jwtSecret, {expiresIn: config.server.jwtExpiresIn, algorithm: 'HS512'});
     }
 
     static async decodeJwtToken(token: string): Promise<SecureJwtUser> {
