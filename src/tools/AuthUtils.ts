@@ -3,17 +3,18 @@ import config from '../config/config';
 import bcrypt from 'bcrypt';
 import topMostCommonPasswords from './topMostCommonPasswords.json';
 import Validate from 'validate.js';
+import _ from 'lodash';
 
 export type SecureJwtUser = {
     id: number,
-    username: string
+    email: string
 }
 
 export class AuthUtils {
     static createJwtToken(user: SecureJwtUser): string {
         const safeUser: SecureJwtUser = {
             id: user.id,
-            username: user.username
+            email: user.email
         };
         return jwt.sign(safeUser, config.server.jwtSecret, {expiresIn: config.server.jwtExpiresIn, algorithm: 'HS512'});
     }
@@ -27,7 +28,7 @@ export class AuthUtils {
                 } else {
                     resolve({
                         id: decoded.id,
-                        username: decoded.username
+                        email: decoded.email
                     });
                 }
             });
@@ -57,17 +58,10 @@ export class AuthUtils {
         });
     }
 
-    static validateUsernamePassword(params: { username: string, password: string }): string | null {
+    static validateEmailPassword(params: { email: string, password: string }): string | null {
         const constraints = {
-            username: {
-                noSpaces: true,
-                length: {
-                    minimum: 6,
-                    maximum: 32
-                },
-                presence: {
-                    allowEmpty: false
-                }
+            email: {
+                email: true
             },
             password: {
                 presence: {
@@ -93,13 +87,19 @@ export class AuthUtils {
         };
         const valid = Validate.validate(params, constraints);
         if (valid) {
-            if (valid.username) {
-                return valid.username.join(', ');
+            if (valid.email) {
+                return valid.email.join(', ');
             }
             if (valid.password) {
                 return valid.password.join(', ');
             }
         }
         return null;
+    }
+
+    // eslint-disable-next-line no-magic-numbers
+    static generateOneTimeCode(size = 6): string {
+        // eslint-disable-next-line no-magic-numbers
+        return _.random(Math.pow(10, size - 1), Math.pow(10, size) - 1, false).toString();
     }
 }

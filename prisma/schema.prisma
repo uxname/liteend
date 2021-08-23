@@ -15,6 +15,18 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username     String @unique
+  email        String @unique
   passwordHash String
+
+  status String @default("DISABLED")
+}
+
+model EmailCode {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String   @unique
+  code      String
+  expiresAt DateTime
 }

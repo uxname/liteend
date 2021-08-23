@@ -1,6 +1,14 @@
 type Mutation {
     echo(text: String!): String!
-    register(username: String!, password: String!): AuthResult!
-    login(username: String!, password: String!): AuthResult!
+    register(email: String!, password: String!): AuthResult!
+    generateEmailCode(email: String!): GenerateEmailCodeResult!
+    activateAccount(email: String!, code: String!): AuthResult!
+    resetPassword(email: String!, emailCode: String!, newPassword: String!): AuthResult!
+    login(email: String!, password: String!): AuthResult!
     changePassword(password: String!, newPassword: String!): AuthResult!
+}
+
+type GenerateEmailCodeResult {
+    result: Boolean!
+    expiresAt: Date!
 }

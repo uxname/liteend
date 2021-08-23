@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 import config from './config/config';
 import express from 'express';
-import {ApolloServer} from 'apollo-server-express';
+import {ApolloError, ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
 import resolvers from './resolver';
 import {getLogger} from './tools/Logger';
@@ -24,6 +24,7 @@ import {
     ApolloServerPluginLandingPageDisabled,
     ApolloServerPluginLandingPageGraphQLPlayground
 } from 'apollo-server-core';
+import {AccountStatus} from './generated/graphql_api';
 
 const log = getLogger('server');
 const app = express();
@@ -66,6 +67,17 @@ const server = new CostAnalysisApolloServer({
                 log.warn('Decode jwt failed:', authHeader);
             }
         }
+
+        if (user) {
+            const account = await prisma.account.findFirst({where: {id: user.id}});
+            if (!account) {
+                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+            }
+            if (account.status !== AccountStatus.Active) {
+                throw new ApolloError(`Account not active. Current account status: ${account.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
+            }
+        }
+
         return {prisma, user};
     },
     plugins: [
@@ -86,7 +98,7 @@ const server = new CostAnalysisApolloServer({
 app.use(RequestLogger.logHttp);
 app.use(rateLimit(config.server.rateLimit));
 app.use(compression(config.server.compression));
-if (config.server.corsEnabled === true) {
+if (config.server.corsEnabled) {
     app.use(cors());
 }
 

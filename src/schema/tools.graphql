@@ -13,10 +13,16 @@ input CostComplexity {
 
 type Account {
     id: Int!
-    username: String!
+    email: String!
+    status: AccountStatus!
 }
 
 type AuthResult {
     account: Account!
     token: String!
+}
+
+enum AccountStatus {
+    ACTIVE
+    DISABLED
 }
