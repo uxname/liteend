@@ -72,7 +72,7 @@ const mutation: Resolvers = {
                 };
             } catch (e) {
                 log.warn(`Register "${email}" failed:`, e);
-                throw new ApolloError('Register fail, user may be already exists', String(StatusCodes.CONFLICT));
+                throw new ApolloError('Register fail, account may be already exists', String(StatusCodes.CONFLICT));
             }
         },
         generateEmailCode: async (parent, {email}, {prisma}) => {
@@ -145,7 +145,7 @@ const mutation: Resolvers = {
         login: async (parent, {email, password}, {prisma}) => {
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
-                throw new ApolloError('Wrong password or user not found', String(StatusCodes.FORBIDDEN));
+                throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
             }
             if (await AuthUtils.checkHash({
                 hash: account.passwordHash,
@@ -160,30 +160,30 @@ const mutation: Resolvers = {
                     token
                 };
             } else {
-                throw new ApolloError('Wrong password or user not found', String(StatusCodes.FORBIDDEN));
+                throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
             }
         },
-        changePassword: async (parent, {password, newPassword}, {prisma, user}) => {
-            if (!user) {
+        changePassword: async (parent, {password, newPassword}, {prisma, account}) => {
+            if (!account) {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
-            const account = await prisma.account.findFirst({where: {id: user.id}});
+            const accountDb = await prisma.account.findFirst({where: {id: account.id}});
 
-            if (!account) {
+            if (!accountDb) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
 
             if (await AuthUtils.checkHash({
-                hash: account.passwordHash,
+                hash: accountDb.passwordHash,
                 text: password + config.server.salt
             })) {
                 const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
-                await prisma.account.update({where: {id: user.id}, data: {passwordHash}});
-                const token = AuthUtils.createJwtToken(account);
+                await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
+                const token = AuthUtils.createJwtToken(accountDb);
                 return {
                     account: {
-                        ...account,
-                        status: account.status as AccountStatus
+                        ...accountDb,
+                        status: accountDb.status as AccountStatus
                     },
                     token
                 };

@@ -15,12 +15,12 @@ const resolvers: Resolvers = {
         error: () => {
             throw new ApolloError('Some error', StatusCodes.INTERNAL_SERVER_ERROR.toString());
         },
-        whoami: async (parent, args, {user}) => {
-            if (!user) {
+        whoami: async (parent, args, {account}) => {
+            if (!account) {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
 
-            const account = await prisma.account.findFirst({where: {id: user.id}});
+            const account = await prisma.account.findFirst({where: {id: account.id}});
             if (!account) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }

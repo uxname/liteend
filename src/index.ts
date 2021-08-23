@@ -16,7 +16,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import RequestLogger from './tools/RequestLogger';
 import StatusCodes from './tools/StatusCodes';
-import {AuthUtils, SecureJwtUser} from './tools/AuthUtils';
+import {AuthUtils, SecureJwtAccount} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
 import packageJson from '../package.json';
 import {mocks} from './tools/mocks';
@@ -25,6 +25,7 @@ import {
     ApolloServerPluginLandingPageGraphQLPlayground
 } from 'apollo-server-core';
 import {AccountStatus} from './generated/graphql_api';
+import {GraphQLContext} from './IContext';
 
 const log = getLogger('server');
 const app = express();
@@ -56,29 +57,29 @@ const server = new CostAnalysisApolloServer({
         log.debug(err);
         return err;
     },
-    context: async ({req}) => {
+    context: async ({req}): Promise<GraphQLContext> => {
         RequestLogger.logGraphQL(req);
-        let user: SecureJwtUser | null = null;
+        let account: SecureJwtAccount | null = null;
         const authHeader = req.header('authorization');
         if (authHeader) {
             try {
-                user = await AuthUtils.decodeJwtToken(authHeader);
+                account = await AuthUtils.decodeJwtToken(authHeader);
             } catch (e) {
                 log.warn('Decode jwt failed:', authHeader);
             }
         }
 
-        if (user) {
-            const account = await prisma.account.findFirst({where: {id: user.id}});
-            if (!account) {
+        if (account) {
+            const accountDb = await prisma.account.findFirst({where: {id: account.id}});
+            if (!accountDb) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
-            if (account.status !== AccountStatus.Active) {
-                throw new ApolloError(`Account not active. Current account status: ${account.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
+            if (accountDb.status !== AccountStatus.Active) {
+                throw new ApolloError(`Account not active. Current account status: ${accountDb.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
             }
         }
 
-        return {prisma, user};
+        return {prisma, account};
     },
     plugins: [
         config.server.graphql.playground

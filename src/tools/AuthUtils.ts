@@ -5,21 +5,21 @@ import topMostCommonPasswords from './topMostCommonPasswords.json';
 import Validate from 'validate.js';
 import _ from 'lodash';
 
-export type SecureJwtUser = {
+export type SecureJwtAccount = {
     id: number,
     email: string
 }
 
 export class AuthUtils {
-    static createJwtToken(user: SecureJwtUser): string {
-        const safeUser: SecureJwtUser = {
-            id: user.id,
-            email: user.email
+    static createJwtToken(account: SecureJwtAccount): string {
+        const safeAccount: SecureJwtAccount = {
+            id: account.id,
+            email: account.email
         };
-        return jwt.sign(safeUser, config.server.jwtSecret, {expiresIn: config.server.jwtExpiresIn, algorithm: 'HS512'});
+        return jwt.sign(safeAccount, config.server.jwtSecret, {expiresIn: config.server.jwtExpiresIn, algorithm: 'HS512'});
     }
 
-    static async decodeJwtToken(token: string): Promise<SecureJwtUser> {
+    static async decodeJwtToken(token: string): Promise<SecureJwtAccount> {
         return new Promise((resolve, reject) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             jwt.verify(token, config.server.jwtSecret, (err, decoded: any) => {
