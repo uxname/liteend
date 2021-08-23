@@ -108,8 +108,8 @@ export default {
         salt: 'kmpigYcbvjfKUBJvPCEuA43LXWrTb27Qe8Xv5uGuNQ6tyAvYC354VahSKpUR5SkR'
     },
     email: {
-        host: 'smtp.gmail.com',
-        user: 'noreply@gmail.com',
-        password: '123456'
+        host: 'smtp.ethereal.email',
+        user: 'marianne.collier@ethereal.email',
+        password: 'dbsrgD3q13GYBGm11B'
     }
 };

@@ -5,15 +5,26 @@ import StatusCodes from '../tools/StatusCodes';
 import {AuthUtils} from '../tools/AuthUtils';
 import config from '../config/config';
 import {PrismaClient} from '@prisma/client';
+import {Email} from '../tools/Email';
 
 const log = getLogger('mutation');
 
+const emailClient = new Email({host: config.email.host, user: config.email.user, password: config.email.password});
+
 async function createNewEmailCode(email: string, prisma: PrismaClient): Promise<{ result: boolean, expiresAt: Date }> {
-    //todo delete expired codes
-    //todo send code to email
+    await prisma.emailCode.deleteMany({where: {expiresAt: {lt: new Date()}}});
+
     const oneTimeCode = AuthUtils.generateOneTimeCode();
     const ONE_HOUR = 3600000;
     const expiresAt = new Date(new Date().getTime() + ONE_HOUR);
+
+    await emailClient.sendEmail({
+        from: config.email.user,
+        text: oneTimeCode,
+        to: email,
+        subject: 'Code'
+    });
+    log.debug(`Email code sent to: ${email}`);
 
     const result = !!await prisma.emailCode.upsert({
         where: {email},

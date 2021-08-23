@@ -10,10 +10,10 @@ export interface EmailConstructorParams {
 export interface SendEmailParams {
     from: string;
     to: string;
-    bcc: string | undefined;
     subject: string;
     text: string;
-    html: string | undefined;
+    bcc?: string;
+    html?: string;
 }
 
 export class Email {
