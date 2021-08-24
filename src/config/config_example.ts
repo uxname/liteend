@@ -105,7 +105,15 @@ export default {
         },
         jwtSecret: 'pk8xiSKTUPuo78MH562JqggS3Peh4rJydRvAkcAbyKpafPxd3hfk8roctXqXcuQc',
         jwtExpiresIn: 180 * 24 * 60 * 60,
-        salt: 'kmpigYcbvjfKUBJvPCEuA43LXWrTb27Qe8Xv5uGuNQ6tyAvYC354VahSKpUR5SkR'
+        salt: 'kmpigYcbvjfKUBJvPCEuA43LXWrTb27Qe8Xv5uGuNQ6tyAvYC354VahSKpUR5SkR',
+        maxUploadFileSizeBytes: 5 * 1024 * 1024,
+        uploadAllowedFileTypes: [
+            '.jpg',
+            '.jpeg',
+            '.png',
+            '.webp',
+            '.gif'
+        ]
     },
     email: {
         host: 'smtp.ethereal.email',

@@ -20,17 +20,17 @@ const resolvers: Resolvers = {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
 
-            const account = await prisma.account.findFirst({where: {id: account.id}});
-            if (!account) {
+            const accountDb = await prisma.account.findFirst({where: {id: account.id}});
+            if (!accountDb) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
-            if (account.status !== AccountStatus.Active) {
-                throw new ApolloError(`Account not active. Current account status: ${account.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
+            if (accountDb.status !== AccountStatus.Active) {
+                throw new ApolloError(`Account not active. Current account status: ${accountDb.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
             }
 
             return {
-                ...account,
-                status: account.status as AccountStatus
+                ...accountDb,
+                status: accountDb.status as AccountStatus
             };
         }
     }

@@ -30,3 +30,17 @@ model EmailCode {
   code      String
   expiresAt DateTime
 }
+
+model Upload {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  filename         String @unique
+  originalFilename String
+  extension        String
+  size             Int
+  mimetype         String
+
+  uploaderIp String
+}

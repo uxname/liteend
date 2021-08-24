@@ -191,3 +191,5 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 src/generated/**
+uploads
+!uploads/robots.txt

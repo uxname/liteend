@@ -76,3 +76,5 @@ fabric.properties
 data.sqlite3
 data.sqlite3-journal
 telemetry.json
+uploads
+!uploads/robots.txt

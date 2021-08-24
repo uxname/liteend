@@ -26,6 +26,10 @@ import {
 } from 'apollo-server-core';
 import {AccountStatus} from './generated/graphql_api';
 import {GraphQLContext} from './IContext';
+import path from 'path';
+import multer from 'multer';
+import {nanoid} from 'nanoid';
+import {AddressInfo} from 'net';
 
 const log = getLogger('server');
 const app = express();
@@ -120,6 +124,72 @@ app.use((req, res, next) => {
         });
     }
 });
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', 'uploads'));
+    },
+    filename: (req, file, cb) => {
+        const ext = file.originalname.split('.');
+        const RANDOM_SUFFIX_SIZE = 12;
+        cb(null, `${Date.now()}-${nanoid(RANDOM_SUFFIX_SIZE)}.${ext[ext.length - 1]}`);
+    }
+});
+
+const upload = multer({
+    storage,
+    fileFilter(req: Express.Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
+        const fileExt = path.extname(file.originalname).toLowerCase();
+        if (config.server.uploadAllowedFileTypes.indexOf(fileExt) >= 0) {
+            return callback(null, true);
+        } else {
+            return callback(new Error(`Allowed file types to upload: ${config.server.uploadAllowedFileTypes.join(', ')}`));
+        }
+    },
+    limits: {
+        fileSize: config.server.maxUploadFileSizeBytes,
+        fieldSize: config.server.maxUploadFileSizeBytes
+    },
+    dest: path.join(__dirname, '..', 'uploads')
+}).single('file');
+
+app.post('/upload',
+    (req, res) => {
+        upload(req, res, async (err) => {
+            if (err) {
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: 'error',
+                    message: err.message
+                });
+            }
+
+            if (!req?.file) {
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    status: 'error',
+                    message: 'Field "file" not provided'
+                });
+            }
+
+            await prisma.upload.create({
+                data: {
+                    originalFilename: req.file.originalname,
+                    filename: req.file.filename,
+                    size: req.file.size,
+                    mimetype: req.file.mimetype,
+                    extension: path.extname(req.file.originalname).toLowerCase(),
+                    uploaderIp: (<AddressInfo>req.socket.address()).address
+                }
+            });
+
+            return res.status(StatusCodes.OK).json({
+                status: 'ok',
+                filePath: `/uploads/${req.file.filename}`,
+                originalName: req.file.originalname
+            });
+        });
+    }
+);
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 async function main() {
     await server.start();
