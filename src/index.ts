@@ -58,7 +58,8 @@ const server = new CostAnalysisApolloServer({
     introspection: config.server.graphql.introspection,
     debug: config.server.graphql.debug,
     formatError: (err) => {
-        log.debug(err);
+        const SPACES = 2;
+        log.debug(JSON.stringify(err, null, SPACES));
         return err;
     },
     context: async ({req}): Promise<GraphQLContext> => {
