@@ -72,7 +72,7 @@ const mutation: Resolvers = {
                 };
             } catch (e) {
                 log.warn(`Register "${email}" failed:`, e);
-                throw new ApolloError('Register fail, account may be already exists', String(StatusCodes.CONFLICT));
+                throw new ApolloError('Account may be already exists', String(StatusCodes.CONFLICT));
             }
         },
         generateEmailCode: async (parent, {email}, {prisma}) => {
