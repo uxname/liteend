@@ -20,6 +20,8 @@ import {AuthUtils, SecureJwtAccount} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
 import packageJson from '../package.json';
 import {mocks} from './tools/mocks';
+import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
+import {makeExecutableSchema} from '@graphql-tools/schema';
 import {
     ApolloServerPluginLandingPageDisabled,
     ApolloServerPluginLandingPageGraphQLPlayground
@@ -50,11 +52,20 @@ class CostAnalysisApolloServer extends ApolloServer {
     }
 }
 
+let schema = makeExecutableSchema({typeDefs, resolvers});
+
+if (config.server.graphql.mocksEnabled) {
+    const store = createMockStore({schema: schema, mocks});
+    schema = addMocksToSchema({store, schema, mocks});
+
+    const RESET_MOCK_STORE_INTERVAL = 200;
+    setInterval(() => {
+        store.reset();
+    }, RESET_MOCK_STORE_INTERVAL);
+}
+
 const server = new CostAnalysisApolloServer({
-    typeDefs,
-    resolvers,
-    mocks: config.server.graphql.mocksEnabled ? mocks : undefined,
-    mockEntireSchema: config.server.graphql.mocksEnabled ? true : undefined,
+    schema,
     introspection: config.server.graphql.introspection,
     debug: config.server.graphql.debug,
     formatError: (err) => {
