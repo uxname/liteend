@@ -83,6 +83,7 @@ export default {
             playground: true,
             tracing: process.env.NODE_ENV !== 'production',
             mocksEnabled: false,
+            mocksPreserveResolvers: true,
             debug: process.env.NODE_ENV !== 'production'
         },
         costAnalysis: {

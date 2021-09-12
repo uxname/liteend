@@ -55,8 +55,13 @@ class CostAnalysisApolloServer extends ApolloServer {
 let schema = makeExecutableSchema({typeDefs, resolvers});
 
 if (config.server.graphql.mocksEnabled) {
-    const store = createMockStore({schema: schema, mocks});
-    schema = addMocksToSchema({store, schema, mocks});
+    const store = createMockStore({schema, mocks});
+    schema = addMocksToSchema({
+        store,
+        schema,
+        mocks,
+        preserveResolvers: config.server.graphql.mocksPreserveResolvers
+    });
 
     const RESET_MOCK_STORE_INTERVAL = 200;
     setInterval(() => {
