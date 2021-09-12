@@ -5,7 +5,7 @@ export const mocks = {
     Mutation: {
         register: () => {
             return {
-                token: 'test_token_123',
+                token: `test_token_${_.random(999999).toString()}`,
                 account: {
                     id: 4,
                     email: 'test@mail.com',
