@@ -2,6 +2,18 @@
 import _ from 'lodash';
 
 export const mocks = {
+    Mutation: {
+        register: () => {
+            return {
+                token: 'test_token_123',
+                account: {
+                    id: 4,
+                    email: 'test@mail.com',
+                    status: 'ACTIVE'
+                }
+            };
+        }
+    },
     Int: () => _.sample([1111, 2222, 3333, 4444, 1234, 1, 0, -123]),
     Float: () => _.sample([0.123, 1.111, 777.123, -123.456]),
     String: () => _.sample(['Hello world', 'lorem ipsum', 'Just a test string', 'test_str', 'test']),
