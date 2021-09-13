@@ -13,8 +13,13 @@ input CostComplexity {
 
 type Account {
     id: Int!
+    createdAt: Date!
+    updatedAt: Date!
+
     email: String!
     status: AccountStatus!
+
+    sessions: [AccountSession!]
 }
 
 type AuthResult {

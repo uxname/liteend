@@ -1,7 +1,9 @@
 import {PrismaClient} from '@prisma/client';
-import {SecureJwtAccount} from './tools/AuthUtils';
+import express from 'express';
+import {AccountSession} from './generated/graphql_api';
 
 export interface GraphQLContext {
     prisma: PrismaClient;
-    account?: SecureJwtAccount | null;
+    request: express.Request;
+    session?: AccountSession;
 }

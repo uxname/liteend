@@ -3,3 +3,13 @@ type Query {
     error: Int
     whoami: Account!
 }
+
+type AccountSession {
+    id: Int!
+    createdAt:  Date!
+    updatedAt:  Date!
+    account:    Account!
+    ipAddr:     String!
+    userAgent:  String
+    expiresAt:  Date!
+}

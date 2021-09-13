@@ -19,6 +19,8 @@ model Account {
   passwordHash String
 
   status String @default("DISABLED")
+
+  sessions AccountSession[]
 }
 
 model EmailCode {
@@ -43,4 +45,18 @@ model Upload {
   mimetype         String
 
   uploaderIp String
+}
+
+model AccountSession {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId Int
+
+  token     String   @unique
+  ipAddr    String
+  userAgent String?
+  expiresAt DateTime
 }

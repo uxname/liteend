@@ -16,7 +16,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import RequestLogger from './tools/RequestLogger';
 import StatusCodes from './tools/StatusCodes';
-import {AuthUtils, SecureJwtAccount} from './tools/AuthUtils';
 import {prisma} from './tools/Prisma';
 import packageJson from '../package.json';
 import {mocks} from './tools/mocks';
@@ -78,29 +77,40 @@ const server = new CostAnalysisApolloServer({
         log.debug(JSON.stringify(err, null, SPACES));
         return err;
     },
+    // eslint-disable-next-line complexity
     context: async ({req}): Promise<GraphQLContext> => {
         RequestLogger.logGraphQL(req);
-        let account: SecureJwtAccount | null = null;
         const authHeader = req.header('authorization');
-        if (authHeader) {
-            try {
-                account = await AuthUtils.decodeJwtToken(authHeader);
-            } catch (e) {
-                log.warn('Decode jwt failed:', authHeader);
-            }
-        }
 
-        if (account) {
-            const accountDb = await prisma.account.findFirst({where: {id: account.id}});
-            if (!accountDb) {
+        const session = authHeader && await prisma.accountSession.findFirst({
+            where: {token: authHeader},
+            include: {account: true}
+        });
+
+        if (session) {
+            if (!session.account) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
-            if (accountDb.status !== AccountStatus.Active) {
-                throw new ApolloError(`Account not active. Current account status: ${accountDb.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
+            if (session.account.status !== AccountStatus.Active) {
+                throw new ApolloError(`Account not active. Current account status: ${session.account.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
             }
         }
 
-        return {prisma, account};
+        const account = !session ? undefined : {
+            ...session.account,
+            status: session.account.status as AccountStatus,
+            sessions: null
+        };
+
+        return {
+            prisma,
+            request: req,
+            session: !session || !account ? undefined : {
+                ...session,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                account
+            }
+        };
     },
     plugins: [
         config.server.graphql.playground

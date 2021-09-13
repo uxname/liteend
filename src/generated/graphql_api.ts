@@ -17,12 +17,25 @@ export type Scalars = {
   Date: any;
 };
 
-
 export type Account = {
   __typename?: 'Account';
-  id: Scalars['Int'];
+  createdAt: Scalars['Date'];
   email: Scalars['String'];
+  id: Scalars['Int'];
+  sessions?: Maybe<Array<AccountSession>>;
   status: AccountStatus;
+  updatedAt: Scalars['Date'];
+};
+
+export type AccountSession = {
+  __typename?: 'AccountSession';
+  account: Account;
+  createdAt: Scalars['Date'];
+  expiresAt: Scalars['Date'];
+  id: Scalars['Int'];
+  ipAddr: Scalars['String'];
+  updatedAt: Scalars['Date'];
+  userAgent?: Maybe<Scalars['String']>;
 };
 
 export enum AccountStatus {
@@ -37,26 +50,38 @@ export type AuthResult = {
 };
 
 export type CostComplexity = {
-  min?: Maybe<Scalars['Int']>;
   max?: Maybe<Scalars['Int']>;
+  min?: Maybe<Scalars['Int']>;
 };
-
 
 export type GenerateEmailCodeResult = {
   __typename?: 'GenerateEmailCodeResult';
-  result: Scalars['Boolean'];
   expiresAt: Scalars['Date'];
+  result: Scalars['Boolean'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  activateAccount: Scalars['Boolean'];
+  changePassword: Scalars['Boolean'];
   echo: Scalars['String'];
-  register: AuthResult;
   generateEmailCode: GenerateEmailCodeResult;
-  activateAccount: AuthResult;
-  resetPassword: AuthResult;
   login: AuthResult;
-  changePassword: AuthResult;
+  logout: Scalars['Boolean'];
+  register: AuthResult;
+  resetPassword: Scalars['Boolean'];
+};
+
+
+export type MutationActivateAccountArgs = {
+  code: Scalars['String'];
+  email: Scalars['String'];
+};
+
+
+export type MutationChangePasswordArgs = {
+  newPassword: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -65,27 +90,8 @@ export type MutationEchoArgs = {
 };
 
 
-export type MutationRegisterArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
-};
-
-
 export type MutationGenerateEmailCodeArgs = {
   email: Scalars['String'];
-};
-
-
-export type MutationActivateAccountArgs = {
-  email: Scalars['String'];
-  code: Scalars['String'];
-};
-
-
-export type MutationResetPasswordArgs = {
-  email: Scalars['String'];
-  emailCode: Scalars['String'];
-  newPassword: Scalars['String'];
 };
 
 
@@ -95,8 +101,20 @@ export type MutationLoginArgs = {
 };
 
 
-export type MutationChangePasswordArgs = {
+export type MutationLogoutArgs = {
+  sessionId: Scalars['Int'];
+};
+
+
+export type MutationRegisterArgs = {
+  email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationResetPasswordArgs = {
+  email: Scalars['String'];
+  emailCode: Scalars['String'];
   newPassword: Scalars['String'];
 };
 
@@ -183,42 +201,60 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Account: ResolverTypeWrapper<Partial<Account>>;
-  Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
-  String: ResolverTypeWrapper<Partial<Scalars['String']>>;
+  AccountSession: ResolverTypeWrapper<Partial<AccountSession>>;
   AccountStatus: ResolverTypeWrapper<Partial<AccountStatus>>;
   AuthResult: ResolverTypeWrapper<Partial<AuthResult>>;
+  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;
   CostComplexity: ResolverTypeWrapper<Partial<CostComplexity>>;
   Date: ResolverTypeWrapper<Partial<Scalars['Date']>>;
   GenerateEmailCodeResult: ResolverTypeWrapper<Partial<GenerateEmailCodeResult>>;
-  Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;
+  Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
+  String: ResolverTypeWrapper<Partial<Scalars['String']>>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Account: Partial<Account>;
-  Int: Partial<Scalars['Int']>;
-  String: Partial<Scalars['String']>;
+  AccountSession: Partial<AccountSession>;
   AuthResult: Partial<AuthResult>;
+  Boolean: Partial<Scalars['Boolean']>;
   CostComplexity: Partial<CostComplexity>;
   Date: Partial<Scalars['Date']>;
   GenerateEmailCodeResult: Partial<GenerateEmailCodeResult>;
-  Boolean: Partial<Scalars['Boolean']>;
+  Int: Partial<Scalars['Int']>;
   Mutation: {};
   Query: {};
+  String: Partial<Scalars['String']>;
 }>;
 
-export type CostDirectiveArgs = {   multipliers?: Maybe<Array<Maybe<Scalars['String']>>>;
+export type CostDirectiveArgs = {
+  complexity?: Maybe<CostComplexity>;
+  multipliers?: Maybe<Array<Maybe<Scalars['String']>>>;
   useMultipliers?: Maybe<Scalars['Boolean']>;
-  complexity?: Maybe<CostComplexity>; };
+};
 
 export type CostDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = CostDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type AccountResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  sessions?: Resolver<Maybe<Array<ResolversTypes['AccountSession']>>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['AccountStatus'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type AccountSessionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AccountSession'] = ResolversParentTypes['AccountSession']> = ResolversObject<{
+  account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  expiresAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  ipAddr?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -233,19 +269,20 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type GenerateEmailCodeResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GenerateEmailCodeResult'] = ResolversParentTypes['GenerateEmailCodeResult']> = ResolversObject<{
-  result?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   expiresAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  result?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  activateAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationActivateAccountArgs, 'code' | 'email'>>;
+  changePassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'newPassword' | 'password'>>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
-  register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   generateEmailCode?: Resolver<ResolversTypes['GenerateEmailCodeResult'], ParentType, ContextType, RequireFields<MutationGenerateEmailCodeArgs, 'email'>>;
-  activateAccount?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationActivateAccountArgs, 'email' | 'code'>>;
-  resetPassword?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
   login?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  changePassword?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'password' | 'newPassword'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationLogoutArgs, 'sessionId'>>;
+  register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
+  resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -256,6 +293,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
 
 export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   Account?: AccountResolvers<ContextType>;
+  AccountSession?: AccountSessionResolvers<ContextType>;
   AuthResult?: AuthResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   GenerateEmailCodeResult?: GenerateEmailCodeResultResolvers<ContextType>;

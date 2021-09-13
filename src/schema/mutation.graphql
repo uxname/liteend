@@ -2,10 +2,11 @@ type Mutation {
     echo(text: String!): String!
     register(email: String!, password: String!): AuthResult!
     generateEmailCode(email: String!): GenerateEmailCodeResult!
-    activateAccount(email: String!, code: String!): AuthResult!
-    resetPassword(email: String!, emailCode: String!, newPassword: String!): AuthResult!
+    activateAccount(email: String!, code: String!): Boolean!
+    resetPassword(email: String!, emailCode: String!, newPassword: String!): Boolean!
     login(email: String!, password: String!): AuthResult!
-    changePassword(password: String!, newPassword: String!): AuthResult!
+    logout(sessionId: Int!): Boolean!
+    changePassword(password: String!, newPassword: String!): Boolean!
 }
 
 type GenerateEmailCodeResult {

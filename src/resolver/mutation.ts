@@ -4,14 +4,15 @@ import {ApolloError} from 'apollo-server-express';
 import StatusCodes from '../tools/StatusCodes';
 import {AuthUtils} from '../tools/AuthUtils';
 import config from '../config/config';
-import {PrismaClient} from '@prisma/client';
+import * as PrismaClient from '@prisma/client';
 import {Email} from '../tools/Email';
+import express from 'express';
 
 const log = getLogger('mutation');
 
 const emailClient = new Email({host: config.email.host, user: config.email.user, password: config.email.password});
 
-async function createNewEmailCode(email: string, prisma: PrismaClient): Promise<{ result: boolean, expiresAt: Date }> {
+async function createNewEmailCode(email: string, prisma: PrismaClient.PrismaClient): Promise<{ result: boolean, expiresAt: Date }> {
     await prisma.emailCode.deleteMany({where: {expiresAt: {lt: new Date()}}});
 
     const oneTimeCode = AuthUtils.generateOneTimeCode();
@@ -37,13 +38,25 @@ async function createNewEmailCode(email: string, prisma: PrismaClient): Promise<
     };
 }
 
+async function createNewSession(prisma: PrismaClient.PrismaClient, accountId: number, token: string, request: express.Request): Promise<PrismaClient.AccountSession> {
+    return await prisma.accountSession.create({
+        data: {
+            account: {connect: {id: accountId}},
+            token,
+            expiresAt: new Date(new Date().getTime() + config.server.sessionExpiresIn),
+            ipAddr: request.ip,
+            userAgent: request.headers['user-agent']
+        }
+    });
+}
+
 const mutation: Resolvers = {
     Mutation: {
         echo: (parent, args) => {
             log.trace({args});
             return args.text;
         },
-        register: async (parent, {email, password}, {prisma}) => {
+        register: async (parent, {email, password}, {prisma, request}) => {
             const valid = AuthUtils.validateEmailPassword({email, password});
             if (valid) {
                 throw new ApolloError(valid, String(StatusCodes.BAD_REQUEST));
@@ -62,10 +75,21 @@ const mutation: Resolvers = {
                     }
                 });
 
-                const token = AuthUtils.createJwtToken(account);
+                const token = AuthUtils.generateToken();
+                const session = await createNewSession(prisma, account.id, token, request);
+
                 return {
                     account: {
                         ...account,
+                        sessions: [
+                            {
+                                ...session,
+                                account: {
+                                    ...account,
+                                    status: account.status as AccountStatus
+                                }
+                            }
+                        ],
                         status: account.status as AccountStatus
                     },
                     token
@@ -89,7 +113,7 @@ const mutation: Resolvers = {
                 throw new ApolloError('Code not generated', String(StatusCodes.NOT_FOUND));
             }
 
-            let account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
+            const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
@@ -100,16 +124,8 @@ const mutation: Resolvers = {
 
             if (code === emailCode.code) {
                 await prisma.emailCode.delete({where: {email}});
-                account = await prisma.account.update({where: {id: account.id}, data: {status: AccountStatus.Active}});
 
-                const token = AuthUtils.createJwtToken(account);
-                return {
-                    account: {
-                        ...account,
-                        status: account.status as AccountStatus
-                    },
-                    token
-                };
+                return true;
             } else {
                 throw new ApolloError('Wrong code', String(StatusCodes.FORBIDDEN));
             }
@@ -130,19 +146,15 @@ const mutation: Resolvers = {
 
                 const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
                 await prisma.account.update({where: {id: account.id}, data: {passwordHash}});
-                const token = AuthUtils.createJwtToken(account);
-                return {
-                    account: {
-                        ...account,
-                        status: account.status as AccountStatus
-                    },
-                    token
-                };
+
+                return true;
             } else {
                 throw new ApolloError('Wrong code', String(StatusCodes.FORBIDDEN));
             }
         },
-        login: async (parent, {email, password}, {prisma}) => {
+        login: async (parent, {email, password}, {prisma, request}) => {
+            // todo add bruteforce protection
+            // todo add auto remove expired sessions
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
                 throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
@@ -151,10 +163,21 @@ const mutation: Resolvers = {
                 hash: account.passwordHash,
                 text: password + config.server.salt
             })) {
-                const token = AuthUtils.createJwtToken(account);
+                const token = AuthUtils.generateToken();
+                const session = await createNewSession(prisma, account.id, token, request);
+
                 return {
                     account: {
                         ...account,
+                        sessions: [
+                            {
+                                ...session,
+                                account: {
+                                    ...account,
+                                    status: account.status as AccountStatus
+                                }
+                            }
+                        ],
                         status: account.status as AccountStatus
                     },
                     token
@@ -163,11 +186,27 @@ const mutation: Resolvers = {
                 throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
             }
         },
-        changePassword: async (parent, {password, newPassword}, {prisma, account}) => {
-            if (!account) {
+        logout: async (parent, {sessionId}, {prisma, session}) => {
+            if (!session?.account) {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
-            const accountDb = await prisma.account.findFirst({where: {id: account.id}});
+
+            const deletedSessions = await prisma.accountSession.deleteMany({
+                where: {
+                    AND: [
+                        {id: sessionId},
+                        {account: {id: session.account.id}}
+                    ]
+                }
+            });
+
+            return deletedSessions.count > 0;
+        },
+        changePassword: async (parent, {password, newPassword}, {prisma, session}) => {
+            if (!session?.account) {
+                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+            }
+            const accountDb = await prisma.account.findFirst({where: {id: session.account.id}});
 
             if (!accountDb) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
@@ -179,14 +218,7 @@ const mutation: Resolvers = {
             })) {
                 const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
                 await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
-                const token = AuthUtils.createJwtToken(accountDb);
-                return {
-                    account: {
-                        ...accountDb,
-                        status: accountDb.status as AccountStatus
-                    },
-                    token
-                };
+                return true;
             } else {
                 throw new ApolloError('Wrong password', String(StatusCodes.FORBIDDEN));
             }
