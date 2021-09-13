@@ -79,6 +79,7 @@ const server = new CostAnalysisApolloServer({
     },
     // eslint-disable-next-line complexity
     context: async ({req}): Promise<GraphQLContext> => {
+        // todo send signal if need logout (session not found/expired)
         RequestLogger.logGraphQL(req);
         const authHeader = req.header('authorization');
 
