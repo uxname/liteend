@@ -25,7 +25,7 @@ import {
     ApolloServerPluginLandingPageDisabled,
     ApolloServerPluginLandingPageGraphQLPlayground
 } from 'apollo-server-core';
-import {AccountSession, AccountStatus} from './generated/graphql_api';
+import {AccountStatus} from './generated/graphql_api';
 import {GraphQLContext} from './IContext';
 import path from 'path';
 import multer from 'multer';
