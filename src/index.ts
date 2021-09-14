@@ -87,11 +87,7 @@ const server = new CostAnalysisApolloServer({
             include: {account: true}
         });
 
-
         if (session) {
-            console.log('NOW', new Date().getTime());
-            console.log('SESS', session.expiresAt.getTime());
-            console.log('DIFF', new Date().getTime() - session.expiresAt.getTime());
             if (new Date().getTime() > session.expiresAt.getTime()) {
                 throw new ApolloError('Session expired', String(StatusCodes.UNAUTHORIZED));
             }
