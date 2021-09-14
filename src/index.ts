@@ -25,7 +25,7 @@ import {
     ApolloServerPluginLandingPageDisabled,
     ApolloServerPluginLandingPageGraphQLPlayground
 } from 'apollo-server-core';
-import {AccountStatus} from './generated/graphql_api';
+import {AccountSession, AccountStatus} from './generated/graphql_api';
 import {GraphQLContext} from './IContext';
 import path from 'path';
 import multer from 'multer';
@@ -79,7 +79,6 @@ const server = new CostAnalysisApolloServer({
     },
     // eslint-disable-next-line complexity
     context: async ({req}): Promise<GraphQLContext> => {
-        // todo send signal if need logout (session not found/expired)
         RequestLogger.logGraphQL(req);
         const authHeader = req.header('authorization');
 
@@ -88,13 +87,20 @@ const server = new CostAnalysisApolloServer({
             include: {account: true}
         });
 
+
         if (session) {
+            console.log('NOW', new Date().getTime());
+            console.log('SESS', session.expiresAt.getTime());
+            console.log('DIFF', new Date().getTime() - session.expiresAt.getTime());
+            if (new Date().getTime() > session.expiresAt.getTime()) {
+                throw new ApolloError('Session expired', String(StatusCodes.UNAUTHORIZED));
+            }
+
             if (!session.account) {
                 throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
             }
-            if (session.account.status !== AccountStatus.Active) {
-                throw new ApolloError(`Account not active. Current account status: ${session.account.status}`, String(StatusCodes.METHOD_NOT_ALLOWED));
-            }
+        } else if (authHeader) {
+            throw new ApolloError('Session not found', String(StatusCodes.UNAUTHORIZED));
         }
 
         const account = !session ? undefined : {
