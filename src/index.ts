@@ -37,6 +37,10 @@ import geoip, {Lookup} from 'geoip-lite';
 const log = getLogger('server');
 const app = express();
 
+if (config.server.corsEnabled) {
+    app.use(cors());
+}
+
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req: express.Request, res: express.Response) {
         const options = await super.createGraphQLServerOptions(req, res);
@@ -157,9 +161,6 @@ const server = new CostAnalysisApolloServer({
 app.use(RequestLogger.logHttp);
 app.use(rateLimit(config.server.rateLimit));
 app.use(compression(config.server.compression));
-if (config.server.corsEnabled) {
-    app.use(cors());
-}
 
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
