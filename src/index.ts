@@ -187,7 +187,9 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const ext = file.originalname.split('.');
         const RANDOM_SUFFIX_SIZE = 12;
-        cb(null, `${Date.now()}-${nanoid(RANDOM_SUFFIX_SIZE)}.${ext[ext.length - 1]}`);
+        const fileName = `${Date.now()}-${nanoid(RANDOM_SUFFIX_SIZE)}.${ext[ext.length - 1]}`;
+        log.trace(`Upload file "${file.originalname}": ${fileName}`);
+        cb(null, fileName);
     }
 });
 
@@ -196,7 +198,6 @@ const upload = multer({
     fileFilter(req: Express.Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
         const fileExt = path.extname(file.originalname).toLowerCase();
         if (config.server.uploadAllowedFileTypes.indexOf(fileExt) >= 0) {
-            log.trace(`Upload file: ${file.originalname}`);
             return callback(null, true);
         } else {
             return callback(new Error(`Allowed file types to upload: ${config.server.uploadAllowedFileTypes.join(', ')}`));
