@@ -30,12 +30,13 @@ export type Account = {
 export type AccountSession = {
   __typename?: 'AccountSession';
   account: Account;
+  address?: Maybe<Scalars['String']>;
   createdAt: Scalars['Date'];
   expiresAt: Scalars['Date'];
   id: Scalars['Int'];
   ipAddr: Scalars['String'];
   updatedAt: Scalars['Date'];
-  userAgent?: Maybe<Scalars['String']>;
+  userAgent?: Maybe<UserAgent>;
 };
 
 export enum AccountStatus {
@@ -120,6 +121,7 @@ export type MutationResetPasswordArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  currentSession: AccountSession;
   echo: Scalars['String'];
   error?: Maybe<Scalars['Int']>;
   whoami: Account;
@@ -128,6 +130,39 @@ export type Query = {
 
 export type QueryEchoArgs = {
   text: Scalars['String'];
+};
+
+export type UserAgent = {
+  __typename?: 'UserAgent';
+  browser?: Maybe<UserAgentBrowser>;
+  cpu?: Maybe<UserAgentCpu>;
+  engine?: Maybe<UserAgentEngine>;
+  os?: Maybe<UserAgentOs>;
+  ua?: Maybe<Scalars['String']>;
+};
+
+export type UserAgentBrowser = {
+  __typename?: 'UserAgentBrowser';
+  major?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  version?: Maybe<Scalars['String']>;
+};
+
+export type UserAgentCpu = {
+  __typename?: 'UserAgentCpu';
+  architecture?: Maybe<Scalars['String']>;
+};
+
+export type UserAgentEngine = {
+  __typename?: 'UserAgentEngine';
+  name?: Maybe<Scalars['String']>;
+  version?: Maybe<Scalars['String']>;
+};
+
+export type UserAgentOs = {
+  __typename?: 'UserAgentOs';
+  name?: Maybe<Scalars['String']>;
+  version?: Maybe<Scalars['String']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -212,6 +247,11 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Partial<Scalars['String']>>;
+  UserAgent: ResolverTypeWrapper<Partial<UserAgent>>;
+  UserAgentBrowser: ResolverTypeWrapper<Partial<UserAgentBrowser>>;
+  UserAgentCpu: ResolverTypeWrapper<Partial<UserAgentCpu>>;
+  UserAgentEngine: ResolverTypeWrapper<Partial<UserAgentEngine>>;
+  UserAgentOs: ResolverTypeWrapper<Partial<UserAgentOs>>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -227,6 +267,11 @@ export type ResolversParentTypes = ResolversObject<{
   Mutation: {};
   Query: {};
   String: Partial<Scalars['String']>;
+  UserAgent: Partial<UserAgent>;
+  UserAgentBrowser: Partial<UserAgentBrowser>;
+  UserAgentCpu: Partial<UserAgentCpu>;
+  UserAgentEngine: Partial<UserAgentEngine>;
+  UserAgentOs: Partial<UserAgentOs>;
 }>;
 
 export type CostDirectiveArgs = {
@@ -249,12 +294,13 @@ export type AccountResolvers<ContextType = GraphQLContext, ParentType extends Re
 
 export type AccountSessionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AccountSession'] = ResolversParentTypes['AccountSession']> = ResolversObject<{
   account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+  address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   expiresAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   ipAddr?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-  userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  userAgent?: Resolver<Maybe<ResolversTypes['UserAgent']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -286,9 +332,43 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 }>;
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryEchoArgs, 'text'>>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+}>;
+
+export type UserAgentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgent'] = ResolversParentTypes['UserAgent']> = ResolversObject<{
+  browser?: Resolver<Maybe<ResolversTypes['UserAgentBrowser']>, ParentType, ContextType>;
+  cpu?: Resolver<Maybe<ResolversTypes['UserAgentCpu']>, ParentType, ContextType>;
+  engine?: Resolver<Maybe<ResolversTypes['UserAgentEngine']>, ParentType, ContextType>;
+  os?: Resolver<Maybe<ResolversTypes['UserAgentOs']>, ParentType, ContextType>;
+  ua?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserAgentBrowserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentBrowser'] = ResolversParentTypes['UserAgentBrowser']> = ResolversObject<{
+  major?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserAgentCpuResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentCpu'] = ResolversParentTypes['UserAgentCpu']> = ResolversObject<{
+  architecture?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserAgentEngineResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentEngine'] = ResolversParentTypes['UserAgentEngine']> = ResolversObject<{
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserAgentOsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentOs'] = ResolversParentTypes['UserAgentOs']> = ResolversObject<{
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
@@ -299,6 +379,11 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   GenerateEmailCodeResult?: GenerateEmailCodeResultResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  UserAgent?: UserAgentResolvers<ContextType>;
+  UserAgentBrowser?: UserAgentBrowserResolvers<ContextType>;
+  UserAgentCpu?: UserAgentCpuResolvers<ContextType>;
+  UserAgentEngine?: UserAgentEngineResolvers<ContextType>;
+  UserAgentOs?: UserAgentOsResolvers<ContextType>;
 }>;
 
 export type DirectiveResolvers<ContextType = GraphQLContext> = ResolversObject<{

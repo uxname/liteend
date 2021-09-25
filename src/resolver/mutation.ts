@@ -7,6 +7,8 @@ import * as PrismaClient from '@prisma/client';
 import {Email} from '../tools/Email';
 import express from 'express';
 import GraphQLError from '../tools/GraphQLError';
+import uaParse from 'ua-parser-js';
+import geoip from 'geoip-lite';
 
 const log = getLogger('mutation');
 
@@ -80,12 +82,23 @@ const mutation: Resolvers = {
                 const token = AuthUtils.generateToken();
                 const session = await createNewSession(prisma, account.id, token, request);
 
+                const location = geoip.lookup(session.ipAddr);
+                let address = '';
+                if (location) {
+                    address = location.country;
+                    if (location.city.length > 0) {
+                        address = `${address} (${location.city})`;
+                    }
+                }
+
                 return {
                     account: {
                         ...account,
                         sessions: [
                             {
                                 ...session,
+                                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
+                                address: address.length > 0 ? address : undefined,
                                 account: {
                                     ...account,
                                     status: account.status as AccountStatus
@@ -200,12 +213,23 @@ const mutation: Resolvers = {
                 const token = AuthUtils.generateToken();
                 const session = await createNewSession(prisma, account.id, token, request);
 
+                const location = geoip.lookup(session.ipAddr);
+                let address = '';
+                if (location) {
+                    address = location.country;
+                    if (location.city.length > 0) {
+                        address = `${address} (${location.city})`;
+                    }
+                }
+
                 return {
                     account: {
                         ...account,
                         sessions: [
                             {
                                 ...session,
+                                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
+                                address: address.length > 0 ? address : undefined,
                                 account: {
                                     ...account,
                                     status: account.status as AccountStatus

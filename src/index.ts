@@ -31,6 +31,8 @@ import path from 'path';
 import multer from 'multer';
 import {nanoid} from 'nanoid';
 import {AddressInfo} from 'net';
+import uaParse from 'ua-parser-js';
+import geoip, {Lookup} from 'geoip-lite';
 
 const log = getLogger('server');
 const app = express();
@@ -86,7 +88,7 @@ const server = new CostAnalysisApolloServer({
         }
         return err;
     },
-    // eslint-disable-next-line complexity
+    // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
     context: async ({req}): Promise<GraphQLContext> => {
         RequestLogger.logGraphQL(req);
         const authHeader = req.header('authorization');
@@ -114,12 +116,25 @@ const server = new CostAnalysisApolloServer({
             sessions: null
         };
 
+        let location: Lookup | null = null;
+        if (session) {
+            location = geoip.lookup(session.ipAddr || '');
+        }
+        let address = '';
+        if (location) {
+            address = location.country;
+            if (location.city.length > 0) {
+                address = `${address} (${location.city})`;
+            }
+        }
+
         return {
             prisma,
             request: req,
             session: !session || !account ? undefined : {
                 ...session,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
+                address: address.length > 0 ? address : undefined,
                 account
             }
         };

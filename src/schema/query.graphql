@@ -2,6 +2,7 @@ type Query {
     echo(text: String!): String! @cost(complexity: 5)
     error: Int
     whoami: Account!
+    currentSession: AccountSession!
 }
 
 type AccountSession {
@@ -10,6 +11,7 @@ type AccountSession {
     updatedAt:  Date!
     account:    Account!
     ipAddr:     String!
-    userAgent:  String
+    address:    String
+    userAgent:  UserAgent
     expiresAt:  Date!
 }

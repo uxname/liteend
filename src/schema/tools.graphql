@@ -31,3 +31,31 @@ enum AccountStatus {
     ACTIVE
     DISABLED
 }
+
+type UserAgent {
+    ua: String
+    cpu: UserAgentCpu
+    os: UserAgentOs
+    engine: UserAgentEngine
+    browser: UserAgentBrowser
+}
+
+type UserAgentCpu {
+    architecture: String
+}
+
+type UserAgentOs {
+    name: String
+    version: String
+}
+
+type UserAgentEngine {
+    name: String
+    version: String
+}
+
+type UserAgentBrowser {
+    name: String
+    version: String
+    major: String
+}

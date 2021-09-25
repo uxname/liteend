@@ -39,6 +39,13 @@ const resolvers: Resolvers = {
                 ...accountDb,
                 status: accountDb.status as AccountStatus
             };
+        },
+        currentSession: async (parent, args, {session}) => {
+            if (!session) {
+                throw new GraphQLError({message: 'Not found', code: StatusCodes.NOT_FOUND});
+            } else {
+                return session;
+            }
         }
     }
 };
