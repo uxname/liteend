@@ -248,21 +248,38 @@ const mutation: Resolvers = {
                 });
             }
         },
-        logout: async (parent, {sessionId}, {prisma, session}) => {
+        logout: async (parent, {sessionIds}, {prisma, session}) => {
             if (!session?.account) {
                 throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
 
-            const deletedSessions = await prisma.accountSession.deleteMany({
-                where: {
-                    AND: [
-                        {id: sessionId},
-                        {account: {id: session.account.id}}
-                    ]
-                }
-            });
+            let deletedSessions: number;
 
-            return deletedSessions.count > 0;
+            if (sessionIds && sessionIds.length > 0) {
+                deletedSessions = (await prisma.accountSession.deleteMany({
+                    where: {
+                        AND: [
+                            {
+                                OR: sessionIds.map(sessionId => ({
+                                    id: sessionId
+                                }))
+                            },
+                            {account: {id: session.account.id}}
+                        ]
+                    }
+                })).count;
+            } else {
+                deletedSessions = (await prisma.accountSession.deleteMany({
+                    where: {
+                        AND: [
+                            {id: session.id},
+                            {account: {id: session.account.id}}
+                        ]
+                    }
+                })).count;
+            }
+
+            return deletedSessions > 0;
         },
         changePassword: async (parent, {password, newPassword}, {prisma, session}) => {
             if (!session?.account) {

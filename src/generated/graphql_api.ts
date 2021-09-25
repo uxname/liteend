@@ -103,7 +103,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationLogoutArgs = {
-  sessionId: Scalars['Int'];
+  sessionIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 
@@ -326,7 +326,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
   generateEmailCode?: Resolver<ResolversTypes['GenerateEmailCodeResult'], ParentType, ContextType, RequireFields<MutationGenerateEmailCodeArgs, 'email'>>;
   login?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationLogoutArgs, 'sessionId'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationLogoutArgs, never>>;
   register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;

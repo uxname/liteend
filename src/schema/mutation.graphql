@@ -5,7 +5,10 @@ type Mutation {
     activateAccount(email: String!, code: String!): Boolean!
     resetPassword(email: String!, emailCode: String!, newPassword: String!): Boolean!
     login(email: String!, password: String!): AuthResult!
-    logout(sessionId: Int!): Boolean!
+    logout(
+        "List of sessions id. Don't pass for logout all sessions."
+        sessionIds: [Int!]
+    ): Boolean!
     changePassword(password: String!, newPassword: String!): Boolean!
 }
 
