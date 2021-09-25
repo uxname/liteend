@@ -196,6 +196,7 @@ const upload = multer({
     fileFilter(req: Express.Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
         const fileExt = path.extname(file.originalname).toLowerCase();
         if (config.server.uploadAllowedFileTypes.indexOf(fileExt) >= 0) {
+            log.trace(`Upload file: ${file.originalname}`);
             return callback(null, true);
         } else {
             return callback(new Error(`Allowed file types to upload: ${config.server.uploadAllowedFileTypes.join(', ')}`));
