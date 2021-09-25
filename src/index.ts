@@ -73,8 +73,17 @@ const server = new CostAnalysisApolloServer({
     introspection: config.server.graphql.introspection,
     debug: config.server.graphql.debug,
     formatError: (err) => {
+        if (err.extensions?.internalData === undefined) {
+            delete err.extensions?.internalData; // remove "undefined" field from logs
+        }
         const SPACES = 2;
         log.debug(JSON.stringify(err, null, SPACES));
+        if (!config.server.graphql.debug && err.extensions?.stacktrace) {
+            err.extensions.stacktrace = undefined;
+        }
+        if (err.extensions?.internalData) {
+            err.extensions.internalData = undefined;
+        }
         return err;
     },
     // eslint-disable-next-line complexity
@@ -226,7 +235,7 @@ async function main() {
     server.applyMiddleware({app, path: config.server.graphql.path});
 
     app.listen({port: config.server.port}, () => {
-        log.info(`*** ${packageJson.name} ready at http://0.0.0.0:${config.server.port}${server.graphqlPath} ***`);
+        log.info(`*** ${packageJson.name} ready at http://127.0.0.1:${config.server.port}${server.graphqlPath} ***`);
     });
 }
 

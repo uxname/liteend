@@ -1,12 +1,12 @@
 import {AccountStatus, Resolvers} from '../generated/graphql_api';
 import {getLogger} from '../tools/Logger';
-import {ApolloError} from 'apollo-server-express';
 import StatusCodes from '../tools/StatusCodes';
 import {AuthUtils} from '../tools/AuthUtils';
 import config from '../config/config';
 import * as PrismaClient from '@prisma/client';
 import {Email} from '../tools/Email';
 import express from 'express';
+import GraphQLError from '../tools/GraphQLError';
 
 const log = getLogger('mutation');
 
@@ -39,12 +39,14 @@ async function createNewEmailCode(email: string, prisma: PrismaClient.PrismaClie
 }
 
 async function createNewSession(prisma: PrismaClient.PrismaClient, accountId: number, token: string, request: express.Request): Promise<PrismaClient.AccountSession> {
+    const ipAddr: string = request.headers['x-forwarded-for'] ? request.headers['x-forwarded-for'].toString().split(', ')[0] : request.socket.remoteAddress || 'unknown';
+
     return await prisma.accountSession.create({
         data: {
             account: {connect: {id: accountId}},
             token,
             expiresAt: new Date(new Date().getTime() + config.server.sessionExpiresIn),
-            ipAddr: request.ip,
+            ipAddr,
             userAgent: request.headers['user-agent']
         }
     });
@@ -59,7 +61,7 @@ const mutation: Resolvers = {
         register: async (parent, {email, password}, {prisma, request}) => {
             const valid = AuthUtils.validateEmailPassword({email, password});
             if (valid) {
-                throw new ApolloError(valid, String(StatusCodes.BAD_REQUEST));
+                throw new GraphQLError({message: valid, code: StatusCodes.BAD_REQUEST, internalData: {email}});
             }
 
             try {
@@ -94,32 +96,51 @@ const mutation: Resolvers = {
                     },
                     token
                 };
-            } catch (e) {
-                log.warn(`Register "${email}" failed:`, e);
-                throw new ApolloError('Account may be already exists', String(StatusCodes.CONFLICT));
+            } catch (error) {
+                throw new GraphQLError({
+                    message: 'Account may be already exists',
+                    code: StatusCodes.CONFLICT,
+                    internalData: {error}
+                });
             }
         },
         generateEmailCode: async (parent, {email}, {prisma}) => {
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
-                // eslint-disable-next-line sonarjs/no-duplicate-string
-                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({
+                    // eslint-disable-next-line sonarjs/no-duplicate-string
+                    message: 'Account not found',
+                    code: StatusCodes.NOT_FOUND,
+                    internalData: {email}
+                });
             }
             return await createNewEmailCode(email, prisma);
         },
         activateAccount: async (parent, {email, code}, {prisma}) => {
             const emailCode = await prisma.emailCode.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!emailCode) {
-                throw new ApolloError('Code not generated', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({
+                    message: 'Code not generated',
+                    code: StatusCodes.NOT_FOUND,
+                    internalData: {email}
+                });
             }
 
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
-                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({
+                    message: 'Account not found',
+                    code: StatusCodes.NOT_FOUND,
+                    internalData: {email}
+                });
             }
 
             if (account.status === AccountStatus.Active) {
-                throw new ApolloError('Account already active', String(StatusCodes.CONFLICT));
+                throw new GraphQLError({
+                    message: 'Account already active',
+                    code: StatusCodes.CONFLICT,
+                    internalData: {email}
+                });
             }
 
             if (code === emailCode.code) {
@@ -127,19 +148,27 @@ const mutation: Resolvers = {
 
                 return true;
             } else {
-                throw new ApolloError('Wrong code', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({message: 'Wrong code', code: StatusCodes.FORBIDDEN, internalData: {email}});
             }
         },
         resetPassword: async (parent, {email, emailCode, newPassword}, {prisma}) => {
             const emailCodeDb = await prisma.emailCode.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!emailCodeDb) {
-                throw new ApolloError('Code not generated', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({
+                    message: 'Code not generated',
+                    code: StatusCodes.NOT_FOUND,
+                    internalData: {email}
+                });
             }
 
             if (emailCode === emailCodeDb.code) {
                 const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
                 if (!account) {
-                    throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+                    throw new GraphQLError({
+                        message: 'Account not found',
+                        code: StatusCodes.NOT_FOUND,
+                        internalData: {email}
+                    });
                 }
 
                 await prisma.emailCode.delete({where: {email}});
@@ -149,7 +178,7 @@ const mutation: Resolvers = {
 
                 return true;
             } else {
-                throw new ApolloError('Wrong code', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({message: 'Wrong code', code: StatusCodes.FORBIDDEN, internalData: {email}});
             }
         },
         login: async (parent, {email, password}, {prisma, request}) => {
@@ -157,7 +186,13 @@ const mutation: Resolvers = {
             // todo add auto remove expired sessions
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
-                throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({
+                    message: 'Wrong password or account not found',
+                    code: StatusCodes.FORBIDDEN,
+                    internalData: {
+                        email
+                    }
+                });
             }
             if (await AuthUtils.checkHash({
                 hash: account.passwordHash,
@@ -183,12 +218,16 @@ const mutation: Resolvers = {
                     token
                 };
             } else {
-                throw new ApolloError('Wrong password or account not found', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({
+                    message: 'Wrong password or account not found',
+                    code: StatusCodes.FORBIDDEN,
+                    internalData: {email}
+                });
             }
         },
         logout: async (parent, {sessionId}, {prisma, session}) => {
             if (!session?.account) {
-                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
 
             const deletedSessions = await prisma.accountSession.deleteMany({
@@ -204,12 +243,12 @@ const mutation: Resolvers = {
         },
         changePassword: async (parent, {password, newPassword}, {prisma, session}) => {
             if (!session?.account) {
-                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
             const accountDb = await prisma.account.findFirst({where: {id: session.account.id}});
 
             if (!accountDb) {
-                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({message: 'Account not found', code: StatusCodes.NOT_FOUND});
             }
 
             if (await AuthUtils.checkHash({
@@ -220,7 +259,7 @@ const mutation: Resolvers = {
                 await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
                 return true;
             } else {
-                throw new ApolloError('Wrong password', String(StatusCodes.FORBIDDEN));
+                throw new GraphQLError({message: 'Wrong password', code: StatusCodes.FORBIDDEN});
             }
         }
     }
