@@ -237,6 +237,18 @@ async function main() {
     app.listen({port: config.server.port}, () => {
         log.info(`*** ${packageJson.name} ready at http://127.0.0.1:${config.server.port}${server.graphqlPath} ***`);
     });
+
+    const CLEAR_EXPIRED_SESSIONS_INTERVAL = 10000;
+    setInterval(async () => {
+        const deletedSessions = await prisma.accountSession.deleteMany({
+            where: {
+                expiresAt: {lt: new Date()}
+            }
+        });
+        if (deletedSessions.count > 0) {
+            log.debug(`Deleted ${deletedSessions.count} expired sessions`);
+        }
+    }, CLEAR_EXPIRED_SESSIONS_INTERVAL);
 }
 
 main();

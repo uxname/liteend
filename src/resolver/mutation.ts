@@ -183,7 +183,6 @@ const mutation: Resolvers = {
         },
         login: async (parent, {email, password}, {prisma, request}) => {
             // todo add bruteforce protection
-            // todo add auto remove expired sessions
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
                 throw new GraphQLError({
