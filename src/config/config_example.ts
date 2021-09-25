@@ -119,5 +119,6 @@ export default {
         host: 'smtp.ethereal.email',
         user: 'marianne.collier@ethereal.email',
         password: 'dbsrgD3q13GYBGm11B'
-    }
+    },
+    disableRegisterEmailConfirmation: false
 };

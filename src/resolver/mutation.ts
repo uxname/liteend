@@ -67,7 +67,9 @@ const mutation: Resolvers = {
             }
 
             try {
-                await createNewEmailCode(email, prisma);
+                if (!config.disableRegisterEmailConfirmation) {
+                    await createNewEmailCode(email, prisma);
+                }
 
                 const passwordHash = await AuthUtils.hash(password + config.server.salt);
 
@@ -75,7 +77,7 @@ const mutation: Resolvers = {
                     data: {
                         email: email.trim().toLowerCase(),
                         passwordHash,
-                        status: AccountStatus.Disabled
+                        status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
                     }
                 });
 
