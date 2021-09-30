@@ -97,9 +97,9 @@ const server = new CostAnalysisApolloServer({
         RequestLogger.logGraphQL(req);
         let authHeader = req.header('authorization');
 
-        const BEARER_PREFIX = 'Bearer ';
-        if (authHeader?.startsWith(BEARER_PREFIX)) {
-            authHeader = authHeader?.replace(BEARER_PREFIX, '');
+        const BEARER_PREFIX = 'bearer ';
+        if (authHeader?.toLowerCase().startsWith(BEARER_PREFIX)) {
+            authHeader = authHeader?.slice(BEARER_PREFIX.length);
         }
 
         const session = authHeader && await prisma.accountSession.findFirst({
