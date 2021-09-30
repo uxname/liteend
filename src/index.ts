@@ -95,7 +95,12 @@ const server = new CostAnalysisApolloServer({
     // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
     context: async ({req}): Promise<GraphQLContext> => {
         RequestLogger.logGraphQL(req);
-        const authHeader = req.header('authorization');
+        let authHeader = req.header('authorization');
+
+        const BEARER_PREFIX = 'Bearer ';
+        if (authHeader?.startsWith(BEARER_PREFIX)) {
+            authHeader = authHeader?.replace(BEARER_PREFIX, '');
+        }
 
         const session = authHeader && await prisma.accountSession.findFirst({
             where: {token: authHeader},
