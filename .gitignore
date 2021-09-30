@@ -73,8 +73,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 /src/config/config.ts
 .idea/
-data.sqlite3
-data.sqlite3-journal
+data/
 telemetry.json
 uploads
 !uploads/robots.txt

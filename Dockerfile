@@ -1,12 +1,11 @@
-FROM node:14-alpine as base
-
+FROM node:14 as modules
 WORKDIR /app
 COPY package*.json ./
-EXPOSE 4001
-
-FROM base as production
-
 RUN npm i
+
+FROM modules as app
+WORKDIR /app
 COPY . ./
 RUN npm run prisma:gen
+EXPOSE 4000
 CMD ["npm", "start"]

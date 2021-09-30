@@ -176,9 +176,9 @@ web_modules/
 .pnp.*
 
 .idea
-data.sqlite3
-data.sqlite3-journal
+data/
 /src/config/config.ts
 uploads
 !uploads/robots.txt
-
+docker-compose.yml
+Dockerfile
