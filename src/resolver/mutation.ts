@@ -1,4 +1,4 @@
-import {AccountStatus, Resolvers} from '../generated/graphql_api';
+import {AccountStatus, AuthResult, Resolvers} from '../generated/graphql_api';
 import {getLogger} from '../tools/Logger';
 import StatusCodes from '../tools/StatusCodes';
 import {AuthUtils} from '../tools/AuthUtils';
@@ -40,18 +40,56 @@ async function createNewEmailCode(email: string, prisma: PrismaClient.PrismaClie
     };
 }
 
-async function createNewSession(prisma: PrismaClient.PrismaClient, accountId: number, token: string, request: express.Request): Promise<PrismaClient.AccountSession> {
-    const ipAddr: string = request.headers['x-forwarded-for'] ? request.headers['x-forwarded-for'].toString().split(', ')[0] : request.socket.remoteAddress || 'unknown';
+async function createNewSession(input: { prisma: PrismaClient.PrismaClient, accountId: number, token: string, request: express.Request }): Promise<PrismaClient.AccountSession> {
+    const ipAddr: string = input.request.headers['x-forwarded-for'] ? input.request.headers['x-forwarded-for'].toString().split(', ')[0] : input.request.socket.remoteAddress || 'unknown';
 
-    return await prisma.accountSession.create({
+    return await input.prisma.accountSession.create({
         data: {
-            account: {connect: {id: accountId}},
-            token,
+            account: {connect: {id: input.accountId}},
+            token: input.token,
             expiresAt: new Date(new Date().getTime() + config.server.sessionExpiresIn),
             ipAddr,
-            userAgent: request.headers['user-agent']
+            userAgent: input.request.headers['user-agent']
         }
     });
+}
+
+async function generateNewAuth(input: { prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request }): Promise<AuthResult> {
+    const token = AuthUtils.generateToken();
+    const session = await createNewSession({
+        prisma: input.prisma,
+        accountId: input.account.id,
+        token,
+        request: input.request
+    });
+
+    const location = geoip.lookup(session.ipAddr);
+    let address = '';
+    if (location) {
+        address = location.country;
+        if (location.city.length > 0) {
+            address = `${address} (${location.city})`;
+        }
+    }
+
+    return {
+        account: {
+            ...input.account,
+            sessions: [
+                {
+                    ...session,
+                    userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
+                    address: address.length > 0 ? address : undefined,
+                    account: {
+                        ...(input.account),
+                        status: input.account.status as AccountStatus
+                    }
+                }
+            ],
+            status: input.account.status as AccountStatus
+        },
+        token
+    };
 }
 
 const mutation: Resolvers = {
@@ -60,6 +98,7 @@ const mutation: Resolvers = {
             log.trace({args});
             return args.text;
         },
+        // eslint-disable-next-line complexity
         register: async (parent, {email, password}, {prisma, request}) => {
             const valid = AuthUtils.validateEmailPassword({email, password});
             if (valid) {
@@ -81,36 +120,7 @@ const mutation: Resolvers = {
                     }
                 });
 
-                const token = AuthUtils.generateToken();
-                const session = await createNewSession(prisma, account.id, token, request);
-
-                const location = geoip.lookup(session.ipAddr);
-                let address = '';
-                if (location) {
-                    address = location.country;
-                    if (location.city.length > 0) {
-                        address = `${address} (${location.city})`;
-                    }
-                }
-
-                return {
-                    account: {
-                        ...account,
-                        sessions: [
-                            {
-                                ...session,
-                                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
-                                address: address.length > 0 ? address : undefined,
-                                account: {
-                                    ...account,
-                                    status: account.status as AccountStatus
-                                }
-                            }
-                        ],
-                        status: account.status as AccountStatus
-                    },
-                    token
-                };
+                return await generateNewAuth({prisma, account, request});
             } catch (error) {
                 throw new GraphQLError({
                     message: 'Account may be already exists',
@@ -212,36 +222,7 @@ const mutation: Resolvers = {
                 hash: account.passwordHash,
                 text: password + config.server.salt
             })) {
-                const token = AuthUtils.generateToken();
-                const session = await createNewSession(prisma, account.id, token, request);
-
-                const location = geoip.lookup(session.ipAddr);
-                let address = '';
-                if (location) {
-                    address = location.country;
-                    if (location.city.length > 0) {
-                        address = `${address} (${location.city})`;
-                    }
-                }
-
-                return {
-                    account: {
-                        ...account,
-                        sessions: [
-                            {
-                                ...session,
-                                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
-                                address: address.length > 0 ? address : undefined,
-                                account: {
-                                    ...account,
-                                    status: account.status as AccountStatus
-                                }
-                            }
-                        ],
-                        status: account.status as AccountStatus
-                    },
-                    token
-                };
+                return await generateNewAuth({prisma, account, request});
             } else {
                 throw new GraphQLError({
                     message: 'Wrong password or account not found',
