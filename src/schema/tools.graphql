@@ -11,7 +11,13 @@ input CostComplexity {
     max: Int
 }
 
-type Account {
+interface Node {
+    id: Int!
+    createdAt:  Date!
+    updatedAt:  Date!
+}
+
+type Account implements Node {
     id: Int!
     createdAt: Date!
     updatedAt: Date!

@@ -5,7 +5,7 @@ type Query {
     currentSession: AccountSession!
 }
 
-type AccountSession {
+type AccountSession implements Node {
     id: Int!
     createdAt:  Date!
     updatedAt:  Date!

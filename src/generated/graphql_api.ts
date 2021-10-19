@@ -17,7 +17,7 @@ export type Scalars = {
   Date: any;
 };
 
-export type Account = {
+export type Account = Node & {
   __typename?: 'Account';
   createdAt: Scalars['Date'];
   email: Scalars['String'];
@@ -27,7 +27,7 @@ export type Account = {
   updatedAt: Scalars['Date'];
 };
 
-export type AccountSession = {
+export type AccountSession = Node & {
   __typename?: 'AccountSession';
   account: Account;
   address?: Maybe<Scalars['String']>;
@@ -117,6 +117,12 @@ export type MutationResetPasswordArgs = {
   email: Scalars['String'];
   emailCode: Scalars['String'];
   newPassword: Scalars['String'];
+};
+
+export type Node = {
+  createdAt: Scalars['Date'];
+  id: Scalars['Int'];
+  updatedAt: Scalars['Date'];
 };
 
 export type Query = {
@@ -245,6 +251,7 @@ export type ResolversTypes = ResolversObject<{
   GenerateEmailCodeResult: ResolverTypeWrapper<Partial<GenerateEmailCodeResult>>;
   Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
   Mutation: ResolverTypeWrapper<{}>;
+  Node: ResolversTypes['Account'] | ResolversTypes['AccountSession'];
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Partial<Scalars['String']>>;
   UserAgent: ResolverTypeWrapper<Partial<UserAgent>>;
@@ -265,6 +272,7 @@ export type ResolversParentTypes = ResolversObject<{
   GenerateEmailCodeResult: Partial<GenerateEmailCodeResult>;
   Int: Partial<Scalars['Int']>;
   Mutation: {};
+  Node: ResolversParentTypes['Account'] | ResolversParentTypes['AccountSession'];
   Query: {};
   String: Partial<Scalars['String']>;
   UserAgent: Partial<UserAgent>;
@@ -331,6 +339,13 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;
 
+export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'Account' | 'AccountSession', ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+}>;
+
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryEchoArgs, 'text'>>;
@@ -378,6 +393,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   Date?: GraphQLScalarType;
   GenerateEmailCodeResult?: GenerateEmailCodeResultResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Node?: NodeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   UserAgent?: UserAgentResolvers<ContextType>;
   UserAgentBrowser?: UserAgentBrowserResolvers<ContextType>;
