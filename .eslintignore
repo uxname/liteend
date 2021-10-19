@@ -193,3 +193,4 @@ fabric.properties
 src/generated/**
 uploads
 !uploads/robots.txt
+data/

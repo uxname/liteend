@@ -7,7 +7,6 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/app/data:rw
-            - ./logs:/app/logs:rw
             - ./src/config/config.ts:/app/src/config/config.ts:ro
         ports:
             - "4000:4000"

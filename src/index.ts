@@ -187,7 +187,7 @@ app.use((req, res, next) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '..', 'uploads'));
+        cb(null, path.join(__dirname, '..', 'data', 'uploads'));
     },
     filename: (req, file, cb) => {
         const ext = file.originalname.split('.');
@@ -212,7 +212,7 @@ const upload = multer({
         fileSize: config.server.maxUploadFileSizeBytes,
         fieldSize: config.server.maxUploadFileSizeBytes
     },
-    dest: path.join(__dirname, '..', 'uploads')
+    dest: path.join(__dirname, '..', 'data', 'uploads')
 }).single('file');
 
 app.post('/upload',
@@ -251,7 +251,7 @@ app.post('/upload',
         });
     }
 );
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'data', 'uploads')));
 
 async function main() {
     await server.start();

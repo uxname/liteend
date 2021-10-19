@@ -8,49 +8,49 @@ export default {
                 out: {type: 'stdout'},
                 fileOutAll: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/all/logs_all.log'),
+                    filename: path.join(__dirname, '/../../data/logs/all/logs_all.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutTrace: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/trace/logs_trace.log'),
+                    filename: path.join(__dirname, '/../../data/logs/trace/logs_trace.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutDebug: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/debug/logs_debug.log'),
+                    filename: path.join(__dirname, '/../../data/logs/debug/logs_debug.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutInfo: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/info/logs_info.log'),
+                    filename: path.join(__dirname, '/../../data/logs/info/logs_info.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutWarn: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/warn/logs_warn.log'),
+                    filename: path.join(__dirname, '/../../data/logs/warn/logs_warn.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutError: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/error/logs_error.log'),
+                    filename: path.join(__dirname, '/../../data/logs/error/logs_error.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
                 },
                 fileOutFatal: {
                     type: 'file',
-                    filename: path.join(__dirname, '/../../logs/fatal/logs_fatal.log'),
+                    filename: path.join(__dirname, '/../../data/logs/fatal/logs_fatal.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
