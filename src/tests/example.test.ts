@@ -1,8 +1,8 @@
-describe('example tests', () => {
-    test('sum', () => {
-        const a = 1;
-        const b = 2;
-        const res = 3;
-        expect(a + b).toEqual(res);
+describe('Array', () => {
+    describe('#indexOf()', () => {
+        it('should return -1 when the value is not present', () => {
+            // eslint-disable-next-line no-magic-numbers
+            expect([1, 2, 3].indexOf(4)).toEqual(-1);
+        });
     });
 });
