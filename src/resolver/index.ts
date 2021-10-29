@@ -10,13 +10,13 @@ import uaParse from 'ua-parser-js';
 const resolvers: Resolvers = {
     Query: Query.Query,
     Mutation: Mutation.Mutation,
-    Date: new GraphQLScalarType({
+    Date: new GraphQLScalarType<Date, string>({
         name: 'Date',
         parseValue(value) {
-            return new Date(value);
+            return new Date(value as string);
         },
         serialize(value) {
-            return value.toISOString();
+            return (value as Date).toISOString();
         }
     }),
     Account: {

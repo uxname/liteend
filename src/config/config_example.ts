@@ -13,12 +13,23 @@ export default {
                     backups: 100,
                     compress: true
                 },
+                fileOutAllFilter: {
+                    type: 'logLevelFilter',
+                    level: 'trace',
+                    appender: 'fileOutAll'
+                },
                 fileOutTrace: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/trace/logs_trace.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
+                },
+                fileOutTraceFilter: {
+                    type: 'logLevelFilter',
+                    level: 'trace',
+                    maxLevel: 'trace',
+                    appender: 'fileOutTrace'
                 },
                 fileOutDebug: {
                     type: 'file',
@@ -27,12 +38,24 @@ export default {
                     backups: 100,
                     compress: true
                 },
+                fileOutDebugFilter: {
+                    type: 'logLevelFilter',
+                    level: 'debug',
+                    maxLevel: 'debug',
+                    appender: 'fileOutDebug'
+                },
                 fileOutInfo: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/info/logs_info.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
+                },
+                fileOutInfoFilter: {
+                    type: 'logLevelFilter',
+                    level: 'info',
+                    maxLevel: 'info',
+                    appender: 'fileOutInfo'
                 },
                 fileOutWarn: {
                     type: 'file',
@@ -41,6 +64,12 @@ export default {
                     backups: 100,
                     compress: true
                 },
+                fileOutWarnFilter: {
+                    type: 'logLevelFilter',
+                    level: 'warn',
+                    maxLevel: 'warn',
+                    appender: 'fileOutWarn'
+                },
                 fileOutError: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/error/logs_error.log'),
@@ -48,25 +77,37 @@ export default {
                     backups: 100,
                     compress: true
                 },
+                fileOutErrorFilter: {
+                    type: 'logLevelFilter',
+                    level: 'error',
+                    maxLevel: 'error',
+                    appender: 'fileOutError'
+                },
                 fileOutFatal: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/fatal/logs_fatal.log'),
                     maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
                     backups: 100,
                     compress: true
+                },
+                fileOutFatalFilter: {
+                    type: 'logLevelFilter',
+                    level: 'fatal',
+                    maxLevel: 'fatal',
+                    appender: 'fileOutFatal'
                 }
             },
             categories: {
                 default: {
                     appenders: [
                         'out',
-                        'fileOutAll',
-                        'fileOutTrace',
-                        'fileOutDebug',
-                        'fileOutInfo',
-                        'fileOutWarn',
-                        'fileOutError',
-                        'fileOutFatal'
+                        'fileOutAllFilter',
+                        'fileOutTraceFilter',
+                        'fileOutDebugFilter',
+                        'fileOutInfoFilter',
+                        'fileOutWarnFilter',
+                        'fileOutErrorFilter',
+                        'fileOutFatalFilter'
                     ],
                     level: 'trace'
                 }
