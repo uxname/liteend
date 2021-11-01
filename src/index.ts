@@ -33,9 +33,20 @@ import {nanoid} from 'nanoid';
 import {AddressInfo} from 'net';
 import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
+import serveIndex from 'serve-index';
+import basicAuth from 'express-basic-auth';
 
 const log = getLogger('server');
 const app = express();
+const logsDir = path.join(__dirname, '..', 'data', 'logs');
+app.use('/logs',
+    basicAuth({
+        users: config.server.logsServe.users,
+        challenge: true,
+        realm: config.server.logsServe.realm
+    }),
+    express.static(logsDir), serveIndex(logsDir, {icons: true})
+);
 
 if (config.server.corsEnabled) {
     app.use(cors());

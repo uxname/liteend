@@ -3,6 +3,12 @@ import path from 'path';
 
 export default {
     server: {
+        logsServe: {
+            users: {
+                admin: 'MWmkGdyCkHDPpBgkdwrHWGYZ2EdHHFp5rmNGZvxBV8nNQ4svZLBjdM4LvV8bSLde'
+            },
+            realm: 'AT3QknJ48Ku3W2'
+        },
         loggerConfig: {
             appenders: {
                 out: {type: 'stdout'},
