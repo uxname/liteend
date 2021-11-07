@@ -35,6 +35,7 @@ import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
+import {sendStatistic} from './tools/Telemetry';
 
 const log = getLogger('server');
 const app = express();
@@ -283,6 +284,8 @@ async function main() {
             log.debug(`Deleted ${deletedSessions.count} expired sessions`);
         }
     }, CLEAR_EXPIRED_SESSIONS_INTERVAL);
+
+    await sendStatistic();
 }
 
 main();
