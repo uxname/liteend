@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as https from 'https';
 import crypto from 'crypto';
 import os from 'os';
