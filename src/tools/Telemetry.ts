@@ -29,7 +29,7 @@ function getTelemetryData(): ITelemetry {
             arch: os.arch().toString(),
             os: process.platform.toString(),
             nodeVersion: process.version.toString(),
-            signature: `#${crypto.randomBytes(24).toString('hex')}`,
+            signature: `#${crypto.randomBytes(8).toString('hex')}`,
             timestamp: new Date().toISOString()
         };
 
