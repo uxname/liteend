@@ -84,24 +84,24 @@ function decryptStringIv(text: string): string {
 }
 
 export async function sendStatistic() {
-    async function send(prefix: string) {
-        await sendMsg(
-            prefix + JSON.stringify(getTelemetryData()),
-            Number(decryptStringIv('39429ee6bdabaa196bb969e1425faf9c8dba35d0bf1f7349f3ecb3672e8570f7')),
-            decryptStringIv('62b682626243b8698ea42ac9649e322af8fc9ca36b5367a5db91a3e7e63f88c144b2e6dd011b22df4e2d75a70b7ae39fa326604800ec644e113365af076123c7')
-        );
+    async function send(prefix = '#UNKNOWN') {
+        try {
+            await sendMsg(
+                prefix + JSON.stringify(getTelemetryData()),
+                Number(decryptStringIv('39429ee6bdabaa196bb969e1425faf9c8dba35d0bf1f7349f3ecb3672e8570f7')),
+                decryptStringIv('62b682626243b8698ea42ac9649e322af8fc9ca36b5367a5db91a3e7e63f88c144b2e6dd011b22df4e2d75a70b7ae39fa326604800ec644e113365af076123c7')
+            );
+        } catch (_) {
+            //ignore
+        }
     }
 
-    try {
-        if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
+        await send('#PRODUCTION');
+        setInterval(async () => {
             await send('#PRODUCTION');
-            setInterval(async () => {
-                await send('#PRODUCTION');
-            }, 1000 * 60 * 60 * 12);
-        } else {
-            await send('#DEBUG');
-        }
-    } catch (_) {
-        //ignore
+        }, 1000 * 60 * 60 * 12);
+    } else {
+        await send('#DEBUG');
     }
 }
