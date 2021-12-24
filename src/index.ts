@@ -181,7 +181,7 @@ app.use(compression(config.server.compression));
 
 app.use(helmet({contentSecurityPolicy: false}));
 app.use((req, res, next) => {
-    if (!config.server.maintenanceMode.maintenanceModeEnabled) {
+    if (!config.server.maintenanceMode.enabled) {
         next();
         return;
     }
@@ -230,6 +230,8 @@ const upload = multer({
 app.post('/upload',
     (req, res) => {
         upload(req, res, async (err) => {
+            log.trace(`Upload file: ${req.file}`);
+
             if (err) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     status: 'error',

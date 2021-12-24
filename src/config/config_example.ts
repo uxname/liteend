@@ -1,6 +1,9 @@
 /* eslint-disable no-magic-numbers */
 import path from 'path';
 
+const MAX_BACKUP_SIZE = 5 * 1024 * 1024; // maximum size (in bytes) for the log file.
+const MAX_BACKUP_COUNT = 100; // maximum number of log files.
+
 export default {
     server: {
         logsServe: {
@@ -15,8 +18,8 @@ export default {
                 fileOutAll: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/all/logs_all.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutAllFilter: {
@@ -27,8 +30,8 @@ export default {
                 fileOutTrace: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/trace/logs_trace.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutTraceFilter: {
@@ -40,8 +43,8 @@ export default {
                 fileOutDebug: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/debug/logs_debug.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutDebugFilter: {
@@ -53,8 +56,8 @@ export default {
                 fileOutInfo: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/info/logs_info.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutInfoFilter: {
@@ -66,8 +69,8 @@ export default {
                 fileOutWarn: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/warn/logs_warn.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutWarnFilter: {
@@ -79,8 +82,8 @@ export default {
                 fileOutError: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/error/logs_error.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutErrorFilter: {
@@ -92,8 +95,8 @@ export default {
                 fileOutFatal: {
                     type: 'file',
                     filename: path.join(__dirname, '/../../data/logs/fatal/logs_fatal.log'),
-                    maxLogSize: 25 * 1024 * 1024, // maximum size (in bytes) for the log file.
-                    backups: 100,
+                    maxLogSize: MAX_BACKUP_SIZE,
+                    backups: MAX_BACKUP_COUNT,
                     compress: true
                 },
                 fileOutFatalFilter: {
@@ -143,7 +146,7 @@ export default {
         corsEnabled: true,
         port: 4000,
         maintenanceMode: {
-            maintenanceModeEnabled: true,
+            enabled: true,
             message: 'Sorry, we are down for maintenance',
             allowedHosts: [
                 '127.1.0.1',
