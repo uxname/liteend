@@ -178,8 +178,10 @@ const server = new CostAnalysisApolloServer({
 app.use(RequestLogger.logHttp);
 app.use(rateLimit(config.server.rateLimit));
 app.use(compression(config.server.compression));
-
-app.use(helmet({contentSecurityPolicy: false}));
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+}));
 app.use((req, res, next) => {
     if (!config.server.maintenanceMode.enabled) {
         next();
