@@ -273,6 +273,13 @@ async function main() {
     await server.start();
     server.applyMiddleware({app, path: config.server.graphql.path});
 
+    app.use((req, res) => {
+        res.status(StatusCodes.NOT_FOUND).json({
+            status: 'error',
+            message: 'Not found'
+        });
+    });
+
     app.listen({port: config.server.port}, () => {
         log.info(`*** ${packageJson.name} ready at http://127.0.0.1:${config.server.port}${server.graphqlPath} ***`);
     });
