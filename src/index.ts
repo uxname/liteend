@@ -274,6 +274,7 @@ async function main() {
     server.applyMiddleware({app, path: config.server.graphql.path});
 
     // 404 vulnerability https://nvd.nist.gov/vuln/detail/cve-2019-3498
+    // last "app.use" in the middleware chain
     app.use((req, res) => {
         res.status(StatusCodes.NOT_FOUND).json({
             status: 'error',
