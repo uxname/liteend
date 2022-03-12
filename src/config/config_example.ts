@@ -146,7 +146,7 @@ export default {
         corsEnabled: true,
         port: 4000,
         maintenanceMode: {
-            enabled: true,
+            enabled: false,
             message: 'Sorry, we are down for maintenance',
             allowedHosts: [
                 '127.1.0.1',
