@@ -60,3 +60,13 @@ model AccountSession {
   userAgent String?
   expiresAt DateTime
 }
+
+model StatisticItem {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hardwareId    String  @unique
+  walletAddress String?
+  ipAddress     String?
+}

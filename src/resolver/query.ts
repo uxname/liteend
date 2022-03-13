@@ -1,7 +1,6 @@
 import {AccountStatus, Resolvers} from '../generated/graphql_api';
 import {getLogger} from '../tools/Logger';
 import StatusCodes from '../tools/StatusCodes';
-import {prisma} from '../tools/Prisma';
 import GraphQLError from '../tools/GraphQLError';
 
 const log = getLogger('query');
@@ -19,7 +18,7 @@ const resolvers: Resolvers = {
                 internalData: {someData: 777}
             });
         },
-        whoami: async (parent, args, {session}) => {
+        whoami: async (parent, args, {session, prisma}) => {
             if (!session?.account) {
                 throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
@@ -46,6 +45,26 @@ const resolvers: Resolvers = {
             } else {
                 return session;
             }
+        },
+        statisticItems: async (parent, {hardwareId, take, skip}, {prisma, session}) => {
+            const result = await prisma.statisticItem.findMany({
+                where: {
+                    hardwareId
+                },
+                take,
+                skip
+            });
+
+            const total = await prisma.statisticItem.count({
+                where: {
+                    hardwareId
+                }
+            });
+
+            return {
+                items: result,
+                totalCount: total
+            };
         }
     }
 };

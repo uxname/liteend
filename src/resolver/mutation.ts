@@ -99,36 +99,36 @@ const mutation: Resolvers = {
             return args.text;
         },
         // eslint-disable-next-line complexity
-        register: async (parent, {email, password}, {prisma, request}) => {
-            const valid = AuthUtils.validateEmailPassword({email, password});
-            if (valid) {
-                throw new GraphQLError({message: valid, code: StatusCodes.BAD_REQUEST, internalData: {email}});
-            }
-
-            try {
-                if (!config.disableRegisterEmailConfirmation) {
-                    await createNewEmailCode(email, prisma);
-                }
-
-                const passwordHash = await AuthUtils.hash(password + config.server.salt);
-
-                const account = await prisma.account.create({
-                    data: {
-                        email: email.trim().toLowerCase(),
-                        passwordHash,
-                        status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
-                    }
-                });
-
-                return await generateNewAuth({prisma, account, request});
-            } catch (error) {
-                throw new GraphQLError({
-                    message: 'Account may be already exists',
-                    code: StatusCodes.CONFLICT,
-                    internalData: {error}
-                });
-            }
-        },
+        // register: async (parent, {email, password}, {prisma, request}) => {
+        //     const valid = AuthUtils.validateEmailPassword({email, password});
+        //     if (valid) {
+        //         throw new GraphQLError({message: valid, code: StatusCodes.BAD_REQUEST, internalData: {email}});
+        //     }
+        //
+        //     try {
+        //         if (!config.disableRegisterEmailConfirmation) {
+        //             await createNewEmailCode(email, prisma);
+        //         }
+        //
+        //         const passwordHash = await AuthUtils.hash(password + config.server.salt);
+        //
+        //         const account = await prisma.account.create({
+        //             data: {
+        //                 email: email.trim().toLowerCase(),
+        //                 passwordHash,
+        //                 status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
+        //             }
+        //         });
+        //
+        //         return await generateNewAuth({prisma, account, request});
+        //     } catch (error) {
+        //         throw new GraphQLError({
+        //             message: 'Account may be already exists',
+        //             code: StatusCodes.CONFLICT,
+        //             internalData: {error}
+        //         });
+        //     }
+        // },
         generateEmailCode: async (parent, {email}, {prisma}) => {
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
             if (!account) {
@@ -284,6 +284,16 @@ const mutation: Resolvers = {
             } else {
                 throw new GraphQLError({message: 'Wrong password', code: StatusCodes.FORBIDDEN});
             }
+        },
+        provideStatus: async (parent, {hardwareId, walletAddress}, {prisma, request}) => {
+            await prisma.statisticItem.create({
+                data: {
+                    hardwareId,
+                    walletAddress,
+                    ipAddress: request.ip
+                }
+            });
+            return true;
         }
     }
 };

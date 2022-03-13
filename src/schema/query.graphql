@@ -3,6 +3,22 @@ type Query {
     error: Int
     whoami: Account!
     currentSession: AccountSession!
+    statisticItems(hardwareId: String!, take: Int = 100, skip: Int = 0): StatisticItemNodes!
+}
+
+type StatisticItemNodes {
+    items: [StatisticItem]
+    totalCount: Int!
+}
+
+type StatisticItem {
+    id: Int!
+    createdAt:  Date!
+    updatedAt:  Date!
+
+    hardwareId: String!
+    walletAddress: String
+    ipAddress: String
 }
 
 type AccountSession implements Node {

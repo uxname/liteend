@@ -1,6 +1,6 @@
 type Mutation {
     echo(text: String!): String!
-    register(email: String!, password: String!): AuthResult!
+#    register(email: String!, password: String!): AuthResult!
     generateEmailCode(email: String!): GenerateEmailCodeResult!
     activateAccount(email: String!, code: String!): Boolean!
     resetPassword(email: String!, emailCode: String!, newPassword: String!): Boolean!
@@ -10,6 +10,8 @@ type Mutation {
         sessionIds: [Int!]
     ): Boolean!
     changePassword(password: String!, newPassword: String!): Boolean!
+
+    provideStatus(hardwareId: String!, walletAddress: String): Boolean!
 }
 
 type GenerateEmailCodeResult {

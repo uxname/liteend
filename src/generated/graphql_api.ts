@@ -7,7 +7,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -70,7 +70,7 @@ export type Mutation = {
   generateEmailCode: GenerateEmailCodeResult;
   login: AuthResult;
   logout: Scalars['Boolean'];
-  register: AuthResult;
+  provideStatus: Scalars['Boolean'];
   resetPassword: Scalars['Boolean'];
 };
 
@@ -108,9 +108,9 @@ export type MutationLogoutArgs = {
 };
 
 
-export type MutationRegisterArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+export type MutationProvideStatusArgs = {
+  hardwareId: Scalars['String'];
+  walletAddress?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -131,12 +131,36 @@ export type Query = {
   currentSession: AccountSession;
   echo: Scalars['String'];
   error?: Maybe<Scalars['Int']>;
+  statisticItems: StatisticItemNodes;
   whoami: Account;
 };
 
 
 export type QueryEchoArgs = {
   text: Scalars['String'];
+};
+
+
+export type QueryStatisticItemsArgs = {
+  hardwareId: Scalars['String'];
+  skip?: InputMaybe<Scalars['Int']>;
+  take?: InputMaybe<Scalars['Int']>;
+};
+
+export type StatisticItem = {
+  __typename?: 'StatisticItem';
+  createdAt: Scalars['Date'];
+  hardwareId: Scalars['String'];
+  id: Scalars['Int'];
+  ipAddress?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['Date'];
+  walletAddress?: Maybe<Scalars['String']>;
+};
+
+export type StatisticItemNodes = {
+  __typename?: 'StatisticItemNodes';
+  items?: Maybe<Array<Maybe<StatisticItem>>>;
+  totalCount: Scalars['Int'];
 };
 
 export type UserAgent = {
@@ -254,6 +278,8 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<{}>;
   Node: ResolversTypes['Account'] | ResolversTypes['AccountSession'];
   Query: ResolverTypeWrapper<{}>;
+  StatisticItem: ResolverTypeWrapper<Partial<StatisticItem>>;
+  StatisticItemNodes: ResolverTypeWrapper<Partial<StatisticItemNodes>>;
   String: ResolverTypeWrapper<Partial<Scalars['String']>>;
   UserAgent: ResolverTypeWrapper<Partial<UserAgent>>;
   UserAgentBrowser: ResolverTypeWrapper<Partial<UserAgentBrowser>>;
@@ -275,6 +301,8 @@ export type ResolversParentTypes = ResolversObject<{
   Mutation: {};
   Node: ResolversParentTypes['Account'] | ResolversParentTypes['AccountSession'];
   Query: {};
+  StatisticItem: Partial<StatisticItem>;
+  StatisticItemNodes: Partial<StatisticItemNodes>;
   String: Partial<Scalars['String']>;
   UserAgent: Partial<UserAgent>;
   UserAgentBrowser: Partial<UserAgentBrowser>;
@@ -335,8 +363,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
   generateEmailCode?: Resolver<ResolversTypes['GenerateEmailCodeResult'], ParentType, ContextType, RequireFields<MutationGenerateEmailCodeArgs, 'email'>>;
   login?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationLogoutArgs, never>>;
-  register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationLogoutArgs>>;
+  provideStatus?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationProvideStatusArgs, 'hardwareId'>>;
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;
 
@@ -351,7 +379,24 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryEchoArgs, 'text'>>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  statisticItems?: Resolver<ResolversTypes['StatisticItemNodes'], ParentType, ContextType, RequireFields<QueryStatisticItemsArgs, 'hardwareId' | 'skip' | 'take'>>;
   whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
+}>;
+
+export type StatisticItemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StatisticItem'] = ResolversParentTypes['StatisticItem']> = ResolversObject<{
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  hardwareId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  ipAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  walletAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type StatisticItemNodesResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['StatisticItemNodes'] = ResolversParentTypes['StatisticItemNodes']> = ResolversObject<{
+  items?: Resolver<Maybe<Array<Maybe<ResolversTypes['StatisticItem']>>>, ParentType, ContextType>;
+  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UserAgentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgent'] = ResolversParentTypes['UserAgent']> = ResolversObject<{
@@ -396,6 +441,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   Node?: NodeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  StatisticItem?: StatisticItemResolvers<ContextType>;
+  StatisticItemNodes?: StatisticItemNodesResolvers<ContextType>;
   UserAgent?: UserAgentResolvers<ContextType>;
   UserAgentBrowser?: UserAgentBrowserResolvers<ContextType>;
   UserAgentCpu?: UserAgentCpuResolvers<ContextType>;
