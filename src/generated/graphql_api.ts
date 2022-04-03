@@ -7,7 +7,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -16,6 +16,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   Date: any;
+  Json: any;
 };
 
 export type Account = Node & {
@@ -129,14 +130,9 @@ export type Node = {
 export type Query = {
   __typename?: 'Query';
   currentSession: AccountSession;
-  echo: Scalars['String'];
+  debug?: Maybe<Scalars['Json']>;
   error?: Maybe<Scalars['Int']>;
   whoami: Account;
-};
-
-
-export type QueryEchoArgs = {
-  text: Scalars['String'];
 };
 
 export type UserAgent = {
@@ -251,6 +247,7 @@ export type ResolversTypes = ResolversObject<{
   Date: ResolverTypeWrapper<Partial<Scalars['Date']>>;
   GenerateEmailCodeResult: ResolverTypeWrapper<Partial<GenerateEmailCodeResult>>;
   Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
+  Json: ResolverTypeWrapper<Partial<Scalars['Json']>>;
   Mutation: ResolverTypeWrapper<{}>;
   Node: ResolversTypes['Account'] | ResolversTypes['AccountSession'];
   Query: ResolverTypeWrapper<{}>;
@@ -272,6 +269,7 @@ export type ResolversParentTypes = ResolversObject<{
   Date: Partial<Scalars['Date']>;
   GenerateEmailCodeResult: Partial<GenerateEmailCodeResult>;
   Int: Partial<Scalars['Int']>;
+  Json: Partial<Scalars['Json']>;
   Mutation: {};
   Node: ResolversParentTypes['Account'] | ResolversParentTypes['AccountSession'];
   Query: {};
@@ -329,13 +327,17 @@ export type GenerateEmailCodeResultResolvers<ContextType = GraphQLContext, Paren
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
+  name: 'Json';
+}
+
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   activateAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationActivateAccountArgs, 'code' | 'email'>>;
   changePassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'newPassword' | 'password'>>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
   generateEmailCode?: Resolver<ResolversTypes['GenerateEmailCodeResult'], ParentType, ContextType, RequireFields<MutationGenerateEmailCodeArgs, 'email'>>;
   login?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationLogoutArgs, never>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationLogoutArgs>>;
   register?: Resolver<ResolversTypes['AuthResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;
@@ -349,7 +351,7 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
-  echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryEchoArgs, 'text'>>;
+  debug?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
 }>;
@@ -393,6 +395,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   AuthResult?: AuthResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   GenerateEmailCodeResult?: GenerateEmailCodeResultResolvers<ContextType>;
+  Json?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Node?: NodeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

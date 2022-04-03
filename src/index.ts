@@ -4,7 +4,7 @@ import express from 'express';
 import {ApolloError, ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
 import resolvers from './resolver';
-import {getLogger} from './tools/Logger';
+import {getLogger} from './core/Logger';
 import rateLimit from 'express-rate-limit';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,11 +14,11 @@ import costAnalysis from 'graphql-cost-analysis';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import RequestLogger from './tools/RequestLogger';
-import StatusCodes from './tools/StatusCodes';
-import {prisma} from './tools/Prisma';
+import RequestLogger from './core/RequestLogger';
+import StatusCodes from './core/StatusCodes';
+import {prisma} from './core/Prisma';
 import packageJson from '../package.json';
-import {mocks} from './tools/mocks';
+import {mocks} from './core/mocks';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {
@@ -35,7 +35,7 @@ import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
-import {sendStatistic} from './tools/Telemetry';
+import {sendStatistic} from './core/Telemetry';
 
 const log = getLogger('server');
 const app = express();

@@ -3,7 +3,7 @@ import Mutation from './mutation';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
 import {ApolloError} from 'apollo-server-express';
-import StatusCodes from '../tools/StatusCodes';
+import StatusCodes from '../core/StatusCodes';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
 

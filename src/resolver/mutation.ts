@@ -1,12 +1,12 @@
 import {AccountStatus, AuthResult, Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../tools/Logger';
-import StatusCodes from '../tools/StatusCodes';
-import {AuthUtils} from '../tools/AuthUtils';
+import {getLogger} from '../core/Logger';
+import StatusCodes from '../core/StatusCodes';
+import {AuthUtils} from '../core/AuthUtils';
 import config from '../config/config';
 import * as PrismaClient from '@prisma/client';
-import {Email} from '../tools/Email';
+import {Email} from '../core/Email';
 import express from 'express';
-import GraphQLError from '../tools/GraphQLError';
+import GraphQLError from '../core/GraphQLError';
 import uaParse from 'ua-parser-js';
 import geoip from 'geoip-lite';
 

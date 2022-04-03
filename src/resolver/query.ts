@@ -1,16 +1,21 @@
 import {AccountStatus, Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../tools/Logger';
-import StatusCodes from '../tools/StatusCodes';
-import {prisma} from '../tools/Prisma';
-import GraphQLError from '../tools/GraphQLError';
+import {getLogger} from '../core/Logger';
+import StatusCodes from '../core/StatusCodes';
+import {prisma} from '../core/Prisma';
+import GraphQLError from '../core/GraphQLError';
 
 const log = getLogger('query');
 
 const resolvers: Resolvers = {
     Query: {
-        echo: (parent, args) => {
-            log.trace({args});
-            return args.text;
+        debug: () => {
+            log.debug('debug query log');
+            return {
+                appName: 'LiteEnd',
+                appVersion: '1.0.0',
+                serverTime: new Date().toISOString(),
+                uptime: process.uptime()
+            };
         },
         error: () => {
             throw new GraphQLError({

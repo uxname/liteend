@@ -1,4 +1,5 @@
 scalar Date
+scalar Json
 
 directive @cost(
     multipliers: [String],
