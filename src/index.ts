@@ -21,10 +21,7 @@ import packageJson from '../package.json';
 import {mocks} from './core/mocks';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
-import {
-    ApolloServerPluginLandingPageDisabled,
-    ApolloServerPluginLandingPageGraphQLPlayground
-} from 'apollo-server-core';
+import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
 import {AccountStatus} from './generated/graphql_api';
 import {GraphQLContext} from './IContext';
 import path from 'path';
@@ -42,7 +39,23 @@ const app = express();
 const logsDir = path.join(__dirname, '..', 'data', 'logs');
 app.use('/logs',
     basicAuth({
-        users: config.server.logsServe.users,
+        authorizeAsync: true,
+        authorizer: (username, password, cb) => {
+            // eslint-disable-next-line security/detect-object-injection
+            const userFromConfig: string = (config.server.logsServe.users as {[index: string]: string})[username];
+
+            // eslint-disable-next-line security/detect-possible-timing-attacks
+            if (userFromConfig === password) {
+                cb(null, true);
+            } else {
+                // delay 3000 ms to prevent brute force
+                setTimeout(() => {
+                    log.warn(`Failed login attempt from ${username} to logs`);
+                    cb(null, false);
+                    // eslint-disable-next-line no-magic-numbers
+                }, 3000);
+            }
+        },
         challenge: true,
         realm: config.server.logsServe.realm
     }),
