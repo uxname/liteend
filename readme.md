@@ -5,7 +5,7 @@ Simple lightweight GraphQL server on Node.JS which can be used as a basis backen
 
 # Get started
 
-- `git clone https://github.com/uxname/liteend.git`
+- `git clone ...`
 - `npm install`
 - `cp src/config/config_example.ts src/config/config.ts`
     - Edit `config.ts`
