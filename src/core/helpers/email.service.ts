@@ -16,7 +16,7 @@ export interface SendEmailParams {
     html?: string;
 }
 
-export class Email {
+export class EmailService {
     private transporter: Transporter<SMTPTransport.SentMessageInfo>;
 
     constructor({host, user, password}: EmailConstructorParams) {

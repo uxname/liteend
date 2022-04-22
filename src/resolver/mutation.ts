@@ -1,23 +1,23 @@
 import {AccountStatus, AuthResult, Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../core/Logger';
-import StatusCodes from '../core/StatusCodes';
-import {AuthUtils} from '../core/AuthUtils';
+import {getLogger} from '../core/helpers/logger.service';
+import StatusCodes from '../core/helpers/status-codes';
+import {AuthUtilsService} from '../core/helpers/auth-utils.service';
 import config from '../config/config';
 import * as PrismaClient from '@prisma/client';
-import {Email} from '../core/Email';
+import {EmailService} from '../core/helpers/email.service';
 import express from 'express';
-import GraphQLError from '../core/GraphQLError';
+import GraphQLError from '../core/helpers/graphql-error';
 import uaParse from 'ua-parser-js';
 import geoip from 'geoip-lite';
 
 const log = getLogger('mutation');
 
-const emailClient = new Email({host: config.email.host, user: config.email.user, password: config.email.password});
+const emailClient = new EmailService({host: config.email.host, user: config.email.user, password: config.email.password});
 
 async function createNewEmailCode(email: string, prisma: PrismaClient.PrismaClient): Promise<{ result: boolean, expiresAt: Date }> {
     await prisma.emailCode.deleteMany({where: {expiresAt: {lt: new Date()}}});
 
-    const oneTimeCode = AuthUtils.generateOneTimeCode();
+    const oneTimeCode = AuthUtilsService.generateOneTimeCode();
     const ONE_HOUR = 3600000;
     const expiresAt = new Date(new Date().getTime() + ONE_HOUR);
 
@@ -55,7 +55,7 @@ async function createNewSession(input: { prisma: PrismaClient.PrismaClient, acco
 }
 
 async function generateNewAuth(input: { prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request }): Promise<AuthResult> {
-    const token = AuthUtils.generateToken();
+    const token = AuthUtilsService.generateToken();
     const session = await createNewSession({
         prisma: input.prisma,
         accountId: input.account.id,
@@ -100,7 +100,7 @@ const mutation: Resolvers = {
         },
         // eslint-disable-next-line complexity
         register: async (parent, {email, password}, {prisma, request}) => {
-            const valid = AuthUtils.validateEmailPassword({email, password});
+            const valid = AuthUtilsService.validateEmailPassword({email, password});
             if (valid) {
                 throw new GraphQLError({message: valid, code: StatusCodes.BAD_REQUEST, internalData: {email}});
             }
@@ -110,7 +110,7 @@ const mutation: Resolvers = {
                     await createNewEmailCode(email, prisma);
                 }
 
-                const passwordHash = await AuthUtils.hash(password + config.server.salt);
+                const passwordHash = await AuthUtilsService.hash(password + config.server.salt);
 
                 const account = await prisma.account.create({
                     data: {
@@ -198,7 +198,7 @@ const mutation: Resolvers = {
 
                 await prisma.emailCode.delete({where: {email}});
 
-                const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
+                const passwordHash = await AuthUtilsService.hash(newPassword + config.server.salt);
                 await prisma.account.update({where: {id: account.id}, data: {passwordHash}});
 
                 return true;
@@ -218,7 +218,7 @@ const mutation: Resolvers = {
                     }
                 });
             }
-            if (await AuthUtils.checkHash({
+            if (await AuthUtilsService.checkHash({
                 hash: account.passwordHash,
                 text: password + config.server.salt
             })) {
@@ -274,11 +274,11 @@ const mutation: Resolvers = {
                 throw new GraphQLError({message: 'Account not found', code: StatusCodes.NOT_FOUND});
             }
 
-            if (await AuthUtils.checkHash({
+            if (await AuthUtilsService.checkHash({
                 hash: accountDb.passwordHash,
                 text: password + config.server.salt
             })) {
-                const passwordHash = await AuthUtils.hash(newPassword + config.server.salt);
+                const passwordHash = await AuthUtilsService.hash(newPassword + config.server.salt);
                 await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
                 return true;
             } else {

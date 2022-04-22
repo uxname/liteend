@@ -1,8 +1,8 @@
 import {AccountStatus, Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../core/Logger';
-import StatusCodes from '../core/StatusCodes';
-import {prisma} from '../core/Prisma';
-import GraphQLError from '../core/GraphQLError';
+import {getLogger} from '../core/helpers/logger.service';
+import StatusCodes from '../core/helpers/status-codes';
+import {prisma} from '../core/helpers/prisma.service';
+import GraphQLError from '../core/helpers/graphql-error';
 
 const log = getLogger('query');
 

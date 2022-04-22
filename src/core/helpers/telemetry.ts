@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs';
 
-import packageJson from '../../package.json';
+import packageJson from '../../../package.json';
 
 const telemetryFilepath = path.join(__dirname, '..', '..', 'data', 'telemetry.json');
 const telemetryFileExists = fs.existsSync(telemetryFilepath);

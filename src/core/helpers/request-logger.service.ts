@@ -1,11 +1,11 @@
-import {getLogger} from './Logger';
+import {getLogger} from './logger.service';
 import express, {RequestHandler} from 'express';
 import {AddressInfo} from 'net';
 import {Source} from 'graphql/language/source';
 
 const log = getLogger('graphql_request_logger');
 
-export default class RequestLogger {
+export default class RequestLoggerService {
     public static logGraphQL(httpRequest: express.Request): void {
         function logBody(query: string | Source, isMerged: boolean) {
             const isMergedPrefix = isMerged ? ' (merged request)' : '';

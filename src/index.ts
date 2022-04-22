@@ -4,7 +4,7 @@ import express from 'express';
 import {ApolloError, ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
 import resolvers from './resolver';
-import {getLogger} from './core/Logger';
+import {getLogger} from './core/helpers/logger.service';
 import rateLimit from 'express-rate-limit';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,11 +14,11 @@ import costAnalysis from 'graphql-cost-analysis';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import RequestLogger from './core/RequestLogger';
-import StatusCodes from './core/StatusCodes';
-import {prisma} from './core/Prisma';
+import RequestLoggerService from './core/helpers/request-logger.service';
+import StatusCodes from './core/helpers/status-codes';
+import {prisma} from './core/helpers/prisma.service';
 import packageJson from '../package.json';
-import {mocks} from './core/mocks';
+import {mocksService} from './core/helpers/mocks.service';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
@@ -32,7 +32,7 @@ import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
-import {sendStatistic} from './core/Telemetry';
+import {sendStatistic} from './core/helpers/telemetry';
 
 const log = getLogger('server');
 const app = express();
@@ -85,11 +85,11 @@ class CostAnalysisApolloServer extends ApolloServer {
 let schema = makeExecutableSchema({typeDefs, resolvers});
 
 if (config.server.graphql.mocksEnabled) {
-    const store = createMockStore({schema, mocks});
+    const store = createMockStore({schema, mocks: mocksService});
     schema = addMocksToSchema({
         store,
         schema,
-        mocks,
+        mocks: mocksService,
         preserveResolvers: config.server.graphql.mocksPreserveResolvers
     });
 
@@ -119,7 +119,7 @@ const server = new CostAnalysisApolloServer({
     },
     // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
     context: async ({req}): Promise<GraphQLContext> => {
-        RequestLogger.logGraphQL(req);
+        RequestLoggerService.logGraphQL(req);
         let authHeader = req.header('authorization');
 
         const BEARER_PREFIX = 'bearer ';
@@ -188,7 +188,7 @@ const server = new CostAnalysisApolloServer({
     ]
 });
 
-app.use(RequestLogger.logHttp);
+app.use(RequestLoggerService.logHttp);
 app.use(rateLimit(config.server.rateLimit));
 app.use(compression(config.server.compression));
 app.use(helmet({

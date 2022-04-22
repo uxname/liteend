@@ -1,5 +1,5 @@
 import {ApolloError} from 'apollo-server-express';
-import config from '../config/config';
+import config from '../../config/config';
 
 export default class GraphQLError extends ApolloError {
     constructor({

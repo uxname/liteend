@@ -1,5 +1,5 @@
 import log4js, {Logger} from 'log4js';
-import config from '../config/config';
+import config from '../../config/config';
 import cluster from 'cluster';
 
 log4js.configure(config.server.loggerConfig);

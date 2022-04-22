@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers,@typescript-eslint/explicit-module-boundary-types */
 import _ from 'lodash';
 
-export const mocks = {
+export const mocksService = {
     Mutation: {
         register: () => {
             return {

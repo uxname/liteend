@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
-import topMostCommonPasswords from './topMostCommonPasswords.json';
+import topMostCommonPasswords from './top-most-common-passwords.json';
 import Validate from 'validate.js';
 import _ from 'lodash';
 import {nanoid} from 'nanoid';
 
-export class AuthUtils {
+export class AuthUtilsService {
     static generateToken(): string {
         const TOKEN_SIZE = 48;
         return nanoid(TOKEN_SIZE);
