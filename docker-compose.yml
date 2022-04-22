@@ -10,3 +10,4 @@ services:
             - ./src/config/config.ts:/app/src/config/config.ts:ro
         ports:
             - "4000:4000"
+            - "5555:5555"
