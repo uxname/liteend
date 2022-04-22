@@ -16,6 +16,7 @@ Simple lightweight GraphQL server on Node.JS which can be used as a basis backen
 # Database workflow
 
 - Change schema: `prisma/schema.prisma`
+- Format schema: `npm run prisma:format`
 - Create migration: `npm run prisma:create`
 - Deploy migration to database: `npm run prisma:deploy`
 
