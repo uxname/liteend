@@ -189,7 +189,14 @@ export type LoginAccountMutationVariables = Exact<{
 }>;
 
 
-export type LoginAccountMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResult', token: string, account: { __typename?: 'Account', id: number, email: string, status: AccountStatus } } };
+export type LoginAccountMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResult', token: string, account: { __typename?: 'Account', id: number, email: string, status: AccountStatus, sessions?: Array<{ __typename?: 'AccountSession', id: number }> | null } } };
+
+export type LogoutAccountMutationVariables = Exact<{
+  sessionIds?: InputMaybe<Array<Scalars['Int']> | Scalars['Int']>;
+}>;
+
+
+export type LogoutAccountMutation = { __typename?: 'Mutation', logout: boolean };
 
 
 export const MyEchoDocument = gql`
@@ -217,8 +224,16 @@ export const LoginAccountDocument = gql`
       id
       email
       status
+      sessions {
+        id
+      }
     }
   }
+}
+    `;
+export const LogoutAccountDocument = gql`
+    mutation LogoutAccount($sessionIds: [Int!]) {
+  logout(sessionIds: $sessionIds)
 }
     `;
 
@@ -237,6 +252,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     LoginAccount(variables: LoginAccountMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LoginAccountMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<LoginAccountMutation>(LoginAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LoginAccount', 'mutation');
+    },
+    LogoutAccount(variables?: LogoutAccountMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LogoutAccountMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<LogoutAccountMutation>(LogoutAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LogoutAccount', 'mutation');
     }
   };
 }

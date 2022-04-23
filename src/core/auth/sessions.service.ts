@@ -1,6 +1,6 @@
 import * as PrismaClient from '@prisma/client';
 import express from 'express';
-import {AccountSession, AccountStatus, AuthResult} from '../../generated/graphql_api';
+import {AccountStatus, AuthResult} from '../../generated/graphql_api';
 import {AuthUtilsService} from '../common/auth-utils.service';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
@@ -82,33 +82,14 @@ export class SessionsService {
         };
     }
 
-    // todo change signature to take sessionIds: number[] only
-    static async deleteSessions(session: AccountSession, sessionIds: Array<number> | null | undefined) : Promise<boolean> {
-        let deletedSessions: number;
-
-        if (sessionIds && sessionIds.length > 0) {
-            deletedSessions = (await prisma.accountSession.deleteMany({
-                where: {
-                    AND: [
-                        {
-                            OR: sessionIds.map(sessionId => ({
-                                id: sessionId
-                            }))
-                        },
-                        {account: {id: session.account.id}}
-                    ]
-                }
-            })).count;
-        } else {
-            deletedSessions = (await prisma.accountSession.deleteMany({
-                where: {
-                    AND: [
-                        {id: session.id},
-                        {account: {id: session.account.id}}
-                    ]
-                }
-            })).count;
-        }
+    static async deleteSessions(sessionIds: number[]): Promise<boolean> {
+        const deletedSessions = (await prisma.accountSession.deleteMany({
+            where: {
+                OR: sessionIds.map(sessionId => ({
+                    id: sessionId
+                }))
+            }
+        })).count;
 
         return deletedSessions > 0;
     }

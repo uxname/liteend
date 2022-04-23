@@ -20,6 +20,13 @@ mutation LoginAccount($email: String!, $password: String!) {
             id
             email
             status
+            sessions {
+                id
+            }
         }
     }
+}
+
+mutation LogoutAccount($sessionIds: [Int!]) {
+    logout(sessionIds: $sessionIds)
 }

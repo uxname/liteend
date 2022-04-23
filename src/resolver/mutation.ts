@@ -72,7 +72,9 @@ const mutation: Resolvers = {
         logout: async (parent, {sessionIds}, {session}) => {
             AuthGuard.assertIfNotAuthenticated(session);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return await SessionsService.deleteSessions(session!, sessionIds);
+            await AuthGuard.assertIfSessionsNotOwned(session!.id, sessionIds || [session!.id]);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return await SessionsService.deleteSessions(sessionIds || [session!.id]);
         },
         changePassword: async (parent, {password, newPassword}, {session}) => {
             AuthGuard.assertIfNotAuthenticated(session);

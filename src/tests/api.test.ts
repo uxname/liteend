@@ -59,4 +59,37 @@ describe('API Tests', () => {
         await prisma.accountSession.deleteMany({where: {account: {email}}});
         await prisma.account.delete({where: {email}});
     });
+
+    test('Should logout account', async () => {
+        const email = `test${Math.random()}@test.com`;
+        const password = 'test123456!';
+        const result = await api.RegisterAccount({email, password});
+
+        const loginResult = await api.LoginAccount({
+            email: result.register.account.email,
+            password
+        });
+
+        const sessionCountBeforeLogout = await prisma.accountSession.count({where: {account: {email}}});
+        const logoutResult = await api.LogoutAccount({}, {
+            Authorization: `Bearer ${result.register.token}`
+        });
+
+        expect(logoutResult.logout).toBeTruthy();
+        const sessionCountAfterLogout = await prisma.accountSession.count({where: {account: {email}}});
+        expect(sessionCountAfterLogout).toEqual(sessionCountBeforeLogout - 1);
+
+        await api.LogoutAccount({
+            sessionIds: [loginResult.login.account.sessions![0].id]
+        }, {
+            Authorization: `Bearer ${loginResult.login.token}`
+        });
+
+        const sessionCountAfterLogoutWithParameters = await prisma.accountSession.count({where: {account: {email}}});
+
+        expect(sessionCountAfterLogoutWithParameters).toEqual(0);
+
+        await prisma.accountSession.deleteMany({where: {account: {email}}});
+        await prisma.account.delete({where: {email}});
+    });
 });
