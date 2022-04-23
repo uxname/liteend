@@ -175,10 +175,50 @@ export type MyEchoMutationVariables = Exact<{
 
 export type MyEchoMutation = { __typename?: 'Mutation', echo: string };
 
+export type RegisterAccountMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type RegisterAccountMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthResult', token: string, account: { __typename?: 'Account', id: number, email: string, status: AccountStatus } } };
+
+export type LoginAccountMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginAccountMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResult', token: string, account: { __typename?: 'Account', id: number, email: string, status: AccountStatus } } };
+
 
 export const MyEchoDocument = gql`
     mutation MyEcho($text: String!) {
   echo(text: $text)
+}
+    `;
+export const RegisterAccountDocument = gql`
+    mutation RegisterAccount($email: String!, $password: String!) {
+  register(email: $email, password: $password) {
+    token
+    account {
+      id
+      email
+      status
+    }
+  }
+}
+    `;
+export const LoginAccountDocument = gql`
+    mutation LoginAccount($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    token
+    account {
+      id
+      email
+      status
+    }
+  }
 }
     `;
 
@@ -191,6 +231,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     MyEcho(variables: MyEchoMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<MyEchoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<MyEchoMutation>(MyEchoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'MyEcho', 'mutation');
+    },
+    RegisterAccount(variables: RegisterAccountMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RegisterAccountMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RegisterAccountMutation>(RegisterAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'RegisterAccount', 'mutation');
+    },
+    LoginAccount(variables: LoginAccountMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LoginAccountMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<LoginAccountMutation>(LoginAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LoginAccount', 'mutation');
     }
   };
 }

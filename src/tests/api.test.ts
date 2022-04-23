@@ -2,6 +2,8 @@
 import {GraphQLClient} from 'graphql-request';
 import {getSdk, Sdk} from './graphql/generated/gql_tests';
 import config from '../config/config';
+import {prisma} from '../core/common/prisma.service';
+import * as console from 'console';
 
 describe('API Tests', () => {
     let client: GraphQLClient;
@@ -16,5 +18,45 @@ describe('API Tests', () => {
         const text = 'Hello World';
         const result = await api.MyEcho({text});
         expect(result.echo).toEqual(text);
+    });
+
+    test('Should reject register with weak password', async () => {
+        const email = `test${Math.random()}@test.com`;
+        const password = '123';
+        try {
+            const result = await api.RegisterAccount({email, password});
+            console.debug(result);
+        } catch (e) {
+            const err = e as Error;
+            expect(err.message).toContain('too short');
+        }
+    });
+
+    test('Should register new account', async () => {
+        const email = `test${Math.random()}@test.com`;
+        const password = 'test123456!';
+        const result = await api.RegisterAccount({email, password});
+
+        expect(result.register.token).not.toBeNull();
+        expect(result.register.account.email).toEqual(email);
+
+        await prisma.accountSession.deleteMany({where: {token: result.register.token}});
+        await prisma.account.delete({where: {email}});
+    });
+
+    test('Should login account', async () => {
+        const email = `test${Math.random()}@test.com`;
+        const password = 'test123456!';
+        const result = await api.RegisterAccount({email, password});
+
+        const loginResult = await api.LoginAccount({
+            email: result.register.account.email,
+            password
+        });
+        expect(loginResult.login.token).not.toBeNull();
+        expect(loginResult.login.account.email).toEqual(email);
+
+        await prisma.accountSession.deleteMany({where: {account: {email}}});
+        await prisma.account.delete({where: {email}});
     });
 });
