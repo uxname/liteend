@@ -4,6 +4,7 @@ import StatusCodes from '../core/common/status-codes';
 import GraphQLError from '../core/common/graphql-error';
 import {AccountService} from '../core/auth/account.service';
 import {AppInfoService} from '../core/app-info.service';
+import {AuthGuard} from './guard/auth.guard';
 
 const log = getLogger('query');
 
@@ -22,13 +23,12 @@ const resolvers: Resolvers = {
             });
         },
         whoami: async (parent, args, {session}) => {
-            if (!session?.account) {
-                throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
-            }
-
-            return await AccountService.getAccount(session.account.id);
+            AuthGuard.assertIfNotAuthenticated(session);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return await AccountService.getAccount(session!.account.id);
         },
         currentSession: async (parent, args, {session}) => {
+            AuthGuard.assertIfNotAuthenticated(session);
             if (!session) {
                 throw new GraphQLError({message: 'Not found', code: StatusCodes.NOT_FOUND});
             } else {

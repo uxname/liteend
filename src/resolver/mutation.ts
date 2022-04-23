@@ -6,6 +6,7 @@ import config from '../config/config';
 import GraphQLError from '../core/common/graphql-error';
 import {SessionsService} from '../core/auth/sessions.service';
 import {AccountService} from '../core/auth/account.service';
+import {AuthGuard} from './guard/auth.guard';
 
 const log = getLogger('mutation');
 
@@ -69,17 +70,14 @@ const mutation: Resolvers = {
             }
         },
         logout: async (parent, {sessionIds}, {session}) => {
-            if (!session?.account) {
-                throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
-            }
-
-            return await SessionsService.deleteSessions(session, sessionIds);
+            AuthGuard.assertIfNotAuthenticated(session);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return await SessionsService.deleteSessions(session!, sessionIds);
         },
         changePassword: async (parent, {password, newPassword}, {session}) => {
-            if (!session?.account) {
-                throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
-            }
-            return await AccountService.changePassword(session.account.id, password, newPassword);
+            AuthGuard.assertIfNotAuthenticated(session);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return await AccountService.changePassword(session!.account.id, password, newPassword);
         }
     }
 };

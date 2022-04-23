@@ -2,9 +2,8 @@ import Query from './query';
 import Mutation from './mutation';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
-import {ApolloError} from 'apollo-server-express';
-import StatusCodes from '../core/common/status-codes';
 import {AccountService} from '../core/auth/account.service';
+import {AuthGuard} from './guard/auth.guard';
 
 const resolvers: Resolvers = {
     Query: Query.Query,
@@ -24,15 +23,10 @@ const resolvers: Resolvers = {
                 return parent.sessions;
             }
 
-            if (!session?.account) {
-                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
-            }
+            AuthGuard.assertIfNotAuthenticated(session);
 
-            if (!parent.id) {
-                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
-            }
-
-            return await AccountService.getSessions(parent.id);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return await AccountService.getSessions(parent.id!);
         }
     }
 };
