@@ -3,9 +3,8 @@ import Mutation from './mutation';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
 import {ApolloError} from 'apollo-server-express';
-import StatusCodes from '../core/helpers/status-codes';
-import geoip from 'geoip-lite';
-import uaParse from 'ua-parser-js';
+import StatusCodes from '../core/common/status-codes';
+import {AccountService} from '../core/auth/account.service';
 
 const resolvers: Resolvers = {
     Query: Query.Query,
@@ -20,7 +19,7 @@ const resolvers: Resolvers = {
         }
     }),
     Account: {
-        sessions: async (parent, args, {prisma, session}) => {
+        sessions: async (parent, args, {session}) => {
             if (parent.sessions) {
                 return parent.sessions;
             }
@@ -29,22 +28,11 @@ const resolvers: Resolvers = {
                 throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
             }
 
-            const sessions = await prisma.accountSession.findMany({where: {account: {id: parent.id}}});
-            return sessions.map(currentSession => {
-                const location = geoip.lookup(currentSession.ipAddr);
-                let address = '';
-                if (location) {
-                    address = location.country;
-                    if (location.city.length > 0) {
-                        address = `${address} (${location.city})`;
-                    }
-                }
-                return ({
-                    ...currentSession,
-                    userAgent: !currentSession.userAgent ? undefined : uaParse(currentSession.userAgent),
-                    address: address.length > 0 ? address : undefined
-                });
-            });
+            if (!parent.id) {
+                throw new ApolloError('Forbidden', String(StatusCodes.FORBIDDEN));
+            }
+
+            return await AccountService.getSessions(parent.id);
         }
     }
 };

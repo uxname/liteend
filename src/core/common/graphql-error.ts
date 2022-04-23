@@ -7,7 +7,7 @@ export default class GraphQLError extends ApolloError {
         code,
         extension,
         internalData
-    }: { message: string, code?: number, extension?: Record<string, unknown>, internalData?: Record<string, unknown> }) {
+    }: {message: string, code?: number, extension?: Record<string, unknown>, internalData?: Record<string, unknown>}) {
         const extensionRes = extension || {};
 
         if (!config.server.graphql.debug) {

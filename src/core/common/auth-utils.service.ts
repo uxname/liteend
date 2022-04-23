@@ -22,7 +22,7 @@ export class AuthUtilsService {
         });
     }
 
-    static async checkHash(params: { hash: string, text: string }): Promise<boolean> {
+    static async checkHash(params: {hash: string, text: string}): Promise<boolean> {
         return new Promise((resolve, reject) => {
             bcrypt.compare(params.text, params.hash, (err: Error | undefined, result: boolean) => {
                 if (err) {
@@ -33,7 +33,7 @@ export class AuthUtilsService {
         });
     }
 
-    static validateEmailPassword(params: { email: string, password: string }): string | null {
+    static validateEmailPassword(params: {email: string, password: string}): string | null {
         const constraints = {
             email: {
                 email: true

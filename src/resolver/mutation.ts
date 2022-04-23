@@ -1,96 +1,13 @@
-import {AccountStatus, AuthResult, Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../core/helpers/logger.service';
-import StatusCodes from '../core/helpers/status-codes';
-import {AuthUtilsService} from '../core/helpers/auth-utils.service';
+import {Resolvers} from '../generated/graphql_api';
+import {getLogger} from '../core/common/logger.service';
+import StatusCodes from '../core/common/status-codes';
+import {AuthUtilsService} from '../core/common/auth-utils.service';
 import config from '../config/config';
-import * as PrismaClient from '@prisma/client';
-import {EmailService} from '../core/helpers/email.service';
-import express from 'express';
-import GraphQLError from '../core/helpers/graphql-error';
-import uaParse from 'ua-parser-js';
-import geoip from 'geoip-lite';
+import GraphQLError from '../core/common/graphql-error';
+import {SessionsService} from '../core/auth/sessions.service';
+import {AccountService} from '../core/auth/account.service';
 
 const log = getLogger('mutation');
-
-const emailClient = new EmailService({host: config.email.host, user: config.email.user, password: config.email.password});
-
-async function createNewEmailCode(email: string, prisma: PrismaClient.PrismaClient): Promise<{ result: boolean, expiresAt: Date }> {
-    await prisma.emailCode.deleteMany({where: {expiresAt: {lt: new Date()}}});
-
-    const oneTimeCode = AuthUtilsService.generateOneTimeCode();
-    const ONE_HOUR = 3600000;
-    const expiresAt = new Date(new Date().getTime() + ONE_HOUR);
-
-    await emailClient.sendEmail({
-        from: config.email.user,
-        text: oneTimeCode,
-        to: email,
-        subject: 'Code'
-    });
-    log.debug(`Email code sent to: ${email}`);
-
-    const result = !!await prisma.emailCode.upsert({
-        where: {email},
-        create: {code: oneTimeCode, email, expiresAt},
-        update: {code: oneTimeCode, email, expiresAt}
-    });
-    return {
-        result,
-        expiresAt
-    };
-}
-
-async function createNewSession(input: { prisma: PrismaClient.PrismaClient, accountId: number, token: string, request: express.Request }): Promise<PrismaClient.AccountSession> {
-    const ipAddr: string = input.request.headers['x-forwarded-for'] ? input.request.headers['x-forwarded-for'].toString().split(', ')[0] : input.request.socket.remoteAddress || 'unknown';
-
-    return await input.prisma.accountSession.create({
-        data: {
-            account: {connect: {id: input.accountId}},
-            token: input.token,
-            expiresAt: new Date(new Date().getTime() + config.server.sessionExpiresIn),
-            ipAddr,
-            userAgent: input.request.headers['user-agent']
-        }
-    });
-}
-
-async function generateNewAuth(input: { prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request }): Promise<AuthResult> {
-    const token = AuthUtilsService.generateToken();
-    const session = await createNewSession({
-        prisma: input.prisma,
-        accountId: input.account.id,
-        token,
-        request: input.request
-    });
-
-    const location = geoip.lookup(session.ipAddr);
-    let address = '';
-    if (location) {
-        address = location.country;
-        if (location.city.length > 0) {
-            address = `${address} (${location.city})`;
-        }
-    }
-
-    return {
-        account: {
-            ...input.account,
-            sessions: [
-                {
-                    ...session,
-                    userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
-                    address: address.length > 0 ? address : undefined,
-                    account: {
-                        ...(input.account),
-                        status: input.account.status as AccountStatus
-                    }
-                }
-            ],
-            status: input.account.status as AccountStatus
-        },
-        token
-    };
-}
 
 const mutation: Resolvers = {
     Mutation: {
@@ -98,7 +15,6 @@ const mutation: Resolvers = {
             log.trace({args});
             return args.text;
         },
-        // eslint-disable-next-line complexity
         register: async (parent, {email, password}, {prisma, request}) => {
             const valid = AuthUtilsService.validateEmailPassword({email, password});
             if (valid) {
@@ -107,20 +23,11 @@ const mutation: Resolvers = {
 
             try {
                 if (!config.disableRegisterEmailConfirmation) {
-                    await createNewEmailCode(email, prisma);
+                    await SessionsService.createNewEmailCode(email);
                 }
+                const account = await AccountService.createAccount({password, email});
 
-                const passwordHash = await AuthUtilsService.hash(password + config.server.salt);
-
-                const account = await prisma.account.create({
-                    data: {
-                        email: email.trim().toLowerCase(),
-                        passwordHash,
-                        status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
-                    }
-                });
-
-                return await generateNewAuth({prisma, account, request});
+                return await SessionsService.generateNewAuth({prisma, account, request});
             } catch (error) {
                 throw new GraphQLError({
                     message: 'Account may be already exists',
@@ -129,83 +36,13 @@ const mutation: Resolvers = {
                 });
             }
         },
-        generateEmailCode: async (parent, {email}, {prisma}) => {
-            const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
-            if (!account) {
-                throw new GraphQLError({
-                    // eslint-disable-next-line sonarjs/no-duplicate-string
-                    message: 'Account not found',
-                    code: StatusCodes.NOT_FOUND,
-                    internalData: {email}
-                });
-            }
-            return await createNewEmailCode(email, prisma);
-        },
-        activateAccount: async (parent, {email, code}, {prisma}) => {
-            const emailCode = await prisma.emailCode.findFirst({where: {email: email.trim().toLowerCase()}});
-            if (!emailCode) {
-                throw new GraphQLError({
-                    message: 'Code not generated',
-                    code: StatusCodes.NOT_FOUND,
-                    internalData: {email}
-                });
-            }
-
-            const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
-            if (!account) {
-                throw new GraphQLError({
-                    message: 'Account not found',
-                    code: StatusCodes.NOT_FOUND,
-                    internalData: {email}
-                });
-            }
-
-            if (account.status === AccountStatus.Active) {
-                throw new GraphQLError({
-                    message: 'Account already active',
-                    code: StatusCodes.CONFLICT,
-                    internalData: {email}
-                });
-            }
-
-            if (code === emailCode.code) {
-                await prisma.emailCode.delete({where: {email}});
-
-                return true;
-            } else {
-                throw new GraphQLError({message: 'Wrong code', code: StatusCodes.FORBIDDEN, internalData: {email}});
-            }
-        },
-        resetPassword: async (parent, {email, emailCode, newPassword}, {prisma}) => {
-            const emailCodeDb = await prisma.emailCode.findFirst({where: {email: email.trim().toLowerCase()}});
-            if (!emailCodeDb) {
-                throw new GraphQLError({
-                    message: 'Code not generated',
-                    code: StatusCodes.NOT_FOUND,
-                    internalData: {email}
-                });
-            }
-
-            if (emailCode === emailCodeDb.code) {
-                const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
-                if (!account) {
-                    throw new GraphQLError({
-                        message: 'Account not found',
-                        code: StatusCodes.NOT_FOUND,
-                        internalData: {email}
-                    });
-                }
-
-                await prisma.emailCode.delete({where: {email}});
-
-                const passwordHash = await AuthUtilsService.hash(newPassword + config.server.salt);
-                await prisma.account.update({where: {id: account.id}, data: {passwordHash}});
-
-                return true;
-            } else {
-                throw new GraphQLError({message: 'Wrong code', code: StatusCodes.FORBIDDEN, internalData: {email}});
-            }
-        },
+        generateEmailCode: async (parent, {email}) => AccountService.generateEmailCode(email),
+        activateAccount: async (parent, {email, code}) => AccountService.activate({email, code}),
+        resetPassword: async (parent, {email, emailCode, newPassword}) => AccountService.resetPassword({
+            email,
+            emailCode,
+            newPassword
+        }),
         login: async (parent, {email, password}, {prisma, request}) => {
             // todo add bruteforce protection
             const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
@@ -222,7 +59,7 @@ const mutation: Resolvers = {
                 hash: account.passwordHash,
                 text: password + config.server.salt
             })) {
-                return await generateNewAuth({prisma, account, request});
+                return await SessionsService.generateNewAuth({prisma, account, request});
             } else {
                 throw new GraphQLError({
                     message: 'Wrong password or account not found',
@@ -231,59 +68,18 @@ const mutation: Resolvers = {
                 });
             }
         },
-        logout: async (parent, {sessionIds}, {prisma, session}) => {
+        logout: async (parent, {sessionIds}, {session}) => {
             if (!session?.account) {
                 throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
 
-            let deletedSessions: number;
-
-            if (sessionIds && sessionIds.length > 0) {
-                deletedSessions = (await prisma.accountSession.deleteMany({
-                    where: {
-                        AND: [
-                            {
-                                OR: sessionIds.map(sessionId => ({
-                                    id: sessionId
-                                }))
-                            },
-                            {account: {id: session.account.id}}
-                        ]
-                    }
-                })).count;
-            } else {
-                deletedSessions = (await prisma.accountSession.deleteMany({
-                    where: {
-                        AND: [
-                            {id: session.id},
-                            {account: {id: session.account.id}}
-                        ]
-                    }
-                })).count;
-            }
-
-            return deletedSessions > 0;
+            return await SessionsService.deleteSessions(session, sessionIds);
         },
-        changePassword: async (parent, {password, newPassword}, {prisma, session}) => {
+        changePassword: async (parent, {password, newPassword}, {session}) => {
             if (!session?.account) {
                 throw new GraphQLError({message: 'Forbidden', code: StatusCodes.FORBIDDEN});
             }
-            const accountDb = await prisma.account.findFirst({where: {id: session.account.id}});
-
-            if (!accountDb) {
-                throw new GraphQLError({message: 'Account not found', code: StatusCodes.NOT_FOUND});
-            }
-
-            if (await AuthUtilsService.checkHash({
-                hash: accountDb.passwordHash,
-                text: password + config.server.salt
-            })) {
-                const passwordHash = await AuthUtilsService.hash(newPassword + config.server.salt);
-                await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
-                return true;
-            } else {
-                throw new GraphQLError({message: 'Wrong password', code: StatusCodes.FORBIDDEN});
-            }
+            return await AccountService.changePassword(session.account.id, password, newPassword);
         }
     }
 };

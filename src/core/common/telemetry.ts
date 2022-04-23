@@ -1,14 +1,14 @@
 /* eslint-disable */
-import * as https from 'https';
-import crypto from 'crypto';
-import os from 'os';
-import path from 'path';
-import fs from 'fs';
+import * as https from 'https'
+import crypto from 'crypto'
+import os from 'os'
+import path from 'path'
+import fs from 'fs'
 
-import packageJson from '../../../package.json';
+import packageJson from '../../../package.json'
 
-const telemetryFilepath = path.join(__dirname, '..', '..', 'data', 'telemetry.json');
-const telemetryFileExists = fs.existsSync(telemetryFilepath);
+const telemetryFilepath = path.join(__dirname, '..', '..', 'data', 'telemetry.json')
+const telemetryFileExists = fs.existsSync(telemetryFilepath)
 
 interface ITelemetry {
     product: string;
@@ -20,7 +20,7 @@ interface ITelemetry {
     timestamp: string;
 }
 
-const p = 'PaQHW7znR2BdPNJFMvk9UyQMqQ9J2quU';
+const p = 'PaQHW7znR2BdPNJFMvk9UyQMqQ9J2quU'
 
 function getTelemetryData(): ITelemetry {
     if (!telemetryFileExists) {
@@ -32,12 +32,12 @@ function getTelemetryData(): ITelemetry {
             nodeVersion: process.version.toString(),
             signature: `#${crypto.randomBytes(8).toString('hex')}`,
             timestamp: new Date().toISOString()
-        };
+        }
 
-        fs.writeFileSync(telemetryFilepath, JSON.stringify(telemetry, null, 4));
+        fs.writeFileSync(telemetryFilepath, JSON.stringify(telemetry, null, 4))
     }
 
-    return require(telemetryFilepath);
+    return require(telemetryFilepath)
 }
 
 async function sendMsg(m: string, c: number, t: string) {
@@ -50,38 +50,38 @@ async function sendMsg(m: string, c: number, t: string) {
             headers: {
                 'Content-Type': 'application/json'
             }
-        };
+        }
 
         const req = https.request(options, (res) => {
             res.on('data', (d) => {
-                resolve(d);
-            });
-        });
+                resolve(d)
+            })
+        })
 
         req.on('error', (e) => {
-            reject(e);
-        });
+            reject(e)
+        })
 
-        req.end();
-    });
+        req.end()
+    })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function encryptStringIv(text: string): string {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', p, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + encrypted;
+    const iv = crypto.randomBytes(16)
+    const cipher = crypto.createCipheriv('aes-256-cbc', p, iv)
+    let encrypted = cipher.update(text, 'utf8', 'hex')
+    encrypted += cipher.final('hex')
+    return iv.toString('hex') + encrypted
 }
 
 function decryptStringIv(text: string): string {
-    const iv = Buffer.from(text.slice(0, 32), 'hex');
-    const encryptedText = text.slice(32);
-    const decipher = crypto.createDecipheriv('aes-256-cbc', p, iv);
-    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    const iv = Buffer.from(text.slice(0, 32), 'hex')
+    const encryptedText = text.slice(32)
+    const decipher = crypto.createDecipheriv('aes-256-cbc', p, iv)
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+    return decrypted
 }
 
 export async function sendStatistic() {
@@ -91,18 +91,18 @@ export async function sendStatistic() {
                 prefix + JSON.stringify(getTelemetryData()),
                 Number(decryptStringIv('39429ee6bdabaa196bb969e1425faf9c8dba35d0bf1f7349f3ecb3672e8570f7')),
                 decryptStringIv('62b682626243b8698ea42ac9649e322af8fc9ca36b5367a5db91a3e7e63f88c144b2e6dd011b22df4e2d75a70b7ae39fa326604800ec644e113365af076123c7')
-            );
+            )
         } catch (_) {
             //ignore
         }
     }
 
     if (process.env.NODE_ENV === 'production') {
-        await send('#PRODUCTION');
+        await send('#PRODUCTION')
         setInterval(async () => {
-            await send('#PRODUCTION');
-        }, 1000 * 60 * 60 * 12);
+            await send('#PRODUCTION')
+        }, 1000 * 60 * 60 * 12)
     } else {
-        await send('#DEBUG');
+        await send('#DEBUG')
     }
 }
