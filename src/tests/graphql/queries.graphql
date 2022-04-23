@@ -1,0 +1,3 @@
+mutation MyEcho($text: String!) {
+    echo(text: $text)
+}

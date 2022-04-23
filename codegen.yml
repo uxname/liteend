@@ -15,3 +15,15 @@ generates:
             contextType: GraphQLContext
             useIndexSignature: true
             defaultMapper: Partial<{T}>
+    src/tests/graphql/generated/gql_tests.ts:
+        documents: 'src/tests/graphql/*.graphql'
+        schema:
+            - 'src/schema/*.graphql'
+        plugins:
+            - typescript
+            - typescript-operations
+            - typescript-graphql-request
+            - add:
+                  content:
+                      - "/* eslint-disable */"
+                      - "// @ts-nocheck"
