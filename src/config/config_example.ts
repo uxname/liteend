@@ -123,8 +123,8 @@ export default {
             }
         },
         rateLimit: {
-            windowMs: 1000 * 60 * 15,
-            max: 100000,
+            windowMs: 1000,
+            max: 20,
             message: '{ "error": "Too many requests" }'
         },
         graphql: {
