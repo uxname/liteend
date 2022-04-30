@@ -18,7 +18,7 @@ const resolvers: Resolvers = {
             throw new GraphQLError({
                 message: 'Example error',
                 code: StatusCodes.INTERNAL_SERVER_ERROR,
-                extension: {someExternalData: 'hello'},
+                externalData: {someExternalData: 'hello'},
                 internalData: {someInternalData: 777}
             });
         },
