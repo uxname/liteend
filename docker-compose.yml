@@ -11,3 +11,10 @@ services:
         ports:
             - "4000:4000"
             - "5555:5555"
+    db_admin:
+        image: dbeaver/cloudbeaver
+        ports:
+            - '5000:8978'
+        volumes:
+            - ./data:/opt/data:rw
+            - ./data/db_admin:/opt/cloudbeaver/workspace
