@@ -17,15 +17,6 @@ Simple lightweight GraphQL server on Node.JS which can be used as a basis backen
 
 To launch the project in a Docker container, run the command `docker-compose up -d`
 
-### Database admin in docker
-
-The project has an admin panel configured to work with the database, available by default on the `5000`
-port: http://localhost:5000
-
-**Important:** In production mode, be sure to set up a password for the database admin page
-
-The default SQLite database path is `/opt/data/data.sqlite3`.
-
 ## Database workflow
 
 - Edit schema: `prisma/schema.prisma`
@@ -34,6 +25,15 @@ The default SQLite database path is `/opt/data/data.sqlite3`.
 - Deploy only migration to database: `npm run prisma:deploy`
 
 > More info about using Prisma: https://www.prisma.io
+
+### Database admin in docker
+
+The project has an admin panel configured to work with the database, available by default on the `5000`
+port: http://localhost:5000
+
+**Important:** In production mode, be sure to set up a password for the database admin page
+
+The default SQLite database path is `/opt/data/data.sqlite3`.
 
 # Structure description
 
