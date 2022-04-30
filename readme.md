@@ -26,7 +26,7 @@ To launch the project in a Docker container, run the command `docker-compose up 
 
 > More info about using Prisma: https://www.prisma.io
 
-### Database admin in docker
+### Database admin panel in docker
 
 The project has an admin panel configured to work with the database, available by default on the `5000`
 port: http://localhost:5000
