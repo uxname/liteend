@@ -34,7 +34,7 @@ describe('API Tests', () => {
 
     test('Should register new account', async () => {
         const email = `test${Math.random()}@test.com`;
-        const password = 'test123456!';
+        const password = 'test1234567!';
         const result = await api.RegisterAccount({email, password});
 
         expect(result.register.token).not.toBeNull();
@@ -80,6 +80,7 @@ describe('API Tests', () => {
         expect(sessionCountAfterLogout).toEqual(sessionCountBeforeLogout - 1);
 
         await api.LogoutAccount({
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             sessionIds: [loginResult.login.account.sessions![0].id]
         }, {
             Authorization: `Bearer ${loginResult.login.token}`
