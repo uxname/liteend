@@ -8,6 +8,7 @@
         "node": ">=13.0.0"
     },
     "scripts": {
+        "prestart": "npx eslint .",
         "start": "NODE_ENV=production ts-node src/index.ts",
         "dev": "ts-node-dev --respawn --transpile-only --clear --exit-child --rs src/index.ts",
         "prisma:push": "npx prisma db push && npm run gen",
@@ -20,7 +21,7 @@
         "gen": "npm run prisma:gen && npm run ts:gen",
         "ts:gen": "graphql-codegen --config codegen.yml",
         "ts:check": "tsc --noEmit",
-        "lint": "./node_modules/.bin/eslint . --fix",
+        "lint": "npx eslint . --fix",
         "check": "npm run ts:check && npm run lint",
         "update": "npx ncu -u",
         "test": "jest"
