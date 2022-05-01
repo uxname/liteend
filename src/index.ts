@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 import config from './config/config';
 import express from 'express';
-import {ApolloError, ApolloServer} from 'apollo-server-express';
+import {ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
 import resolvers from './resolver';
 import {getLogger} from './core/common/logger.service';
@@ -33,6 +33,7 @@ import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
 import {sendStatistic} from './core/common/telemetry';
+import GraphQLError from './core/common/graphql-error';
 
 const log = getLogger('server');
 const app = express();
@@ -134,14 +135,23 @@ const server = new CostAnalysisApolloServer({
 
         if (session) {
             if (new Date().getTime() > session.expiresAt.getTime()) {
-                throw new ApolloError('Session expired', String(StatusCodes.UNAUTHORIZED));
+                throw new GraphQLError({
+                    message: 'Session expired',
+                    code: StatusCodes.UNAUTHORIZED
+                });
             }
 
             if (!session.account) {
-                throw new ApolloError('Account not found', String(StatusCodes.NOT_FOUND));
+                throw new GraphQLError({
+                    message: 'Account not found',
+                    code: StatusCodes.NOT_FOUND
+                });
             }
         } else if (authHeader) {
-            throw new ApolloError('Session not found', String(StatusCodes.UNAUTHORIZED));
+            throw new GraphQLError({
+                message: 'Session not found',
+                code: StatusCodes.UNAUTHORIZED
+            });
         }
 
         const account = !session ? undefined : {
