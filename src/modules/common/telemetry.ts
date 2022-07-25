@@ -7,7 +7,7 @@ import fs from 'fs'
 
 import packageJson from '../../../package.json'
 
-const telemetryFilepath = path.join(__dirname, '..', '..', 'data', 'telemetry.json')
+const telemetryFilepath = path.join(__dirname, '..', '..', '..', 'data', 'telemetry.json')
 const telemetryFileExists = fs.existsSync(telemetryFilepath)
 
 interface ITelemetry {

@@ -9,8 +9,8 @@
     },
     "scripts": {
         "prestart": "npx eslint .",
-        "start": "NODE_ENV=production ts-node src/index.ts",
-        "dev": "ts-node-dev --respawn --transpile-only --clear --exit-child --rs src/index.ts",
+        "start": "NODE_ENV=production ts-node src/app.ts",
+        "dev": "ts-node-dev --respawn --transpile-only --clear --exit-child --rs src/app.ts",
         "prisma:push": "npx prisma db push && npm run gen",
         "prisma:deploy": "npx prisma migrate deploy",
         "prisma:create": "npx prisma migrate dev",

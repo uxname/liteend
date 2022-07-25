@@ -17,7 +17,6 @@ import helmet from 'helmet';
 import RequestLoggerService from './modules/common/request-logger.service';
 import StatusCodes from './modules/common/status-codes';
 import {prisma} from './modules/common/prisma.service';
-import packageJson from '../package.json';
 import {mocksService} from './modules/common/mocks.service';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
@@ -32,11 +31,10 @@ import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
-import {sendStatistic} from './modules/common/telemetry';
 import GraphQLError from './modules/common/graphql-error';
 
 const log = getLogger('server');
-const app = express();
+export const app = express();
 const logsDir = path.join(__dirname, '..', 'data', 'logs');
 app.use('/logs',
     basicAuth({
@@ -100,7 +98,7 @@ if (config.server.graphql.mocksEnabled) {
     }, RESET_MOCK_STORE_INTERVAL);
 }
 
-const server = new CostAnalysisApolloServer({
+export const server = new CostAnalysisApolloServer({
     schema,
     introspection: config.server.graphql.introspection,
     persistedQueries: false,
@@ -293,36 +291,3 @@ app.post('/upload',
 );
 app.use('/uploads', express.static(path.join(__dirname, '..', 'data', 'uploads')));
 
-async function main() {
-    await server.start();
-    server.applyMiddleware({app, path: config.server.graphql.path});
-
-    // 404 vulnerability https://nvd.nist.gov/vuln/detail/cve-2019-3498
-    // last "app.use" in the middleware chain
-    app.use((req, res) => {
-        res.status(StatusCodes.NOT_FOUND).json({
-            status: 'error',
-            message: 'Not found'
-        });
-    });
-
-    app.listen({port: config.server.port}, () => {
-        log.info(`*** ${packageJson.name} ready at http://127.0.0.1:${config.server.port}${server.graphqlPath} ***`);
-    });
-
-    const CLEAR_EXPIRED_SESSIONS_INTERVAL = 10000;
-    setInterval(async () => {
-        const deletedSessions = await prisma.accountSession.deleteMany({
-            where: {
-                expiresAt: {lt: new Date()}
-            }
-        });
-        if (deletedSessions.count > 0) {
-            log.debug(`Deleted ${deletedSessions.count} expired sessions`);
-        }
-    }, CLEAR_EXPIRED_SESSIONS_INTERVAL);
-
-    await sendStatistic();
-}
-
-main();
