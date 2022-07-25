@@ -31,11 +31,27 @@ CREATE TABLE "Upload" (
     "uploaderIp" TEXT NOT NULL
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Account.email_unique" ON "Account"("email");
+-- CreateTable
+CREATE TABLE "AccountSession" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    "accountId" INTEGER NOT NULL,
+    "token" TEXT NOT NULL,
+    "ipAddr" TEXT NOT NULL,
+    "userAgent" TEXT,
+    "expiresAt" DATETIME NOT NULL,
+    CONSTRAINT "AccountSession_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EmailCode.email_unique" ON "EmailCode"("email");
+CREATE UNIQUE INDEX "Account_email_key" ON "Account"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Upload.filename_unique" ON "Upload"("filename");
+CREATE UNIQUE INDEX "EmailCode_email_key" ON "EmailCode"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Upload_filename_key" ON "Upload"("filename");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AccountSession_token_key" ON "AccountSession"("token");

@@ -103,6 +103,7 @@ if (config.server.graphql.mocksEnabled) {
 const server = new CostAnalysisApolloServer({
     schema,
     introspection: config.server.graphql.introspection,
+    persistedQueries: false,
     debug: config.server.graphql.debug,
     formatError: (err) => {
         if (err.extensions?.internalData === undefined) {
