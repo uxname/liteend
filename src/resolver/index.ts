@@ -2,7 +2,7 @@ import Query from './query';
 import Mutation from './mutation';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
-import {AccountService} from '../core/auth/account.service';
+import {AccountService} from '../modules/auth/account.service';
 import {AuthGuard} from './guard/auth.guard';
 
 const resolvers: Resolvers = {

@@ -1,7 +1,7 @@
 import {AccountSession} from '../../generated/graphql_api';
-import GraphQLError from '../../core/common/graphql-error';
-import StatusCodes from '../../core/common/status-codes';
-import {prisma} from '../../core/common/prisma.service';
+import GraphQLError from '../../modules/common/graphql-error';
+import StatusCodes from '../../modules/common/status-codes';
+import {prisma} from '../../modules/common/prisma.service';
 
 export class AuthGuard {
     static assertIfNotAuthenticated(session?: AccountSession): void {

@@ -2,7 +2,7 @@
 import {GraphQLClient} from 'graphql-request';
 import {getSdk, Sdk} from './graphql/generated/gql_tests';
 import config from '../config/config';
-import {prisma} from '../core/common/prisma.service';
+import {prisma} from '../modules/common/prisma.service';
 import * as console from 'console';
 
 describe('API Tests', () => {

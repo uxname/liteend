@@ -4,7 +4,7 @@ import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
 import resolvers from './resolver';
-import {getLogger} from './core/common/logger.service';
+import {getLogger} from './modules/common/logger.service';
 import rateLimit from 'express-rate-limit';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,11 +14,11 @@ import costAnalysis from 'graphql-cost-analysis';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
-import RequestLoggerService from './core/common/request-logger.service';
-import StatusCodes from './core/common/status-codes';
-import {prisma} from './core/common/prisma.service';
+import RequestLoggerService from './modules/common/request-logger.service';
+import StatusCodes from './modules/common/status-codes';
+import {prisma} from './modules/common/prisma.service';
 import packageJson from '../package.json';
-import {mocksService} from './core/common/mocks.service';
+import {mocksService} from './modules/common/mocks.service';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
@@ -32,8 +32,8 @@ import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
-import {sendStatistic} from './core/common/telemetry';
-import GraphQLError from './core/common/graphql-error';
+import {sendStatistic} from './modules/common/telemetry';
+import GraphQLError from './modules/common/graphql-error';
 
 const log = getLogger('server');
 const app = express();

@@ -1,11 +1,11 @@
 import {Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../core/common/logger.service';
-import StatusCodes from '../core/common/status-codes';
-import {AuthUtilsService} from '../core/common/auth-utils.service';
+import {getLogger} from '../modules/common/logger.service';
+import StatusCodes from '../modules/common/status-codes';
+import {AuthUtilsService} from '../modules/common/auth-utils.service';
 import config from '../config/config';
-import GraphQLError from '../core/common/graphql-error';
-import {SessionsService} from '../core/auth/sessions.service';
-import {AccountService} from '../core/auth/account.service';
+import GraphQLError from '../modules/common/graphql-error';
+import {SessionsService} from '../modules/auth/sessions.service';
+import {AccountService} from '../modules/auth/account.service';
 import {AuthGuard} from './guard/auth.guard';
 
 const log = getLogger('mutation');

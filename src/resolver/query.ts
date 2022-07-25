@@ -1,9 +1,9 @@
 import {Resolvers} from '../generated/graphql_api';
-import {getLogger} from '../core/common/logger.service';
-import StatusCodes from '../core/common/status-codes';
-import GraphQLError from '../core/common/graphql-error';
-import {AccountService} from '../core/auth/account.service';
-import {AppInfoService} from '../core/app-info.service';
+import {getLogger} from '../modules/common/logger.service';
+import StatusCodes from '../modules/common/status-codes';
+import GraphQLError from '../modules/common/graphql-error';
+import {AccountService} from '../modules/auth/account.service';
+import {AppInfoService} from '../modules/app-info.service';
 import {AuthGuard} from './guard/auth.guard';
 
 const log = getLogger('query');
