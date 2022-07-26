@@ -9,9 +9,9 @@ import {AccountService} from '../modules/auth/account.service';
 import {AuthGuard} from './guard/auth.guard';
 import {Email} from '../modules/common/types/email/email';
 
-const log = getLogger('mutation');
+const log = getLogger('mutationResolver');
 
-const mutation: Resolvers = {
+const mutationResolver: Resolvers = {
     Mutation: {
         echo: (parent, args) => {
             log.trace({args});
@@ -25,7 +25,7 @@ const mutation: Resolvers = {
 
             try {
                 if (!config.disableRegisterEmailConfirmation) {
-                    await SessionsService.createNewEmailCode(email);
+                    await SessionsService.createNewEmailCode(new Email(email));
                 }
                 const account = await AccountService.createAccount({password, email: new Email(email)});
 
@@ -41,7 +41,7 @@ const mutation: Resolvers = {
         generateEmailCode: async (parent, {email}) => AccountService.generateEmailCode(new Email(email)),
         activateAccount: async (parent, {email, code}) => AccountService.activate({email: new Email(email), code}),
         resetPassword: async (parent, {email, emailCode, newPassword}) => AccountService.resetPassword({
-            email,
+            email: new Email(email),
             emailCode,
             newPassword
         }),
@@ -85,4 +85,4 @@ const mutation: Resolvers = {
     }
 };
 
-export default mutation;
+export default mutationResolver;

@@ -5,7 +5,6 @@ import {prisma} from './modules/common/prisma.service';
 import {sendStatistic} from './modules/common/telemetry';
 import {app, server} from './index';
 import {getLogger} from './modules/common/logger.service';
-import {Email} from './modules/common/types/email/email';
 
 const log = getLogger('app');
 

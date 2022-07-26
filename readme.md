@@ -46,7 +46,7 @@ The main project directory is `src`. Brief overview of its structure:
 - **/resolver/guard** - directory with request handlers for protecting or processing requests (similar to middleware)
 - **/schema** - directory with GraphQL API schemas
 - **/test** - directory with project tests
-- **/index.ts** - the main project file, it defines the configuration and starts the application
+- **/index.resolver.ts** - the main project file, it defines the configuration and starts the application
 
 The database schema is described in the `prisma/schema.prisma` file. It is a line in
 format [Prisma Schema](https://www.prisma.io/docs/concepts/components/prisma-schema), which is a description of the

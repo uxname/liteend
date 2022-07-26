@@ -1,5 +1,5 @@
-import Query from './query';
-import Mutation from './mutation';
+import Query from './query.resolver';
+import Mutation from './mutation.resolver';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
 import {AccountService} from '../modules/auth/account.service';

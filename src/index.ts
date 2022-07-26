@@ -3,7 +3,7 @@ import config from './config/config';
 import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
 import typeDefs from './schema';
-import resolvers from './resolver';
+import resolvers from './resolver/index.resolver';
 import {getLogger} from './modules/common/logger.service';
 import rateLimit from 'express-rate-limit';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
