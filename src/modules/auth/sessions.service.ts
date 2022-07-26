@@ -8,6 +8,7 @@ import config from '../../config/config';
 import {EmailService} from '../common/email.service';
 import {getLogger} from '../common/logger.service';
 import {prisma} from '../common/prisma.service';
+import {Email} from '../common/types/email/email';
 
 const log = getLogger('auth service');
 
@@ -18,7 +19,7 @@ const emailClient = new EmailService({
 });
 
 export class SessionsService {
-    static async createNewEmailCode(email: string): Promise<{result: boolean, expiresAt: Date}> {
+    static async createNewEmailCode(email: Email): Promise<{result: boolean, expiresAt: Date}> {
         await prisma.emailCode.deleteMany({where: {expiresAt: {lt: new Date()}}});
 
         const oneTimeCode = AuthUtilsService.generateOneTimeCode();
@@ -28,15 +29,15 @@ export class SessionsService {
         await emailClient.sendEmail({
             from: config.email.user,
             text: oneTimeCode,
-            to: email,
+            to: email.value,
             subject: 'Code'
         });
-        log.debug(`Email code sent to: ${email}`);
+        log.debug(`Email code sent to: ${email.value}`);
 
         const result = !!await prisma.emailCode.upsert({
-            where: {email},
-            create: {code: oneTimeCode, email, expiresAt},
-            update: {code: oneTimeCode, email, expiresAt}
+            where: {email: email.value},
+            create: {code: oneTimeCode, email: email.value, expiresAt},
+            update: {code: oneTimeCode, email: email.value, expiresAt}
         });
         return {
             result,

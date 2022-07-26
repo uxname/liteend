@@ -7,6 +7,7 @@ import GraphQLError from '../modules/common/graphql-error';
 import {SessionsService} from '../modules/auth/sessions.service';
 import {AccountService} from '../modules/auth/account.service';
 import {AuthGuard} from './guard/auth.guard';
+import {Email} from '../modules/common/types/email/email';
 
 const log = getLogger('mutation');
 
@@ -26,7 +27,7 @@ const mutation: Resolvers = {
                 if (!config.disableRegisterEmailConfirmation) {
                     await SessionsService.createNewEmailCode(email);
                 }
-                const account = await AccountService.createAccount({password, email});
+                const account = await AccountService.createAccount({password, email: new Email(email)});
 
                 return await SessionsService.generateNewAuth({prisma, account, request});
             } catch (error) {
@@ -37,8 +38,8 @@ const mutation: Resolvers = {
                 });
             }
         },
-        generateEmailCode: async (parent, {email}) => AccountService.generateEmailCode(email),
-        activateAccount: async (parent, {email, code}) => AccountService.activate({email, code}),
+        generateEmailCode: async (parent, {email}) => AccountService.generateEmailCode(new Email(email)),
+        activateAccount: async (parent, {email, code}) => AccountService.activate({email: new Email(email), code}),
         resetPassword: async (parent, {email, emailCode, newPassword}) => AccountService.resetPassword({
             email,
             emailCode,

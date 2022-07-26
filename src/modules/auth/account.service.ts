@@ -8,25 +8,26 @@ import {SessionsService} from './sessions.service';
 import * as PrismaClient from '@prisma/client';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
+import {Email} from '../common/types/email/email';
 
 const ACCOUNT_NOT_FOUND = 'Account not found';
 const CODE_NOT_GENERATED = 'Code not generated';
 
 export class AccountService {
-    static async createAccount(data: {password: string, email: string}): Promise<PrismaClient.Account> {
+    static async createAccount(data: {password: string, email: Email}): Promise<PrismaClient.Account> {
         const passwordHash = await AuthUtilsService.hash(data.password + config.server.salt);
 
         return await prisma.account.create({
             data: {
-                email: data.email.trim().toLowerCase(),
+                email: data.email.value,
                 passwordHash,
                 status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
             }
         });
     }
 
-    static async activate(data: {email: string, code: string}): Promise<boolean> {
-        const emailCode = await prisma.emailCode.findFirst({where: {email: data.email.trim().toLowerCase()}});
+    static async activate(data: {email: Email, code: string}): Promise<boolean> {
+        const emailCode = await prisma.emailCode.findFirst({where: {email: data.email.value}});
         if (!emailCode) {
             throw new GraphQLError({
                 message: CODE_NOT_GENERATED,
@@ -35,7 +36,7 @@ export class AccountService {
             });
         }
 
-        const account = await prisma.account.findFirst({where: {email: data.email.trim().toLowerCase()}});
+        const account = await prisma.account.findFirst({where: {email: data.email.value}});
         if (!account) {
             throw new GraphQLError({
                 message: ACCOUNT_NOT_FOUND,
@@ -53,7 +54,7 @@ export class AccountService {
         }
 
         if (data.code === emailCode.code) {
-            await prisma.emailCode.delete({where: {email: data.email}});
+            await prisma.emailCode.delete({where: {email: data.email.value}});
 
             return true;
         } else {
@@ -65,8 +66,8 @@ export class AccountService {
         }
     }
 
-    static async generateEmailCode(email: string): Promise<{result: boolean, expiresAt: Date}> {
-        const account = await prisma.account.findFirst({where: {email: email.trim().toLowerCase()}});
+    static async generateEmailCode(email: Email): Promise<{result: boolean, expiresAt: Date}> {
+        const account = await prisma.account.findFirst({where: {email: email.value}});
         if (!account) {
             throw new GraphQLError({
                 message: ACCOUNT_NOT_FOUND,
@@ -77,8 +78,8 @@ export class AccountService {
         return await SessionsService.createNewEmailCode(email);
     }
 
-    static async resetPassword(data: {email: string, emailCode: string, newPassword: string}): Promise<boolean> {
-        const emailCodeDb = await prisma.emailCode.findFirst({where: {email: data.email.trim().toLowerCase()}});
+    static async resetPassword(data: {email: Email, emailCode: string, newPassword: string}): Promise<boolean> {
+        const emailCodeDb = await prisma.emailCode.findFirst({where: {email: data.email.value}});
         if (!emailCodeDb) {
             throw new GraphQLError({
                 message: CODE_NOT_GENERATED,
@@ -88,7 +89,7 @@ export class AccountService {
         }
 
         if (data.emailCode === emailCodeDb.code) {
-            const account = await prisma.account.findFirst({where: {email: data.email.trim().toLowerCase()}});
+            const account = await prisma.account.findFirst({where: {email: data.email.value}});
             if (!account) {
                 throw new GraphQLError({
                     message: ACCOUNT_NOT_FOUND,
@@ -97,7 +98,7 @@ export class AccountService {
                 });
             }
 
-            await prisma.emailCode.delete({where: {email: data.email}});
+            await prisma.emailCode.delete({where: {email: data.email.value}});
 
             const passwordHash = await AuthUtilsService.hash(data.newPassword + config.server.salt);
             await prisma.account.update({where: {id: account.id}, data: {passwordHash}});
