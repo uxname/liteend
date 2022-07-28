@@ -2,7 +2,7 @@ import Query from './query.resolver';
 import Mutation from './mutation.resolver';
 import {Resolvers} from '../generated/graphql_api';
 import {GraphQLScalarType} from 'graphql';
-import {AccountService} from '../modules/auth/account.service';
+import {AccountService} from '../modules/account/account.service';
 import {AuthGuard} from './guard/auth.guard';
 
 const resolvers: Resolvers = {
@@ -25,7 +25,6 @@ const resolvers: Resolvers = {
 
             AuthGuard.assertIfNotAuthenticated(session);
 
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return await AccountService.getSessions(parent.id!);
         }
     }

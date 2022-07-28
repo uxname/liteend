@@ -4,8 +4,8 @@ import StatusCodes from '../modules/common/status-codes';
 import {AuthUtilsService} from '../modules/common/auth-utils.service';
 import config from '../config/config';
 import GraphQLError from '../modules/common/graphql-error';
-import {SessionsService} from '../modules/auth/sessions.service';
-import {AccountService} from '../modules/auth/account.service';
+import {SessionsService} from '../modules/sessions.service';
+import {AccountService} from '../modules/account/account.service';
 import {AuthGuard} from './guard/auth.guard';
 import {Email} from '../modules/common/types/email/email';
 
@@ -52,9 +52,7 @@ const mutationResolver: Resolvers = {
                 throw new GraphQLError({
                     message: 'Wrong password or account not found',
                     code: StatusCodes.FORBIDDEN,
-                    internalData: {
-                        email
-                    }
+                    internalData: {email}
                 });
             }
             if (await AuthUtilsService.checkHash({
@@ -72,14 +70,11 @@ const mutationResolver: Resolvers = {
         },
         logout: async (parent, {sessionIds}, {session}) => {
             AuthGuard.assertIfNotAuthenticated(session);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             await AuthGuard.assertIfSessionsNotOwned(session!.id, sessionIds || [session!.id]);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return await SessionsService.deleteSessions(sessionIds || [session!.id]);
         },
         changePassword: async (parent, {password, newPassword}, {session}) => {
             AuthGuard.assertIfNotAuthenticated(session);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return await AccountService.changePassword(session!.account.id, password, newPassword);
         }
     }

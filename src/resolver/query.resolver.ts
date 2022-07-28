@@ -2,7 +2,7 @@ import {AccountRole, Resolvers} from '../generated/graphql_api';
 import {getLogger} from '../modules/common/logger.service';
 import StatusCodes from '../modules/common/status-codes';
 import GraphQLError from '../modules/common/graphql-error';
-import {AccountService} from '../modules/auth/account.service';
+import {AccountService} from '../modules/account/account.service';
 import {AppInfoService} from '../modules/app-info.service';
 import {AuthGuard} from './guard/auth.guard';
 import {RolesGuard} from './guard/roles.guard';
@@ -39,7 +39,6 @@ const resolvers: Resolvers = {
         },
         whoami: async (parent, args, {session}) => {
             AuthGuard.assertIfNotAuthenticated(session);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return await AccountService.getAccount(session!.account.id);
         },
         currentSession: async (parent, args, {session}) => {

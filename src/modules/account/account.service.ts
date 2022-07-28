@@ -4,11 +4,12 @@ import {Account, AccountRole, AccountSession, AccountStatus} from '../../generat
 import {prisma} from '../common/prisma.service';
 import GraphQLError from '../common/graphql-error';
 import StatusCodes from '../common/status-codes';
-import {SessionsService} from './sessions.service';
+import {SessionsService} from '../sessions.service';
 import * as PrismaClient from '@prisma/client';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
 import {Email} from '../common/types/email/email';
+import {AccountAdapter} from './account.adapter';
 
 const ACCOUNT_NOT_FOUND = 'Account not found';
 const CODE_NOT_GENERATED = 'Code not generated';
@@ -146,10 +147,7 @@ export class AccountService {
             });
         }
 
-        return {
-            ...accountDb,
-            roles: JSON.parse(accountDb.rolesArrayJson) // todo move to adapter
-        } as Account;
+        return AccountAdapter.dbToGraphQL(accountDb);
     }
 
     static async getSessions(accountId: number): Promise<AccountSession[]> {

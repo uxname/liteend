@@ -1,14 +1,15 @@
 import * as PrismaClient from '@prisma/client';
 import express from 'express';
-import {AccountStatus, AuthResult} from '../../generated/graphql_api';
-import {AuthUtilsService} from '../common/auth-utils.service';
+import {AuthResult} from '../generated/graphql_api';
+import {AuthUtilsService} from './common/auth-utils.service';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
-import config from '../../config/config';
-import {EmailService} from '../common/email.service';
-import {getLogger} from '../common/logger.service';
-import {prisma} from '../common/prisma.service';
-import {Email} from '../common/types/email/email';
+import config from '../config/config';
+import {EmailService} from './common/email.service';
+import {getLogger} from './common/logger.service';
+import {prisma} from './common/prisma.service';
+import {Email} from './common/types/email/email';
+import {AccountAdapter} from './account/account.adapter';
 
 const log = getLogger('auth service');
 
@@ -45,13 +46,13 @@ export class SessionsService {
         };
     }
 
-    static async generateNewAuth(input: {prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request}): Promise<AuthResult> {
+    static async generateNewAuth(data: {prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request}): Promise<AuthResult> {
         const token = AuthUtilsService.generateToken();
         const session = await SessionsService.createNewSession({
-            prisma: input.prisma,
-            accountId: input.account.id,
+            prisma: data.prisma,
+            accountId: data.account.id,
             token,
-            request: input.request
+            request: data.request
         });
 
         const location = geoip.lookup(session.ipAddr);
@@ -63,24 +64,18 @@ export class SessionsService {
             }
         }
 
+        const resultAccount = AccountAdapter.dbToGraphQL(data.account);
+        resultAccount.sessions = [
+            {
+                ...session,
+                userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
+                address: address.length > 0 ? address : undefined,
+                account: AccountAdapter.dbToGraphQL(data.account)
+            }
+        ];
+
         return {
-            account: {
-                ...input.account,
-                roles: JSON.parse(input.account.rolesArrayJson),
-                sessions: [
-                    {
-                        ...session,
-                        userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
-                        address: address.length > 0 ? address : undefined,
-                        account: {
-                            ...(input.account),
-                            roles: JSON.parse(input.account.rolesArrayJson),
-                            status: input.account.status as AccountStatus
-                        }
-                    }
-                ],
-                status: input.account.status as AccountStatus
-            },
+            account: resultAccount,
             token
         };
     }

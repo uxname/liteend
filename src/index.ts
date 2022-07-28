@@ -32,6 +32,7 @@ import geoip, {Lookup} from 'geoip-lite';
 import serveIndex from 'serve-index';
 import basicAuth from 'express-basic-auth';
 import GraphQLError from './modules/common/graphql-error';
+import {AccountAdapter} from './modules/account/account.adapter';
 
 const log = getLogger('server');
 export const app = express();
@@ -178,10 +179,7 @@ export const server = new CostAnalysisApolloServer({
                 ...session,
                 userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
                 address: address.length > 0 ? address : undefined,
-                account: {
-                    ...account,
-                    roles: JSON.parse(account.rolesArrayJson)
-                }
+                account: AccountAdapter.dbToGraphQL(account)
             }
         };
     },

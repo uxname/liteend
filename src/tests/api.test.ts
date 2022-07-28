@@ -80,7 +80,6 @@ describe('API Tests', () => {
         expect(sessionCountAfterLogout).toEqual(sessionCountBeforeLogout - 1);
 
         await api.LogoutAccount({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             sessionIds: [loginResult.login.account.sessions![0].id]
         }, {
             Authorization: `Bearer ${loginResult.login.token}`

@@ -54,6 +54,7 @@
         "prefer-arrow-callback": "error",
         "no-var": "error",
         "arrow-spacing": "error",
-        "@typescript-eslint/no-explicit-any": "error"
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/no-non-null-assertion": "off"
     }
 }
