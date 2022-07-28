@@ -1,6 +1,6 @@
 import {AuthUtilsService} from '../common/auth-utils.service';
 import config from '../../config/config';
-import {Account, AccountSession, AccountStatus} from '../../generated/graphql_api';
+import {Account, AccountRole, AccountSession, AccountStatus} from '../../generated/graphql_api';
 import {prisma} from '../common/prisma.service';
 import GraphQLError from '../common/graphql-error';
 import StatusCodes from '../common/status-codes';
@@ -12,6 +12,7 @@ import {Email} from '../common/types/email/email';
 
 const ACCOUNT_NOT_FOUND = 'Account not found';
 const CODE_NOT_GENERATED = 'Code not generated';
+const WRONG_PASSWORD = 'Wrong password';
 
 export class AccountService {
     static async createAccount(data: {password: string, email: Email}): Promise<PrismaClient.Account> {
@@ -21,7 +22,8 @@ export class AccountService {
             data: {
                 email: data.email.value,
                 passwordHash,
-                status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled
+                status: config.disableRegisterEmailConfirmation ? AccountStatus.Active : AccountStatus.Disabled,
+                rolesArrayJson: JSON.stringify([AccountRole.User])
             }
         });
     }
@@ -128,7 +130,7 @@ export class AccountService {
             await prisma.account.update({where: {id: accountDb.id}, data: {passwordHash}});
             return true;
         } else {
-            throw new GraphQLError({message: 'Wrong password', code: StatusCodes.FORBIDDEN});
+            throw new GraphQLError({message: WRONG_PASSWORD, code: StatusCodes.FORBIDDEN});
         }
     }
 
@@ -144,7 +146,10 @@ export class AccountService {
             });
         }
 
-        return accountDb as Account;
+        return {
+            ...accountDb,
+            roles: JSON.parse(accountDb.rolesArrayJson) // todo move to adapter
+        } as Account;
     }
 
     static async getSessions(accountId: number): Promise<AccountSession[]> {

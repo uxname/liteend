@@ -24,10 +24,16 @@ export type Account = Node & {
   createdAt: Scalars['Date'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  roles: Array<AccountRole>;
   sessions?: Maybe<Array<AccountSession>>;
   status: AccountStatus;
   updatedAt: Scalars['Date'];
 };
+
+export enum AccountRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type AccountSession = Node & {
   __typename?: 'AccountSession';
@@ -135,6 +141,11 @@ export type Query = {
   whoami: Account;
 };
 
+
+export type QueryDebugArgs = {
+  showAdditionalInfo: Scalars['Boolean'];
+};
+
 export type UserAgent = {
   __typename?: 'UserAgent';
   browser?: Maybe<UserAgentBrowser>;
@@ -239,6 +250,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Account: ResolverTypeWrapper<Partial<Account>>;
+  AccountRole: ResolverTypeWrapper<Partial<AccountRole>>;
   AccountSession: ResolverTypeWrapper<Partial<AccountSession>>;
   AccountStatus: ResolverTypeWrapper<Partial<AccountStatus>>;
   AuthResult: ResolverTypeWrapper<Partial<AuthResult>>;
@@ -293,6 +305,7 @@ export type AccountResolvers<ContextType = GraphQLContext, ParentType extends Re
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  roles?: Resolver<Array<ResolversTypes['AccountRole']>, ParentType, ContextType>;
   sessions?: Resolver<Maybe<Array<ResolversTypes['AccountSession']>>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['AccountStatus'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -351,7 +364,7 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
-  debug?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>;
+  debug?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType, RequireFields<QueryDebugArgs, 'showAdditionalInfo'>>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
 }>;

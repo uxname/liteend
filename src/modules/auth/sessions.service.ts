@@ -66,6 +66,7 @@ export class SessionsService {
         return {
             account: {
                 ...input.account,
+                roles: JSON.parse(input.account.rolesArrayJson),
                 sessions: [
                     {
                         ...session,
@@ -73,6 +74,7 @@ export class SessionsService {
                         address: address.length > 0 ? address : undefined,
                         account: {
                             ...(input.account),
+                            roles: JSON.parse(input.account.rolesArrayJson),
                             status: input.account.status as AccountStatus
                         }
                     }

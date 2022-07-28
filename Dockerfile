@@ -6,6 +6,6 @@ RUN npm i --legacy-peer-deps
 FROM modules as app
 WORKDIR /app
 COPY . ./
-RUN npm run prisma:gen
+RUN npm run db:gen
 EXPOSE 4000
 CMD ["npm", "start"]

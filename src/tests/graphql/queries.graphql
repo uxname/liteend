@@ -1,8 +1,8 @@
-mutationResolver MyEcho($text: String!) {
+mutation MyEcho($text: String!) {
     echo(text: $text)
 }
 
-mutationResolver RegisterAccount($email: String!, $password: String!) {
+mutation RegisterAccount($email: String!, $password: String!) {
     register(email: $email, password: $password) {
         token
         account {
@@ -13,7 +13,7 @@ mutationResolver RegisterAccount($email: String!, $password: String!) {
     }
 }
 
-mutationResolver LoginAccount($email: String!, $password: String!) {
+mutation LoginAccount($email: String!, $password: String!) {
     login(email: $email, password: $password) {
         token
         account {
@@ -27,6 +27,6 @@ mutationResolver LoginAccount($email: String!, $password: String!) {
     }
 }
 
-mutationResolver LogoutAccount($sessionIds: [Int!]) {
+mutation LogoutAccount($sessionIds: [Int!]) {
     logout(sessionIds: $sessionIds)
 }

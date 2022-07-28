@@ -1,3 +1,5 @@
+import {execSync} from 'child_process';
+
 export class AppInfoService {
     static getAppInfo() {
         return {
@@ -6,5 +8,13 @@ export class AppInfoService {
             serverTime: new Date().toISOString(),
             uptimeSeconds: process.uptime()
         };
+    }
+
+    static getLastCommitMessageText() {
+        return execSync('git log -1 --pretty=%B').toString().trim();
+    }
+
+    static getLastCommitHash() {
+        return execSync('git rev-parse HEAD').toString().trim();
     }
 }

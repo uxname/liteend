@@ -5,6 +5,7 @@ CREATE TABLE "Account" (
     "updatedAt" DATETIME NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
+    "rolesArrayJson" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'DISABLED'
 );
 

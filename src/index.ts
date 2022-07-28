@@ -178,7 +178,10 @@ export const server = new CostAnalysisApolloServer({
                 ...session,
                 userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
                 address: address.length > 0 ? address : undefined,
-                account
+                account: {
+                    ...account,
+                    roles: JSON.parse(account.rolesArrayJson)
+                }
             }
         };
     },

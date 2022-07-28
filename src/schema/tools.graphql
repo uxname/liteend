@@ -25,8 +25,14 @@ type Account implements Node {
 
     email: String!
     status: AccountStatus!
+    roles: [AccountRole!]!
 
     sessions: [AccountSession!]
+}
+
+enum AccountRole {
+    ADMIN
+    USER
 }
 
 type AuthResult {

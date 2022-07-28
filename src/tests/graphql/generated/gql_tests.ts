@@ -24,10 +24,16 @@ export type Account = Node & {
   createdAt: Scalars['Date'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  roles: Array<AccountRole>;
   sessions?: Maybe<Array<AccountSession>>;
   status: AccountStatus;
   updatedAt: Scalars['Date'];
 };
+
+export enum AccountRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type AccountSession = Node & {
   __typename?: 'AccountSession';
@@ -133,6 +139,11 @@ export type Query = {
   debug?: Maybe<Scalars['Json']>;
   error?: Maybe<Scalars['Int']>;
   whoami: Account;
+};
+
+
+export type QueryDebugArgs = {
+  showAdditionalInfo: Scalars['Boolean'];
 };
 
 export type UserAgent = {
