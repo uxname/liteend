@@ -17,7 +17,7 @@ const resolvers: Resolvers = {
 
             if (showAdditionalInfo) {
                 AuthGuard.assertIfNotAuthenticated(session);
-                RolesGuard.assertIfNotInRoleArray(session!.account.roles, [AccountRole.User]);
+                RolesGuard.assertIfNotInRoleArray(session!.account.roles, [AccountRole.Admin]);
 
                 const additionalInfo = {
                     lastCommitMessageText: AppInfoService.getLastCommitMessageText(),
