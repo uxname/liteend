@@ -20,7 +20,7 @@ const resolvers: Resolvers = {
                 RolesGuard.assertIfNotInRoleArray(session!.account.roles, [AccountRole.User]);
 
                 const additionalInfo = {
-                    lastCommit: AppInfoService.getLastCommitMessageText(),
+                    lastCommitMessageText: AppInfoService.getLastCommitMessageText(),
                     lastCommitHash: AppInfoService.getLastCommitHash()
                 };
 
