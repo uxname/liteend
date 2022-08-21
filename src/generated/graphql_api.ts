@@ -143,7 +143,7 @@ export type Query = {
 
 
 export type QueryDebugArgs = {
-  showAdditionalInfo: Scalars['Boolean'];
+  showAdditionalInfo?: Scalars['Boolean'];
 };
 
 export type UserAgent = {

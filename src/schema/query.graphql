@@ -1,5 +1,5 @@
 type Query {
-    debug(showAdditionalInfo: Boolean!): Json @cost(complexity: 5)
+    debug(showAdditionalInfo: Boolean! = false): Json @cost(complexity: 5)
     error: Int
     whoami: Account!
     currentSession: AccountSession!
