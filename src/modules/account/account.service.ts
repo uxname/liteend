@@ -1,6 +1,6 @@
 import {AuthUtilsService} from '../common/auth-utils.service';
 import config from '../../config/config';
-import {Account, AccountRole, AccountSession, AccountStatus} from '../../generated/graphql_api';
+import {Account, AccountRole, AccountSession, AccountStatus} from '../../generated/graphql-api';
 import {prisma} from '../common/prisma.service';
 import GraphQLError from '../common/graphql-error';
 import StatusCodes from '../common/status-codes';

@@ -1,4 +1,4 @@
-import {AccountSession} from '../../generated/graphql_api';
+import {AccountSession} from '../../generated/graphql-api';
 import GraphQLError from '../../modules/common/graphql-error';
 import StatusCodes from '../../modules/common/status-codes';
 import {prisma} from '../../modules/common/prisma.service';

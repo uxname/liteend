@@ -9,6 +9,7 @@ export default class RequestLoggerService {
     public static logGraphQL(httpRequest: express.Request): void {
         function logBody(query: string | Source, isMerged: boolean) {
             const isMergedPrefix = isMerged ? ' (merged request)' : '';
+            // eslint-disable-next-line no-magic-numbers
             log.trace(`\n::::::::::\n:: GraphQL${isMergedPrefix}\n${query}:: Variables\n${JSON.stringify(httpRequest.body.variables, null, 2)}`);
         }
 

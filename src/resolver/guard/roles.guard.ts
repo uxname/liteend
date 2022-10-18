@@ -1,6 +1,6 @@
 import StatusCodes from '../../modules/common/status-codes';
 import GraphQLError from '../../modules/common/graphql-error';
-import {AccountRole} from '../../generated/graphql_api';
+import {AccountRole} from '../../generated/graphql-api';
 
 export class RolesGuard {
     static assertIfNotInRoleArray(targetRoles: AccountRole[], allowedRoles: AccountRole[]) {

@@ -1,4 +1,4 @@
-import {AccountRole, Resolvers} from '../generated/graphql_api';
+import {AccountRole, Resolvers} from '../generated/graphql-api';
 import {getLogger} from '../modules/common/logger.service';
 import StatusCodes from '../modules/common/status-codes';
 import GraphQLError from '../modules/common/graphql-error';

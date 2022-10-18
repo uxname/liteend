@@ -21,7 +21,7 @@ import {mocksService} from './modules/common/mocks.service';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
-import {AccountStatus} from './generated/graphql_api';
+import {AccountStatus} from './generated/graphql-api';
 import {GraphQLContext} from './IContext';
 import path from 'path';
 import multer from 'multer';

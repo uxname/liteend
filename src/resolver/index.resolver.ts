@@ -1,6 +1,6 @@
 import Query from './query.resolver';
 import Mutation from './mutation.resolver';
-import {Resolvers} from '../generated/graphql_api';
+import {Resolvers} from '../generated/graphql-api';
 import {GraphQLScalarType} from 'graphql';
 import {AccountService} from '../modules/account/account.service';
 import {AuthGuard} from './guard/auth.guard';

@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 import {GraphQLClient} from 'graphql-request';
-import {getSdk, Sdk} from './graphql/generated/gql_tests';
+import {getSdk, Sdk} from './graphql/generated/gql-tests';
 import config from '../config/config';
 import {prisma} from '../modules/common/prisma.service';
 import * as console from 'console';

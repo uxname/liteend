@@ -1,4 +1,4 @@
-import {Resolvers} from '../generated/graphql_api';
+import {Resolvers} from '../generated/graphql-api';
 import {getLogger} from '../modules/common/logger.service';
 import StatusCodes from '../modules/common/status-codes';
 import {AuthUtilsService} from '../modules/common/auth-utils.service';

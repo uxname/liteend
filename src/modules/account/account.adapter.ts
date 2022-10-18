@@ -1,5 +1,5 @@
 import {Account as AccountDB} from '@prisma/client';
-import {Account, AccountStatus} from '../../generated/graphql_api';
+import {Account, AccountStatus} from '../../generated/graphql-api';
 
 export class AccountAdapter {
     static dbToGraphQL(dbAccount: AccountDB): Account {

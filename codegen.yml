@@ -1,6 +1,6 @@
 overwrite: true
 generates:
-    src/generated/graphql_api.ts:
+    src/generated/graphql-api.ts:
         schema:
             - 'src/schema/*.graphql'
         plugins:
@@ -15,7 +15,7 @@ generates:
             contextType: GraphQLContext
             useIndexSignature: true
             defaultMapper: Partial<{T}>
-    src/tests/graphql/generated/gql_tests.ts:
+    src/tests/graphql/generated/gql-tests.ts:
         documents: 'src/tests/graphql/*.graphql'
         schema:
             - 'src/schema/*.graphql'

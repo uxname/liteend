@@ -1,6 +1,6 @@
 import * as PrismaClient from '@prisma/client';
 import express from 'express';
-import {AuthResult} from '../generated/graphql_api';
+import {AuthResult} from '../generated/graphql-api';
 import {AuthUtilsService} from './common/auth-utils.service';
 import geoip from 'geoip-lite';
 import uaParse from 'ua-parser-js';
