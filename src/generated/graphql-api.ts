@@ -299,9 +299,9 @@ export type CostDirectiveArgs = {
   useMultipliers?: Maybe<Scalars['Boolean']>;
 };
 
-export type CostDirectiveResolver<Result, Parent, ContextType = GraphQLContext, Args = CostDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type CostDirectiveResolver<Result, Parent, ContextType = IGraphQLContext, Args = CostDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type AccountResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = ResolversObject<{
+export type AccountResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['Account'] = ResolversParentTypes['Account']> = ResolversObject<{
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -312,7 +312,7 @@ export type AccountResolvers<ContextType = GraphQLContext, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type AccountSessionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AccountSession'] = ResolversParentTypes['AccountSession']> = ResolversObject<{
+export type AccountSessionResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['AccountSession'] = ResolversParentTypes['AccountSession']> = ResolversObject<{
   account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
   address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
@@ -324,7 +324,7 @@ export type AccountSessionResolvers<ContextType = GraphQLContext, ParentType ext
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type AuthResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuthResult'] = ResolversParentTypes['AuthResult']> = ResolversObject<{
+export type AuthResultResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['AuthResult'] = ResolversParentTypes['AuthResult']> = ResolversObject<{
   account?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -334,7 +334,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Date';
 }
 
-export type GenerateEmailCodeResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GenerateEmailCodeResult'] = ResolversParentTypes['GenerateEmailCodeResult']> = ResolversObject<{
+export type GenerateEmailCodeResultResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['GenerateEmailCodeResult'] = ResolversParentTypes['GenerateEmailCodeResult']> = ResolversObject<{
   expiresAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   result?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -344,7 +344,7 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Json';
 }
 
-export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+export type MutationResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   activateAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationActivateAccountArgs, 'code' | 'email'>>;
   changePassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'newPassword' | 'password'>>;
   echo?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationEchoArgs, 'text'>>;
@@ -355,21 +355,21 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   resetPassword?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email' | 'emailCode' | 'newPassword'>>;
 }>;
 
-export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
+export type NodeResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
   __resolveType: TypeResolveFn<'Account' | 'AccountSession', ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
 }>;
 
-export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+export type QueryResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentSession?: Resolver<ResolversTypes['AccountSession'], ParentType, ContextType>;
   debug?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType, RequireFields<QueryDebugArgs, 'showAdditionalInfo'>>;
   error?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   whoami?: Resolver<ResolversTypes['Account'], ParentType, ContextType>;
 }>;
 
-export type UserAgentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgent'] = ResolversParentTypes['UserAgent']> = ResolversObject<{
+export type UserAgentResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['UserAgent'] = ResolversParentTypes['UserAgent']> = ResolversObject<{
   browser?: Resolver<Maybe<ResolversTypes['UserAgentBrowser']>, ParentType, ContextType>;
   cpu?: Resolver<Maybe<ResolversTypes['UserAgentCpu']>, ParentType, ContextType>;
   engine?: Resolver<Maybe<ResolversTypes['UserAgentEngine']>, ParentType, ContextType>;
@@ -378,31 +378,31 @@ export type UserAgentResolvers<ContextType = GraphQLContext, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type UserAgentBrowserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentBrowser'] = ResolversParentTypes['UserAgentBrowser']> = ResolversObject<{
+export type UserAgentBrowserResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['UserAgentBrowser'] = ResolversParentTypes['UserAgentBrowser']> = ResolversObject<{
   major?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type UserAgentCpuResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentCpu'] = ResolversParentTypes['UserAgentCpu']> = ResolversObject<{
+export type UserAgentCpuResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['UserAgentCpu'] = ResolversParentTypes['UserAgentCpu']> = ResolversObject<{
   architecture?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type UserAgentEngineResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentEngine'] = ResolversParentTypes['UserAgentEngine']> = ResolversObject<{
+export type UserAgentEngineResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['UserAgentEngine'] = ResolversParentTypes['UserAgentEngine']> = ResolversObject<{
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type UserAgentOsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAgentOs'] = ResolversParentTypes['UserAgentOs']> = ResolversObject<{
+export type UserAgentOsResolvers<ContextType = IGraphQLContext, ParentType extends ResolversParentTypes['UserAgentOs'] = ResolversParentTypes['UserAgentOs']> = ResolversObject<{
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
+export type Resolvers<ContextType = IGraphQLContext> = ResolversObject<{
   Account?: AccountResolvers<ContextType>;
   AccountSession?: AccountSessionResolvers<ContextType>;
   AuthResult?: AuthResultResolvers<ContextType>;
@@ -419,6 +419,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UserAgentOs?: UserAgentOsResolvers<ContextType>;
 }>;
 
-export type DirectiveResolvers<ContextType = GraphQLContext> = ResolversObject<{
+export type DirectiveResolvers<ContextType = IGraphQLContext> = ResolversObject<{
   cost?: CostDirectiveResolver<any, any, ContextType>;
 }>;

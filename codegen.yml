@@ -12,7 +12,7 @@ generates:
             - "typescript"
             - "typescript-resolvers"
         config:
-            contextType: GraphQLContext
+            contextType: IGraphQLContext
             useIndexSignature: true
             defaultMapper: Partial<{T}>
     src/tests/graphql/generated/gql-tests.ts:
