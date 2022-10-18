@@ -21,7 +21,7 @@ import {mocksService} from './modules/common/mocks.service';
 import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
-import {AccountStatus} from './generated/graphql-api';
+import {Account, AccountStatus} from './generated/graphql-api';
 import {IGraphQLContext} from './IGraphQLContext';
 import path from 'path';
 import multer from 'multer';
@@ -150,11 +150,7 @@ export const server = new CostAnalysisApolloServer({
             });
         }
 
-        const account = !session ? undefined : {
-            ...session.account,
-            status: session.account.status as AccountStatus,
-            sessions: null
-        };
+        const account: Account | undefined = session ? AccountAdapter.dbToGraphQL(session.account) : undefined;
 
         let location: Lookup | null = null;
         if (session) {
@@ -175,7 +171,7 @@ export const server = new CostAnalysisApolloServer({
                 ...session,
                 userAgent: !session.userAgent ? undefined : uaParse(session.userAgent),
                 address: address.length > 0 ? address : undefined,
-                account: AccountAdapter.dbToGraphQL(account)
+                account
             }
         };
     },
