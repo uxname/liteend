@@ -58,6 +58,7 @@ export class AccountService {
 
         if (data.code === emailCode.code) {
             await prisma.emailCode.delete({where: {email: data.email.value}});
+            await prisma.account.update({where: {id: account.id}, data: {status: AccountStatus.Active}});
 
             return true;
         } else {
