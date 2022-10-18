@@ -22,7 +22,7 @@ import {addMocksToSchema, createMockStore} from '@graphql-tools/mock';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
 import {AccountStatus} from './generated/graphql-api';
-import {GraphQLContext} from './IContext';
+import {IGraphQLContext} from './IGraphQLContext';
 import path from 'path';
 import multer from 'multer';
 import {v4 as uuid} from 'uuid';
@@ -115,7 +115,7 @@ export const server = new CostAnalysisApolloServer({
         return err;
     },
     // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-    context: async ({req}): Promise<GraphQLContext> => {
+    context: async ({req}): Promise<IGraphQLContext> => {
         RequestLoggerService.logGraphQL(req);
         let authHeader = req.header('authorization');
 

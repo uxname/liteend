@@ -8,7 +8,7 @@ generates:
                     content:
                         - "/* eslint-disable */"
                         - "// @ts-nocheck"
-                        - "import { GraphQLContext } from '../IContext';"
+                        - "import { IGraphQLContext } from '../IGraphQLContext';"
             - "typescript"
             - "typescript-resolvers"
         config:

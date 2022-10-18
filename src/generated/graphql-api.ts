@@ -1,6 +1,6 @@
 /* eslint-disable */
 // @ts-nocheck
-import { GraphQLContext } from '../IContext';
+import { IGraphQLContext } from '../IGraphQLContext';
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
