@@ -62,10 +62,6 @@ app.use('/logs',
     express.static(logsDir), serveIndex(logsDir, {icons: true})
 );
 
-if (config.server.corsEnabled) {
-    app.use(cors());
-}
-
 class CostAnalysisApolloServer extends ApolloServer {
     async createGraphQLServerOptions(req: express.Request, res: express.Response) {
         const options = await super.createGraphQLServerOptions(req, res);
@@ -205,6 +201,14 @@ app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
 }));
+if (config.server.corsEnabled) {
+    app.use(cors());
+    app.use((req, res, next) => {
+        res.setHeader('Cross-Origin-Opener-Policy', 'cross-origin');
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        next();
+    });
+}
 app.use((req, res, next) => {
     if (!config.server.maintenanceMode.enabled) {
         next();
