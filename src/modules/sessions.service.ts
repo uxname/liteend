@@ -47,7 +47,7 @@ export class SessionsService {
     }
 
     static async generateNewAuth(data: {prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request}): Promise<AuthResult> {
-        const token = AuthUtilsService.generateToken();
+        const token = await AuthUtilsService.generateToken();
         const session = await SessionsService.createNewSession({
             prisma: data.prisma,
             accountId: data.account.id,

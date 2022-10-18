@@ -25,7 +25,7 @@ import {AccountStatus} from './generated/graphql_api';
 import {GraphQLContext} from './IContext';
 import path from 'path';
 import multer from 'multer';
-import {nanoid} from 'nanoid';
+import {v4 as uuid} from 'uuid';
 import {AddressInfo} from 'net';
 import uaParse from 'ua-parser-js';
 import geoip, {Lookup} from 'geoip-lite';
@@ -228,8 +228,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const ext = file.originalname.split('.');
-        const RANDOM_SUFFIX_SIZE = 12;
-        const fileName = `${Date.now()}-${nanoid(RANDOM_SUFFIX_SIZE)}.${ext[ext.length - 1]}`;
+        const fileName = `${Date.now()}-${uuid()}.${ext[ext.length - 1]}`;
         log.trace(`Upload file "${file.originalname}": ${fileName}`);
         cb(null, fileName);
     }

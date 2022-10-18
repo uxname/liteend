@@ -1,13 +1,12 @@
-import bcrypt from 'bcrypt';
+import bcrypt, {hash} from 'bcrypt';
 import topMostCommonPasswords from './top-most-common-passwords.json';
 import Validate from 'validate.js';
 import _ from 'lodash';
-import {nanoid} from 'nanoid';
+import {v4 as uuid} from 'uuid';
 
 export class AuthUtilsService {
-    static generateToken(): string {
-        const TOKEN_SIZE = 48;
-        return nanoid(TOKEN_SIZE);
+    static async generateToken(): Promise<string> {
+        return AuthUtilsService.hash(uuid());
     }
 
     static async hash(text: string): Promise<string> {
