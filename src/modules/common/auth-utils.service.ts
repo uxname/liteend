@@ -1,4 +1,4 @@
-import bcrypt, {hash} from 'bcrypt';
+import bcrypt from 'bcrypt';
 import topMostCommonPasswords from './top-most-common-passwords.json';
 import Validate from 'validate.js';
 import _ from 'lodash';
