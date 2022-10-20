@@ -47,6 +47,21 @@ export class SessionsService {
     }
 
     static async generateNewAuth(data: {prisma: PrismaClient.PrismaClient, account: PrismaClient.Account, request: express.Request}): Promise<AuthResult> {
+        // check if sessions limit is reached and delete the oldest sessions
+        const MAX_SESSIONS = config.server.sessions.maxCountPerAccount;
+        const sessionsCount = await prisma.accountSession.count({where: {accountId: data.account.id}});
+        if (sessionsCount >= MAX_SESSIONS) {
+            const oldestSessions = await prisma.accountSession.findMany({
+                where: {accountId: data.account.id},
+                orderBy: {createdAt: 'asc'},
+                take: sessionsCount - MAX_SESSIONS + 1,
+                select: {id: true}
+            });
+
+            log.trace('Deleting oldest sessions', oldestSessions);
+            await prisma.accountSession.deleteMany({where: {id: {in: oldestSessions.map(s => s.id)}}});
+        }
+
         const token = await AuthUtilsService.generateToken();
         const session = await SessionsService.createNewSession({
             prisma: data.prisma,
@@ -99,7 +114,7 @@ export class SessionsService {
             data: {
                 account: {connect: {id: input.accountId}},
                 token: input.token,
-                expiresAt: new Date(new Date().getTime() + config.server.sessionExpiresIn),
+                expiresAt: new Date(new Date().getTime() + config.server.sessions.expiresIn),
                 ipAddr,
                 userAgent: input.request.headers['user-agent']
             }

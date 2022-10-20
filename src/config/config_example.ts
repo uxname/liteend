@@ -154,7 +154,10 @@ export default {
                 '::ffff:127.0.0.1'
             ]
         },
-        sessionExpiresIn: 30 * 24 * 60 * 60 * 1000,
+        sessions: {
+            expiresIn: 30 * 24 * 60 * 60 * 1000,
+            maxCountPerAccount: 100
+        },
         salt: 'kmpigYcbvjfKUBJvPCEuA43LXWrTb27Qe8Xv5uGuNQ6tyAvYC354VahSKpUR5SkR',
         maxUploadFileSizeBytes: 5 * 1024 * 1024,
         uploadAllowedFileTypes: [

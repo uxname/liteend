@@ -59,20 +59,6 @@ const mutationResolver: Resolvers = {
                 hash: account.passwordHash,
                 text: password + config.server.salt
             })) {
-                // check if sessions limit is reached and delete the oldest sessions
-                const MAX_SESSIONS = 100;
-                const sessionsCount = await prisma.accountSession.count({where: {accountId: account!.id}});
-                if (sessionsCount >= MAX_SESSIONS) {
-                    const oldestSessions = await prisma.accountSession.findMany({
-                        where: {accountId: account!.id},
-                        orderBy: {createdAt: 'asc'},
-                        take: sessionsCount - MAX_SESSIONS + 1,
-                        select: {id: true}
-                    });
-
-                    log.trace('Deleting oldest sessions', oldestSessions);
-                    await prisma.accountSession.deleteMany({where: {id: {in: oldestSessions.map(s => s.id)}}});
-                }
                 return await SessionsService.generateNewAuth({prisma, account, request});
             } else {
                 throw new GraphQLError({
