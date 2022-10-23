@@ -6,7 +6,7 @@ const MAX_BACKUP_COUNT = 100; // maximum number of log files.
 
 export default {
     server: {
-        logsServe: {
+        adminAuth: {
             users: {
                 admin: 'MWmkGdyCkHDPpBgkdwrHWGYZ2EdHHFp5rmNGZvxBV8nNQ4svZLBjdM4LvV8bSLde'
             },
@@ -167,6 +167,9 @@ export default {
             '.webp',
             '.gif'
         ]
+    },
+    db: {
+        studioEnabled: true
     },
     email: {
         host: 'smtp.ethereal.email',
