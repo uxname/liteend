@@ -2,17 +2,20 @@ import {ChildProcess, spawn} from 'child_process';
 import kill from 'tree-kill';
 import {createProxyMiddleware} from 'http-proxy-middleware';
 import {Express, RequestHandler} from 'express';
+import {getLogger} from '../logger.service';
+
+const log = getLogger('Prisma Studio Service');
 
 export class PrismaStudioService {
     private child: ChildProcess | undefined;
 
     public startStudio(): Promise<unknown> {
-        console.log('Starting prisma studio...');
+        log.info('Starting prisma studio...');
         return this.spawnProcess('npm run db:studio-local');
     }
 
     public stopStudio(): Promise<unknown> {
-        console.log('Stopping prisma studio...');
+        log.info('Stopping prisma studio...');
         return this.killProcess();
     }
 
@@ -42,7 +45,7 @@ export class PrismaStudioService {
             });
 
             this.child.on('error', (error) => {
-                console.error(error);
+                log.error(error);
                 reject(error);
             });
 
@@ -57,7 +60,7 @@ export class PrismaStudioService {
             if (this.child?.pid) {
                 kill(this.child.pid, 'SIGKILL', (error) => {
                     if (error) {
-                        console.error(error);
+                        log.error(error);
                         reject(error);
                     }
                     resolve();
