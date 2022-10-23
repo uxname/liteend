@@ -169,7 +169,7 @@ export default {
         ]
     },
     db: {
-        studioEnabled: true
+        studioEnabled: false
     },
     email: {
         host: 'smtp.ethereal.email',
