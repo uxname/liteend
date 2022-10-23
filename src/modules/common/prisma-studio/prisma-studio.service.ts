@@ -23,6 +23,7 @@ export class PrismaStudioService {
         const proxy = createProxyMiddleware({
             target: 'http://localhost:5555',
             changeOrigin: true,
+            logProvider: () => log,
             pathRewrite: {
                 [`^${urlPath}`]: '/'
             }
