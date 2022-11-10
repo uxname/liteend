@@ -10,6 +10,8 @@ Simple lightweight GraphQL server on Node.JS which can be used as a basis backen
 - `cp src/config/config_example.ts src/config/config.ts`
     - Edit `config.ts`
 - Generate types: `npm run gen`
+- Deploy database: `npm run db:deploy`
+- Seed DB: `npm run db:seed`
 - Development run: `npm run dev`
 - Production run: `npm start`
 
