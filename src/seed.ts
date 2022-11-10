@@ -12,11 +12,18 @@ const log = getLogger('DB seed');
 async function seed() {
     const ADMIN_EMAIL = 'admin@admin.com';
     const ADMIN_PASSWORD = 'admin@admin.com';
+    const ADMIN_AUTH_TOKEN = `test_token_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
 
-    const deletedSessions = await prisma.accountSession.deleteMany({where: {account: {email: ADMIN_EMAIL}}});
-    const deletedAccount = await prisma.account.delete({where: {email: ADMIN_EMAIL}});
-    log.debug(`Deleted ${deletedSessions.count} sessions`);
-    log.debug(`Deleted ${deletedAccount.email} account`);
+    const sessions = await prisma.accountSession.findMany({where: {account: {email: ADMIN_EMAIL}}});
+    if (sessions.length > 0) {
+        const deletedSessions = await prisma.accountSession.deleteMany({where: {account: {email: ADMIN_EMAIL}}});
+        log.debug(`Deleted ${deletedSessions.count} sessions`);
+    }
+    const account = await prisma.account.findFirst({where: {email: ADMIN_EMAIL}});
+    if (account) {
+        const deletedAccount = await prisma.account.delete({where: {email: ADMIN_EMAIL}});
+        log.debug(`Deleted ${deletedAccount.email} account`);
+    }
 
     await prisma.account.create({
         data: {
@@ -35,10 +42,11 @@ async function seed() {
     });
 
     log.warn(`Created account with email "${ADMIN_EMAIL}" and password "${ADMIN_PASSWORD}"`);
+    log.warn(`Created session with token "${ADMIN_AUTH_TOKEN}"`);
 }
 
 async function main() {
-    const answer = prompt('Are you sure you want to seed the database? It may delete all data. (y/n) ');
+    const answer = prompt('Are you sure you want to seed the database? It may delete all data. (y/N) ');
 
     if (answer !== 'y') {
         log.info('Aborting seed...');
