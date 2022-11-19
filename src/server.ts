@@ -105,7 +105,7 @@ export function createServer(): Server {
         }, RESET_MOCK_STORE_INTERVAL);
     }
 
-    const server = new CostAnalysisApolloServer({
+    const apolloServer = new CostAnalysisApolloServer({
         schema,
         introspection: config.server.graphql.introspection,
         persistedQueries: false,
@@ -308,19 +308,8 @@ export function createServer(): Server {
     );
     app.use('/uploads', express.static(path.join(__dirname, '..', 'data', 'uploads')));
 
-    server.applyMiddleware({app, path: config.server.graphql.path});
-
-    // 404 vulnerability https://nvd.nist.gov/vuln/detail/cve-2019-3498
-    // should be last "app.use" in the middleware chain
-    app.use((req, res) => {
-        res.status(StatusCodes.NOT_FOUND).json({
-            status: 'error',
-            message: 'Not found'
-        });
-    });
-
     return {
-        apolloServer: server,
+        apolloServer,
         app
     };
 }
