@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import {getLogger} from './logger.service';
 import express, {RequestHandler} from 'express';
 import {AddressInfo} from 'net';
@@ -9,8 +10,13 @@ export default class RequestLoggerService {
     public static logGraphQL(httpRequest: express.Request): void {
         function logBody(query: string | Source, isMerged: boolean) {
             const isMergedPrefix = isMerged ? ' (merged request)' : '';
-            // eslint-disable-next-line no-magic-numbers
-            log.trace(`\n::::::::::\n:: GraphQL${isMergedPrefix}\n${query}\n:: Variables\n${JSON.stringify(httpRequest.body.variables, null, 2)}`);
+            log.trace(`
+::::::::::
+:: GraphQL${isMergedPrefix}
+${query}
+:: Variables
+${JSON.stringify(httpRequest.body.variables, null, 2)}
+::::::::::`);
         }
 
         if (Array.isArray(httpRequest.body)) {
