@@ -1,21 +1,27 @@
 {
     "compilerOptions": {
-        "esModuleInterop": true,
-        "target": "es6",
-        "moduleResolution": "node",
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "ES2017",
         "sourceMap": true,
-        "outDir": "dist",
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "strict": true
+        "baseUrl": "./",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "outDir": "dist"
     },
-    "exclude": [
-        "node_modules"
-    ],
-    "lib": [
-        "es2015"
-    ],
-    "ts-node": {
-        "esm": true
-    }
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
 }

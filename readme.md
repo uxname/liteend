@@ -1,7 +1,13 @@
+[//]: # (todo improve readme)
+
 ![](.github/img.png)
+<p align="center">
+  <a href="https://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="100" alt="Nest Logo" /></a>
+</p>
 
 Simple lightweight GraphQL server on Node.JS which can be used as a basis backend for a new projects.
 [Prisma.io](https://www.prisma.io) and SQLite (postgres and others DBMS available too) uses as base for data storage.
+Based on NestJS framework.
 
 # Get started (TL;DR)
 
