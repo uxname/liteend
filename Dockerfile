@@ -1,11 +1,13 @@
-FROM node:16 as modules
+FROM node:18.12.1-alpine3.17 AS builder
+USER node
 WORKDIR /app
-COPY package*.json ./
-RUN npm i --legacy-peer-deps
+COPY --chown=node:node package*.json ./
+RUN npm ci --legacy-peer-deps
+COPY --chown=node:node . .
+RUN npm run build && npm prune --production --legacy-peer-deps
 
-FROM modules as app
+FROM builder AS production
+ENV NODE_ENV production
+USER node
 WORKDIR /app
-COPY . ./
-RUN npm run db:gen
-EXPOSE 4000
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]
