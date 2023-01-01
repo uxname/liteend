@@ -46,7 +46,7 @@ module.exports = {
       {
         allowList: {
           e2e: true,
-        }
+        },
       },
     ],
     'no-magic-numbers': 'warn',
@@ -68,7 +68,7 @@ module.exports = {
     'jest/consistent-test-it': ['error', { fn: 'test' }],
     'new-cap': 'off',
     'comma-dangle': ['error', 'always-multiline'],
-    'no-unused-vars': "off",
-    '@typescript-eslint/no-unused-vars': ["error"],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
   },
 };

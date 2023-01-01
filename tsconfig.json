@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
         "module": "CommonJS",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "moduleResolution": "Node",
         "declaration": true,
         "removeComments": true,
