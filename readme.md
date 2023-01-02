@@ -7,7 +7,7 @@
 Simple lightweight template for an application based on [NestJS](https://nestjs.com).
 [Prisma.io](https://www.prisma.io) and SQLite (Postgres and others DBMS available too) uses as base for data storage.
 
-# Get started (TL;DR)
+## Get started (TL;DR)
 
 - `git clone ...`
 - `npm install`
@@ -19,11 +19,11 @@ Simple lightweight template for an application based on [NestJS](https://nestjs.
 - Development run: `npm run dev`
 - Production run: `npm start`
 
-## Docker-compose
+### Docker-compose
 
 To launch the project in a Docker container, run the command `docker-compose up -d`
 
-## Database workflow
+### Database workflow
 
 - Edit schema: `prisma/schema.prisma`
 - Format schema: `npm run prisma:format`
@@ -32,7 +32,7 @@ To launch the project in a Docker container, run the command `docker-compose up 
 
 > More info about using Prisma: https://www.prisma.io
 
-### Database admin panel in docker
+#### Database admin panel in docker
 
 The project has an admin panel configured to work with the database, available by default on the `5000`
 port: http://localhost:5000
@@ -41,7 +41,7 @@ port: http://localhost:5000
 
 The default SQLite database path is `/opt/data/data.sqlite3`.
 
-# Structure description
+## Structure description
 
 The main project directory is `src`. Brief overview of its structure:
 
@@ -58,15 +58,7 @@ The database schema is described in the `prisma/schema.prisma` file. It is a lin
 format [Prisma Schema](https://www.prisma.io/docs/concepts/components/prisma-schema), which is a description of the
 database schema, based on this schema will be created database migrations and tables
 
-# Code quality
-
-> TL;DR: Run `npm run check` before **every** commit
-
-The project has [ESLint](https://eslint.org/) configured, which checks the code for errors and warnings, and See
-also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings, and also
-format it according to the configured rules - run the command `npm run check`
-
-# package.json scripts
+## package.json scripts
 
 - `start` - Production start
 - `dev` - Development start (auto restart on code changed)
@@ -82,3 +74,24 @@ format it according to the configured rules - run the command `npm run check`
 - `check` - `ts:check` + `lint`
 - `update` - Update `package.json` dependencies to newest versions
 - `test` - Run tests
+
+## Code quality
+
+> TL;DR: Run `npm run check` before **every** commit
+
+The project has [ESLint](https://eslint.org/) configured, which checks the code for errors and warnings, and See
+also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings, and also
+format it according to the configured rules - run the command `npm run check`
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/uxname/liteend/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## 📝 License
+
+Copyright © 2023 [uxname@gmail.com](https://github.com/uxname).<br />
+This project is [MIT](https://mit-license.org/) licensed.
