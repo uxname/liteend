@@ -9,16 +9,32 @@ Simple lightweight template for a backend applications, based on [NestJS](https:
 
 ## 📃 Get started (TL;DR)
 
-- `git clone ...`
-- `npm install`
-- `cp config/config_example.ts config/config.ts`
-    - Edit `config.ts`
-- Generate types: `npm run gen`
-- Deploy database: `npm run db:deploy`
-- Seed DB: `npm run db:seed`
-- Development run: `npm run start:dev`
-- Production build: `npm run build`
-- Production run: `npm start:prod`
+```shell
+# Init project
+$ git clone ...
+$ npm install
+
+# Create and edit config:
+$ cp config/config_example.ts config/config.ts
+
+# Generate types: 
+$ npm run gen
+
+# Deploy database: 
+$ npm run db:deploy
+
+# Seed DB: 
+$ npm run db:seed
+
+# Development run: 
+$ npm run start:dev
+
+# Production build: 
+$ npm run build
+
+# Production run: 
+$ npm start:prod
+```
 
 ### 🥡 Docker-compose
 
@@ -26,10 +42,19 @@ To launch the project in a Docker container, run the command `docker-compose up 
 
 ### 📦 Database workflow
 
-- Edit schema: `prisma/schema.prisma`
-- Format schema: `npm run db:format`
-- Create migration: `npm run db:create`
-- Deploy migrations to database: `npm run db:deploy`
+```shell
+# Edit schema: 
+$ prisma/schema.prisma
+
+# Format schema: 
+$ npm run db:format
+
+# Create migration: 
+$ npm run db:create
+
+# Deploy migrations to database: 
+$ npm run db:deploy
+```
 
 > More info about using Prisma: https://www.prisma.io
 
@@ -62,7 +87,8 @@ $ npm run test:cov
 The project has [ESLint](https://eslint.org/) configured, which checks the code for errors and warnings, and See
 also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings - run the
 command `npm run check`.
-Prettier is also configured to format the code, run `npm run format` to format the code (but ESLint will still check it).
+Prettier is also configured to format the code, run `npm run format` to format the code (but ESLint will still check it)
+.
 
 ## 🤝 Contributing
 
