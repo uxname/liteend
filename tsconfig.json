@@ -1,5 +1,9 @@
 {
     "compilerOptions": {
+        "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
         "module": "CommonJS",
         "resolveJsonModule": true,
         "esModuleInterop": true,
@@ -17,13 +21,22 @@
                 "src/*"
             ]
         },
-        "outDir": "dist"
-    },
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+        "outDir": "dist",
+        "noImplicitThis": true,
+        "incremental": true,
+        "strictBindCallApply": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitReturns": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitUseStrict": false,
+        "suppressExcessPropertyErrors": false,
+        "suppressImplicitAnyIndexErrors": false,
+        "noStrictGenericChecks": false
+    }
 }
