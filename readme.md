@@ -18,7 +18,7 @@ Simple lightweight template for a backend applications, based on [NestJS](https:
 - Seed DB: `npm run db:seed`
 - Development run: `npm run start:dev`
 - Production build: `npm run build`
-- Production run: `npm start`
+- Production run: `npm start:prod`
 
 ### 🥡 Docker-compose
 
@@ -45,6 +45,19 @@ The default SQLite database path is `/opt/data/data.sqlite3`.
 ## 🍀 Code quality
 
 > TL;DR: Run `npm run check` before **every** commit
+
+### ✅ Tests
+
+```shell
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
 
 The project has [ESLint](https://eslint.org/) configured, which checks the code for errors and warnings, and See
 also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings - run the
