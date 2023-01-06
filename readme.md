@@ -4,35 +4,36 @@
   <a href="https://github.com/uxname/liteend" target="blank"><img src=".github/logo.png" width="400" alt="LiteEnd logo" /></a>
 </p>
 
-Simple lightweight template for an application based on [NestJS](https://nestjs.com).
-[Prisma.io](https://www.prisma.io) and SQLite (Postgres and others DBMS available too) uses as base for data storage.
+Simple lightweight template for a backend applications, based on [NestJS](https://nestjs.com).
+[Prisma.io](https://www.prisma.io) and SQLite uses as base for data storage (Postgres and others DBMS available too).
 
-## Get started (TL;DR)
+## 📃 Get started (TL;DR)
 
 - `git clone ...`
 - `npm install`
-- `cp src/config/config_example.ts src/config/config.ts`
+- `cp config/config_example.ts config/config.ts`
     - Edit `config.ts`
 - Generate types: `npm run gen`
 - Deploy database: `npm run db:deploy`
 - Seed DB: `npm run db:seed`
-- Development run: `npm run dev`
+- Development run: `npm run start:dev`
+- Production build: `npm run build`
 - Production run: `npm start`
 
-### Docker-compose
+### 🥡 Docker-compose
 
 To launch the project in a Docker container, run the command `docker-compose up -d`
 
-### Database workflow
+### 📦 Database workflow
 
 - Edit schema: `prisma/schema.prisma`
-- Format schema: `npm run prisma:format`
-- Create (and deploy) migration: `npm run prisma:create`
-- Deploy only migration to database: `npm run prisma:deploy`
+- Format schema: `npm run db:format`
+- Create migration: `npm run db:create`
+- Deploy migrations to database: `npm run db:deploy`
 
 > More info about using Prisma: https://www.prisma.io
 
-#### Database admin panel in docker
+#### 🔑 Database admin panel in docker
 
 The project has an admin panel configured to work with the database, available by default on the `5000`
 port: http://localhost:5000
@@ -41,53 +42,21 @@ port: http://localhost:5000
 
 The default SQLite database path is `/opt/data/data.sqlite3`.
 
-## Structure description
-
-The main project directory is `src`. Brief overview of its structure:
-
-- **/config** - directory with project settings, contains `config.ts` (not in git) and `config_example.ts` (in git)
-- **/core** - directory with main modules of project, the main application logic are implemented here
-- **/generated** - generated project modules, it is **not recommended** to change files in this directory manually
-- **/resolver** - directory with GraphQL query handlers
-- **/resolver/guard** - directory with request handlers for protecting or processing requests (similar to middleware)
-- **/schema** - directory with GraphQL API schemas
-- **/test** - directory with project tests
-- **/index.resolver.ts** - the main project file, it defines the configuration and starts the application
-
-The database schema is described in the `prisma/schema.prisma` file. It is a line in
-format [Prisma Schema](https://www.prisma.io/docs/concepts/components/prisma-schema), which is a description of the
-database schema, based on this schema will be created database migrations and tables
-
-## package.json scripts
-
-- `start` - Production start
-- `dev` - Development start (auto restart on code changed)
-- `prisma:deploy` - Write DB migrations to database
-- `prisma:create` - Create new DB migration from prisma schema
-- `prisma:gen` - Generate prisma client
-- `prisma:studio` - Run database management tool
-- `prisma:format` - Format prisma schema
-- `gen` - Generate all needed files (`prisma:gen` + `ts:gen`)
-- `ts:gen` - Generate typescript code types from GraphQL files
-- `ts:check` - Validate typescript code
-- `lint` - Check code by ESLint
-- `check` - `ts:check` + `lint`
-- `update` - Update `package.json` dependencies to newest versions
-- `test` - Run tests
-
-## Code quality
+## 🍀 Code quality
 
 > TL;DR: Run `npm run check` before **every** commit
 
 The project has [ESLint](https://eslint.org/) configured, which checks the code for errors and warnings, and See
-also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings, and also
-format it according to the configured rules - run the command `npm run check`
+also `tsconfig.json` for proper assembly and compilation of types. To check the code for errors and warnings - run the
+command `npm run check`.
+Prettier is also configured to format the code, run `npm run format` to format the code (but ESLint will still check it).
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/uxname/liteend/issues).
+Contributions, issues and feature requests are welcome!<br />Feel free to
+check [issues page](https://github.com/uxname/liteend/issues).
 
-## Show your support
+## 💪 Show your support
 
 Give a ⭐️ if this project helped you!
 

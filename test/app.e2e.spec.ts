@@ -1,7 +1,7 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '@/app.module';
 
 describe('AppController (e2e)', () => {
