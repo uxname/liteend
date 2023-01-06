@@ -51,7 +51,7 @@ module.exports = {
     ],
     'no-magic-numbers': 'warn',
     'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': 'warn',
+    '@typescript-eslint/no-shadow': 'error',
     'no-multiple-empty-lines': 'error',
     'prefer-template': 'error',
     'prefer-spread': 'error',
