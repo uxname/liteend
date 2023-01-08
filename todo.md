@@ -7,4 +7,6 @@
 - [x] Rename npm run db:deploy to something more meaningful, like db:apply-migrations
 - [ ] Create CLI for generating new config or change git repo url (liteend-cli generate-new-app or something like that)
   - [ ] Add CLI info to readme
+- [ ] Implement logging to DB, files or remote service
+- [ ] Implement start app with waiting for migration application (ex. via *.lock file)
 - [ ] DELETE THIS FILE
