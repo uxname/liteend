@@ -1,7 +1,7 @@
 # Todo
 
 - [ ] GraphQL integration tests
-- [ ] Config
+- [x] Config
 - [ ] User management (register, login, logout, reset password, roles, etc.)
 - [ ] Rename npm run db:create to something more meaningful, like db:create-migration
 - [ ] Rename npm run db:deploy to something more meaningful, like db:apply-migrations

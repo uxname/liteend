@@ -2,6 +2,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
+    project: null, // hack for webstorm
     sourceType: 'module',
   },
   plugins: [
@@ -70,5 +71,6 @@ module.exports = {
     'comma-dangle': ['error', 'always-multiline'],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
+    'dot-notation': 'off', // TODO: enable
   },
 };
