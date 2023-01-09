@@ -9,4 +9,5 @@
   - [ ] Add CLI info to readme
 - [ ] Implement logging to DB, files or remote service
 - [ ] Implement start app with waiting for migration application (ex. via *.lock file)
+- [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE

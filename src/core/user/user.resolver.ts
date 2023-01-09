@@ -3,7 +3,7 @@ import { Query, Resolver } from '@nestjs/graphql';
 @Resolver()
 export class UserResolver {
   @Query(() => String)
-  helloWorld(): string {
-    return 'Hello world';
+  users(): string {
+    return 'user: 1,2,3,4...';
   }
 }

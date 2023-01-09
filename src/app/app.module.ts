@@ -4,7 +4,7 @@ import { GraphqlModule } from '@/graphql/graphql.module';
 
 @Module({
   imports: [
-    EasyconfigModule.register({ path: '.env', safe: true }),
+    EasyconfigModule.register({ path: '.env', safe: true, parseLog: false }),
     GraphqlModule,
   ],
 })

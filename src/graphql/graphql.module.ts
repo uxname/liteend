@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { UserModule } from './user/user.module';
+import { UserModule } from '@/core/user/user.module';
+import { QueryResolver } from './query/query.resolver';
+import { MutationResolver } from './mutation/mutation.resolver';
 
 @Module({
   imports: [
@@ -12,5 +14,6 @@ import { UserModule } from './user/user.module';
     }),
     UserModule,
   ],
+  providers: [QueryResolver, MutationResolver],
 })
 export class GraphqlModule {}
