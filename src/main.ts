@@ -12,4 +12,4 @@ async function bootstrap() {
 }
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
-bootstrap();
+bootstrap().catch(console.error);

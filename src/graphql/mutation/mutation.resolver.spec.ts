@@ -12,7 +12,7 @@ describe('MutationResolver', () => {
     resolver = module.get<MutationResolver>(MutationResolver);
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(resolver).toBeDefined();
   });
 });

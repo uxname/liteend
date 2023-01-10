@@ -12,7 +12,7 @@ describe('QueryResolver', () => {
     resolver = module.get<QueryResolver>(QueryResolver);
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(resolver).toBeDefined();
   });
 });

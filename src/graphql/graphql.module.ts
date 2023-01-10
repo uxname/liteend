@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { UserModule } from '@/core/user/user.module';
+import { AccountModule } from '@/core/account/account.module';
 import { QueryResolver } from './query/query.resolver';
 import { MutationResolver } from './mutation/mutation.resolver';
+import GraphQLJSON from 'graphql-type-json';
 
 @Module({
   imports: [
@@ -11,8 +12,9 @@ import { MutationResolver } from './mutation/mutation.resolver';
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
+      resolvers: { JSON: GraphQLJSON },
     }),
-    UserModule,
+    AccountModule,
   ],
   providers: [QueryResolver, MutationResolver],
 })

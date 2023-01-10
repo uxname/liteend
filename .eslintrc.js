@@ -72,5 +72,6 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
     'dot-notation': 'off', // TODO: enable
+    'no-use-before-define': 'off',
   },
 };
