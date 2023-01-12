@@ -1,6 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
-import { Account, AccountSession } from '@/core/account/types';
+import { Account, AccountSession } from '@/graphql/account/types';
 
 @Resolver(() => Query)
 export class QueryResolver {

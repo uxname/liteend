@@ -1,5 +1,8 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { AuthResponse, GenerateEmailCodeResponse } from '@/core/account/types';
+import {
+  AuthResponse,
+  GenerateEmailCodeResponse,
+} from '@/graphql/account/types';
 
 @Resolver()
 export class MutationResolver {
