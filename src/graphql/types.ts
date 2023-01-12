@@ -3,9 +3,9 @@ import { Field, InterfaceType } from '@nestjs/graphql';
 @InterfaceType()
 export abstract class Node {
   @Field()
-  id!: number;
+  id: number;
   @Field()
-  createdAt!: Date;
+  createdAt: Date;
   @Field()
-  updatedAt!: Date;
+  updatedAt: Date;
 }

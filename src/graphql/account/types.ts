@@ -4,15 +4,15 @@ import { Node } from '@/graphql/types';
 @ObjectType()
 export class AuthResponse {
   @Field()
-  token!: string;
+  token: string;
 }
 
 @ObjectType()
 export class GenerateEmailCodeResponse {
   @Field()
-  result!: boolean;
+  result: boolean;
   @Field()
-  expiresAt!: Date;
+  expiresAt: Date;
 }
 
 export enum AccountStatus {
@@ -33,24 +33,24 @@ registerEnumType(AccountRole, { name: 'AccountRole' });
   implements: () => [Node],
 })
 export class Account implements Node {
-  @Field() id!: number;
-  @Field() createdAt!: Date;
-  @Field() updatedAt!: Date;
-  @Field() email!: string;
-  @Field() status!: AccountStatus;
-  @Field(() => [AccountRole]) roles!: AccountRole[];
-  @Field(() => [AccountRole]) sessions!: AccountSession[];
+  @Field() id: number;
+  @Field() createdAt: Date;
+  @Field() updatedAt: Date;
+  @Field() email: string;
+  @Field() status: AccountStatus;
+  @Field(() => [AccountRole]) roles: AccountRole[];
+  @Field(() => [AccountRole]) sessions: AccountSession[];
 }
 
 @ObjectType({
   implements: () => [Node],
 })
 export class AccountSession implements Node {
-  @Field() id!: number;
-  @Field() createdAt!: Date;
-  @Field() updatedAt!: Date;
-  @Field() account!: Account;
-  @Field() ipAddr!: string;
-  @Field() address!: string;
-  @Field() expiresAt!: Date;
+  @Field() id: number;
+  @Field() createdAt: Date;
+  @Field() updatedAt: Date;
+  @Field() account: Account;
+  @Field() ipAddr: string;
+  @Field() address: string;
+  @Field() expiresAt: Date;
 }

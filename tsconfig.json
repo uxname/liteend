@@ -29,7 +29,7 @@
         "noUncheckedIndexedAccess": true,
         "noImplicitReturns": true,
         "strictFunctionTypes": true,
-        "strictPropertyInitialization": true,
+        "strictPropertyInitialization": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
         "allowUnreachableCode": false,
