@@ -5,6 +5,8 @@ import { AccountModule } from '@/graphql/account/account.module';
 import { QueryResolver } from './query/query.resolver';
 import { MutationResolver } from './mutation/mutation.resolver';
 import GraphQLJSON from 'graphql-type-json';
+import { PrismaModule } from '@/common/prisma/prisma.module';
+import { AccountSessionModule } from './account-session/account-session.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import GraphQLJSON from 'graphql-type-json';
       path: '/graphql',
       resolvers: { JSON: GraphQLJSON },
     }),
+    PrismaModule,
     AccountModule,
+    AccountSessionModule,
   ],
   providers: [QueryResolver, MutationResolver],
 })

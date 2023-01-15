@@ -5,6 +5,9 @@ import { Node } from '@/graphql/types';
 export class AuthResponse {
   @Field()
   token: string;
+
+  @Field(() => Account)
+  account: Account;
 }
 
 @ObjectType()
