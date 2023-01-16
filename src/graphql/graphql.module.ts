@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AccountModule } from '@/graphql/account/account.module';
@@ -9,6 +10,11 @@ import { PrismaModule } from '@/common/prisma/prisma.module';
 import { AccountSessionModule } from './account-session/account-session.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 
+export class GqlContext {
+  req: Request;
+  res: Response;
+}
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -16,6 +22,7 @@ import { CryptoModule } from '@/common/crypto/crypto.module';
       autoSchemaFile: true,
       path: '/graphql',
       resolvers: { JSON: GraphQLJSON },
+      context: ({ req, res }): GqlContext => ({ req, res }),
     }),
     PrismaModule,
     CryptoModule,

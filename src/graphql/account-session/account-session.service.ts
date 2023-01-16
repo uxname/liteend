@@ -10,6 +10,7 @@ export class AccountSessionService {
     accountId: number,
     token: string,
     ipAddr: string,
+    userAgent?: string,
   ): Promise<PrismaClient.AccountSession> {
     // eslint-disable-next-line no-magic-numbers
     const expiresAtInMs = Date.now() + 1000 * 60 * 60 * 24 * 30;
@@ -22,6 +23,7 @@ export class AccountSessionService {
         },
         token,
         ipAddr,
+        userAgent,
         expiresAt: new Date(expiresAtInMs),
       },
     });
