@@ -13,5 +13,6 @@
 - [ ] Add logger
 - [ ] Add useragent to Account
 - [ ] Add error codes and api that exposes them
+- [ ] Add to every tokens prefix (ex access token has prefix "at_")
 - [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE

@@ -16,14 +16,4 @@ export class QueryResolver {
       showAdditionalInfo,
     };
   }
-
-  @Query(() => GraphQLJSON, { name: 'whoami' })
-  whoami(): Account {
-    return {} as Account;
-  }
-
-  @Query(() => AccountSession, { name: 'currentSession' })
-  currentSession(): AccountSession {
-    return {} as AccountSession;
-  }
 }

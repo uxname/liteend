@@ -29,4 +29,12 @@ export class AccountService {
       },
     });
   }
+
+  async getAccountByEmail(email: string): Promise<Account | null> {
+    return this.prisma.account.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
 }

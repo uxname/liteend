@@ -9,6 +9,7 @@ import GraphQLJSON from 'graphql-type-json';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { AccountSessionModule } from './account-session/account-session.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
+import { AuthModule } from './auth/auth.module';
 
 export class GqlContext {
   req: Request;
@@ -27,7 +28,9 @@ export class GqlContext {
     PrismaModule,
     CryptoModule,
     AccountModule,
+    AuthModule,
     AccountSessionModule,
+    AuthModule,
   ],
   providers: [QueryResolver, MutationResolver],
 })
