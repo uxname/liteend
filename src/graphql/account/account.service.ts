@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { EasyconfigService } from 'nestjs-easyconfig';
 import { CryptoService } from '@/common/crypto/crypto.service';
-import { AccountRole, AccountStatus } from '@/graphql/account/types';
-import Prisma from '@prisma/client';
+import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 
 @Injectable()
 export class AccountService {
@@ -16,15 +17,15 @@ export class AccountService {
   public async createAccount(
     email: string,
     password: string,
-  ): Promise<Prisma.Account> {
+  ): Promise<Account> {
     const salt = this.config.get('SALT');
     const passwordHash = await this.crypto.hash(password, salt);
-    return await this.prisma.account.create({
+    return this.prisma.account.create({
       data: {
         email,
         passwordHash,
         status: AccountStatus.ACTIVE,
-        rolesArrayJson: JSON.stringify([AccountRole.USER]),
+        roles: [AccountRole.USER],
       },
     });
   }

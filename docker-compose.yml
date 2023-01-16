@@ -11,10 +11,22 @@ services:
         ports:
             - "4000:4000"
             - "5555:5555"
+    db:
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: ${DATABASE_USER}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+            POSTGRES_DB: ${DATABASE_NAME}
+            PGDATA: /data/postgres
+        restart: always
+        ports:
+            - "127.0.0.1:5432:5432"
+        volumes:
+            - './data/postgres:/data/postgres'
     db_admin:
         image: dbeaver/cloudbeaver
         ports:
-            - '5000:8978'
+            - '5100:8978'
         volumes:
             - ./data:/opt/data:rw
             - ./data/db_admin:/opt/cloudbeaver/workspace

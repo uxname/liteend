@@ -12,5 +12,6 @@
 - [ ] Add telemetry
 - [ ] Add logger
 - [ ] Add useragent to Account
+- [ ] Add error codes and api that exposes them
 - [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE

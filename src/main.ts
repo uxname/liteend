@@ -7,7 +7,7 @@ async function bootstrap() {
   if (!port) {
     throw new Error('No port specified');
   }
-  console.log('port', port);
+  console.log(`App started at http://localhost:${port}`);
   await app.listen(port);
 }
 

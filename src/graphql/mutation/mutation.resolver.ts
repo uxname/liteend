@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import {
   AuthResponse,
   GenerateEmailCodeResponse,
@@ -6,7 +6,7 @@ import {
 import { AccountService } from '@/graphql/account/account.service';
 import { AccountSessionService } from '@/graphql/account-session/account-session.service';
 import { CryptoService } from '@/common/crypto/crypto.service';
-import { Ip } from '@nestjs/common';
+import { Account } from '@/@generated/nestgraphql/account/account.model';
 
 @Resolver()
 export class MutationResolver {
@@ -24,12 +24,12 @@ export class MutationResolver {
 
   @Mutation(() => AuthResponse)
   async register(
-    email: string,
-    password: string,
-    @Ip() ipAddr: string,
+    @Args('email') email: string,
+    @Args('password') password: string,
   ): Promise<AuthResponse> {
     const account = await this.accountService.createAccount(email, password);
     const token = await this.cryptoService.generateRandomString();
+    const ipAddr = '127.0.0.1'; // todo fix me
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
@@ -48,9 +48,9 @@ export class MutationResolver {
   }
 
   @Mutation(() => Boolean)
-  activateAccount(email: string, code: string): boolean {
+  activateAccount(email: string, code: string): Account {
     console.log(email, code);
-    return true;
+    return {} as Account;
   }
 
   @Mutation(() => Boolean)

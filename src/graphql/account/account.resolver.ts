@@ -1,5 +1,5 @@
+import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
 import { Query, Resolver } from '@nestjs/graphql';
-import { AccountSession } from '@/graphql/account/types';
 
 @Resolver()
 export class AccountResolver {

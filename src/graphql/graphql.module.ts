@@ -7,6 +7,7 @@ import { MutationResolver } from './mutation/mutation.resolver';
 import GraphQLJSON from 'graphql-type-json';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { AccountSessionModule } from './account-session/account-session.module';
+import { CryptoModule } from '@/common/crypto/crypto.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AccountSessionModule } from './account-session/account-session.module';
       resolvers: { JSON: GraphQLJSON },
     }),
     PrismaModule,
+    CryptoModule,
     AccountModule,
     AccountSessionModule,
   ],

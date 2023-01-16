@@ -2,12 +2,18 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:../data/data.sqlite3"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+}
+
+generator nestgraphql {
+    provider = "prisma-nestjs-graphql"
+    output = "../src/@generated/nestgraphql"
+    noTypeId = true
 }
 
 model Account {
@@ -16,15 +22,26 @@ model Account {
   updatedAt DateTime @updatedAt
 
   email          String @unique
+  /// @HideField()
   passwordHash   String
-  rolesArrayJson String
-
-  status String @default("DISABLED")
+  roles AccountRole[]
+  status AccountStatus
 
   sessions AccountSession[]
 }
 
-model EmailCode {
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum AccountRole {
+  ADMIN
+  USER
+}
+
+model OneTimeCode {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
