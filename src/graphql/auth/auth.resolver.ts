@@ -8,10 +8,12 @@ import {
   GenerateEmailCodeResponse,
 } from '@/graphql/account/types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AuthService } from '@/graphql/auth/auth.service';
 
 @Resolver()
 export class AuthResolver {
   constructor(
+    private authService: AuthService,
     private accountService: AccountService,
     private accountSessionService: AccountSessionService,
     private cryptoService: CryptoService,
@@ -43,10 +45,7 @@ export class AuthResolver {
     @Args('password') password: string,
     @Context() context: GqlContext,
   ): Promise<AuthResponse> {
-    const account = await this.accountService.getAccountByEmail(email);
-    if (!account) {
-      throw new Error('Account not found');
-    }
+    const account = await this.authService.validateAccount(email, password);
     const token = await this.cryptoService.generateRandomString();
 
     await this.accountSessionService.createAccountSession(
