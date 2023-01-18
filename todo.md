@@ -1,5 +1,6 @@
 # Todo
 
+- [ ] Add eslint-plugin-simple-import-sort
 - [ ] GraphQL integration tests
 - [x] Config
 - [ ] User management (register, login, logout, reset password, roles, etc.)
@@ -11,8 +12,10 @@
 - [ ] Implement start app with waiting for migration application (ex. via *.lock file)
 - [ ] Add telemetry
 - [ ] Add logger
+- [ ] Implement "npx liteend-cli generate-new-app" or something like that
 - [ ] Add useragent to Account
+- [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
-- [ ] Add to every tokens prefix (ex access token has prefix "at_")
+- [ ] Add to every token prefix (ex access token has prefix "at_")
 - [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE
