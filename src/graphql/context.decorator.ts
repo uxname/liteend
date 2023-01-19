@@ -1,13 +1,12 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { GqlContext } from '@/graphql/graphql.module';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
 
-export const AccountDecorator = createParamDecorator<
+export const ContextDecorator = createParamDecorator<
   undefined,
   ExecutionContext,
-  Promise<Account | undefined>
+  Promise<GqlContext | undefined>
 >(async (_, context: ExecutionContext) => {
   const gqlContext = GqlExecutionContext.create(context);
-  return gqlContext.getContext<GqlContext>().account;
+  return gqlContext.getContext<GqlContext>();
 });

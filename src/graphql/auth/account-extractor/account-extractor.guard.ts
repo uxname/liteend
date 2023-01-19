@@ -16,6 +16,11 @@ export class AccountExtractorGuard implements CanActivate {
     gqlContext.getContext<GqlContext>().account =
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await this.accountSessionService!.getAccountByToken(token);
+
+    gqlContext.getContext<GqlContext>().accountSession =
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this.accountSessionService!.getAccountSessionByToken(token);
+
     return true;
   }
 }

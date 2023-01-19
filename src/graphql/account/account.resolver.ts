@@ -1,7 +1,11 @@
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
 import { Query, Resolver } from '@nestjs/graphql';
-import GraphQLJSON from 'graphql-type-json';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
+import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
+import { ContextDecorator } from '@/graphql/context.decorator';
+import { GqlContext } from '@/graphql/graphql.module';
 
 @Resolver()
 export class AccountResolver {
@@ -10,13 +14,17 @@ export class AccountResolver {
     return [] as AccountSession[];
   }
 
-  @Query(() => GraphQLJSON, { name: 'whoami' })
-  whoami(): Account {
-    return {} as Account;
+  @Query(() => Account, { name: 'whoami' })
+  @UseGuards(AccountExtractorGuard, AuthGuard)
+  whoami(@ContextDecorator() account: Account): Account {
+    return account;
   }
 
   @Query(() => AccountSession, { name: 'currentSession' })
-  currentSession(): AccountSession {
-    return {} as AccountSession;
+  @UseGuards(AccountExtractorGuard, AuthGuard)
+  currentSession(@ContextDecorator() context: GqlContext): AccountSession {
+    // Should be because AuthGuard is used
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return context.accountSession!;
   }
 }

@@ -2,6 +2,7 @@ import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 import { Account } from '../account/account.model';
+import { HideField } from '@nestjs/graphql';
 
 @ObjectType()
 export class AccountSession {
@@ -21,7 +22,7 @@ export class AccountSession {
     @Field(() => Int, {nullable:false})
     accountId!: number;
 
-    @Field(() => String, {nullable:false})
+    @HideField()
     token!: string;
 
     @Field(() => String, {nullable:false})

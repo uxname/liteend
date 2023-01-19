@@ -33,12 +33,13 @@ export class AccountSessionService {
 
   async getAccountSessionByToken(
     token: string,
-  ): Promise<AccountSession | null> {
-    return this.prisma.accountSession.findUnique({
+  ): Promise<AccountSession | undefined> {
+    const result = await this.prisma.accountSession.findUnique({
       where: {
         token,
       },
     });
+    return result || undefined;
   }
 
   async getAccountByToken(token: string): Promise<Account | undefined> {

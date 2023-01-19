@@ -6,6 +6,10 @@ import { GqlContext } from '@/graphql/graphql.module';
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const gqlContext = GqlExecutionContext.create(context);
-    return Boolean(gqlContext.getContext<GqlContext>().account);
+    if (gqlContext.getContext<GqlContext>().account) {
+      return true;
+    } else {
+      throw new Error('Unauthorized');
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
+import { HideField } from '@nestjs/graphql';
 
 @ObjectType()
 export class AccountSessionCountAggregate {
@@ -17,7 +18,7 @@ export class AccountSessionCountAggregate {
     @Field(() => Int, {nullable:false})
     accountId!: number;
 
-    @Field(() => Int, {nullable:false})
+    @HideField()
     token!: number;
 
     @Field(() => Int, {nullable:false})

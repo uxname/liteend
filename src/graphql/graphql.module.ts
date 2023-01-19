@@ -11,12 +11,14 @@ import { AccountSessionModule } from './account-session/account-session.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { AuthModule } from './auth/auth.module';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
 
 // todo move to separated file
 export class GqlContext {
   req: Request;
   res: Response;
   account: Account | undefined;
+  accountSession: AccountSession | undefined;
 }
 
 @Module({
@@ -30,6 +32,7 @@ export class GqlContext {
         req,
         res,
         account: undefined,
+        accountSession: undefined,
       }),
     }),
     PrismaModule,

@@ -73,7 +73,9 @@ model AccountSession {
   account   Account @relation(fields: [accountId], references: [id])
   accountId Int
 
+  /// @HideField()
   token     String   @unique
+
   ipAddr    String
   userAgent String?
   expiresAt DateTime

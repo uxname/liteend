@@ -11,7 +11,7 @@ import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AuthService } from '@/graphql/auth/auth.service';
 import { UseGuards } from '@nestjs/common';
 import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
-import { AccountDecorator } from '@/graphql/auth/account/account.decorator';
+import { ContextDecorator } from '@/graphql/context.decorator';
 import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
 
 @Resolver()
@@ -71,9 +71,14 @@ export class AuthResolver {
       type: () => [Number],
     })
     sessionIds: number[],
-    @AccountDecorator() account: Account,
+    @ContextDecorator() context: GqlContext,
   ): Promise<boolean> {
-    return await this.accountSessionService.deleteSessions(account, sessionIds);
+    return await this.accountSessionService.deleteSessions(
+      // Should be because AuthGuard is used
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      context.account!,
+      sessionIds,
+    );
   }
 
   @Mutation(() => Boolean)
@@ -81,10 +86,12 @@ export class AuthResolver {
   async changePassword(
     @Args('password') password: string,
     @Args('newPassword') newPassword: string,
-    @AccountDecorator() account: Account,
+    @ContextDecorator() context: GqlContext,
   ): Promise<boolean> {
     return await this.accountService.changePassword(
-      account,
+      // Should be because AuthGuard is used
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      context.account!,
       password,
       newPassword,
     );

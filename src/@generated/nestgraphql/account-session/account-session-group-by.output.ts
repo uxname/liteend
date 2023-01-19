@@ -1,6 +1,7 @@
 import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
+import { HideField } from '@nestjs/graphql';
 import { AccountSessionCountAggregate } from './account-session-count-aggregate.output';
 import { AccountSessionAvgAggregate } from './account-session-avg-aggregate.output';
 import { AccountSessionSumAggregate } from './account-session-sum-aggregate.output';
@@ -22,7 +23,7 @@ export class AccountSessionGroupBy {
     @Field(() => Int, {nullable:false})
     accountId!: number;
 
-    @Field(() => String, {nullable:false})
+    @HideField()
     token!: string;
 
     @Field(() => String, {nullable:false})
