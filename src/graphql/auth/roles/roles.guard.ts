@@ -6,10 +6,7 @@ import { AccountSessionService } from '@/graphql/account-session/account-session
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-    private allowedRoles: AccountRole[],
-    private accountSessionService?: AccountSessionService,
-  ) {}
+  constructor(private allowedRoles: AccountRole[]) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const gqlContext = GqlExecutionContext.create(context);
