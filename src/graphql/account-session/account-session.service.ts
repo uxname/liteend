@@ -71,4 +71,14 @@ export class AccountSessionService {
     });
     return true;
   }
+
+  async getSessions(account: Account): Promise<Array<AccountSession>> {
+    return this.prisma.accountSession.findMany({
+      where: {
+        account: {
+          id: account.id,
+        },
+      },
+    });
+  }
 }
