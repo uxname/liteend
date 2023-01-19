@@ -5,7 +5,6 @@
   "compilerOptions": {
     "assets": [
       "**/schema.prisma"
-    ],
-    "deleteOutDir": true
+    ]
   }
 }

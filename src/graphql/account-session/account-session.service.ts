@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import PrismaClient from '@prisma/client';
+import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
+import { Account } from '@/@generated/nestgraphql/account/account.model';
 
 @Injectable()
 export class AccountSessionService {
@@ -27,5 +29,45 @@ export class AccountSessionService {
         expiresAt: new Date(expiresAtInMs),
       },
     });
+  }
+
+  async getAccountSessionByToken(
+    token: string,
+  ): Promise<AccountSession | null> {
+    return this.prisma.accountSession.findUnique({
+      where: {
+        token,
+      },
+    });
+  }
+
+  async getAccountByToken(token: string): Promise<Account | undefined> {
+    const result = await this.prisma.accountSession.findUnique({
+      where: {
+        token,
+      },
+      select: {
+        account: true,
+      },
+    });
+
+    return result?.account;
+  }
+
+  async deleteSessions(
+    account: Account,
+    sessionIds: number[],
+  ): Promise<boolean> {
+    await this.prisma.accountSession.deleteMany({
+      where: {
+        account: {
+          id: account.id,
+        },
+        id: {
+          in: sessionIds,
+        },
+      },
+    });
+    return true;
   }
 }

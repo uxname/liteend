@@ -9,6 +9,11 @@ import {
 } from '@/graphql/account/types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AuthService } from '@/graphql/auth/auth.service';
+import { UseGuards } from '@nestjs/common';
+import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
+import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
+import { AccountDecorator } from '@/graphql/auth/account/account.decorator';
+import { RolesGuard } from '@/graphql/auth/roles/roles.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -61,9 +66,15 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  logout(sessionIds: number[]): boolean {
-    console.log(sessionIds);
-    return true;
+  @UseGuards(AccountExtractorGuard, new RolesGuard([AccountRole.USER]))
+  async logout(
+    @Args('sessionIds', {
+      type: () => [Number],
+    })
+    sessionIds: number[],
+    @AccountDecorator() account: Account,
+  ): Promise<boolean> {
+    return await this.accountSessionService.deleteSessions(account, sessionIds);
   }
 
   @Mutation(() => Boolean)
