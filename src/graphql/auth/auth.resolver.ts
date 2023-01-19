@@ -94,6 +94,7 @@ export class AuthResolver {
   generateEmailCode(email: string): GenerateEmailCodeResponse {
     console.log(email);
     // todo: implement
+    // eslint-disable-next-line sonarjs/no-duplicate-string
     throw new Error('Method not implemented.');
   }
 
