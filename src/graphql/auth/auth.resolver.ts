@@ -10,10 +10,9 @@ import {
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AuthService } from '@/graphql/auth/auth.service';
 import { UseGuards } from '@nestjs/common';
-import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
 import { AccountDecorator } from '@/graphql/auth/account/account.decorator';
-import { RolesGuard } from '@/graphql/auth/roles/roles.guard';
+import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -66,7 +65,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(AccountExtractorGuard, new RolesGuard([AccountRole.USER]))
+  @UseGuards(AccountExtractorGuard, new AuthGuard())
   async logout(
     @Args('sessionIds', {
       type: () => [Number],
@@ -78,9 +77,17 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  changePassword(password: string, newPassword: string): boolean {
-    console.log(password, newPassword);
-    return true;
+  @UseGuards(AccountExtractorGuard, new AuthGuard())
+  async changePassword(
+    @Args('password') password: string,
+    @Args('newPassword') newPassword: string,
+    @AccountDecorator() account: Account,
+  ): Promise<boolean> {
+    return await this.accountService.changePassword(
+      account,
+      password,
+      newPassword,
+    );
   }
 
   @Mutation(() => GenerateEmailCodeResponse)
