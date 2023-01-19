@@ -93,13 +93,15 @@ export class AuthResolver {
   @Mutation(() => GenerateEmailCodeResponse)
   generateEmailCode(email: string): GenerateEmailCodeResponse {
     console.log(email);
-    return {} as GenerateEmailCodeResponse;
+    // todo: implement
+    throw new Error('Method not implemented.');
   }
 
   @Mutation(() => Boolean)
   activateAccount(email: string, code: string): Account {
     console.log(email, code);
-    return {} as Account;
+    // todo: implement
+    throw new Error('Method not implemented.');
   }
 
   @Mutation(() => Boolean)
@@ -112,6 +114,7 @@ export class AuthResolver {
     newPassword: string,
   ): boolean {
     console.log(email, emailCode, newPassword);
-    return true;
+    // todo: implement
+    throw new Error('Method not implemented.');
   }
 }
