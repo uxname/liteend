@@ -16,8 +16,10 @@ export class AccountResolver {
 
   @Query(() => Account, { name: 'whoami' })
   @UseGuards(AccountExtractorGuard, AuthGuard)
-  whoami(@ContextDecorator() account: Account): Account {
-    return account;
+  whoami(@ContextDecorator() context: GqlContext): Account {
+    // Should be because AuthGuard is used
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return context.account!;
   }
 
   @Query(() => AccountSession, { name: 'currentSession' })
