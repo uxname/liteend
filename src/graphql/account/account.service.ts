@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { EasyconfigService } from 'nestjs-easyconfig';
-import { CryptoService } from '@/common/crypto/crypto.service';
+
 import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
 import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
+import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { CryptoService } from '@/common/crypto/crypto.service';
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class AccountService {

@@ -9,14 +9,14 @@
 - [x] Rename npm run db:deploy to something more meaningful, like db:apply-migrations
 - [ ] Create CLI for generating new config or change git repo url (liteend-cli generate-new-app or something like that)
   - [ ] Add CLI info to readme
+  - [ ] Implement "npx liteend-cli generate-new-app" or something like that
 - [ ] Implement logging to DB, files or remote service
 - [ ] Implement start app with waiting for migration application (ex. via *.lock file)
 - [ ] Add telemetry
 - [ ] Add logger
-- [ ] Implement "npx liteend-cli generate-new-app" or something like that
-- [ ] Add useragent to Account
+- [x] Add useragent to Account
 - [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
-- [ ] Add to every token prefix (ex access token has prefix "at_")
+- [x] Add to every token prefix (ex access token has prefix "at_")
 - [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE

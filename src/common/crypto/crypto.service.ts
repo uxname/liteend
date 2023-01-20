@@ -3,6 +3,10 @@ import * as crypto from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
+export enum RandomStringType {
+  ACCESS_TOKEN = 'at_',
+}
+
 @Injectable()
 export class CryptoService {
   public async hash(data: string, salt: string): Promise<string> {
@@ -19,7 +23,10 @@ export class CryptoService {
   }
 
   // eslint-disable-next-line no-magic-numbers
-  public async generateRandomString(length = 48): Promise<string> {
+  public async generateRandomString(
+    prefix: RandomStringType,
+    length = 48,
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(length, (error, buffer) => {
         if (error) {

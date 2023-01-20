@@ -2,7 +2,10 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { CryptoService } from '@/common/crypto/crypto.service';
+import {
+  CryptoService,
+  RandomStringType,
+} from '@/common/crypto/crypto.service';
 import { AccountService } from '@/graphql/account/account.service';
 import {
   AuthResponse,
@@ -31,7 +34,9 @@ export class AuthResolver {
     @Context() context: GqlContext,
   ): Promise<AuthResponse> {
     const account = await this.accountService.createAccount(email, password);
-    const token = await this.cryptoService.generateRandomString();
+    const token = await this.cryptoService.generateRandomString(
+      RandomStringType.ACCESS_TOKEN,
+    );
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
@@ -51,7 +56,9 @@ export class AuthResolver {
     @Context() context: GqlContext,
   ): Promise<AuthResponse> {
     const account = await this.authService.validateAccount(email, password);
-    const token = await this.cryptoService.generateRandomString();
+    const token = await this.cryptoService.generateRandomString(
+      RandomStringType.ACCESS_TOKEN,
+    );
 
     await this.accountSessionService.createAccountSession(
       account.id,

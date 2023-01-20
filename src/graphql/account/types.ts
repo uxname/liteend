@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 
 @ObjectType()

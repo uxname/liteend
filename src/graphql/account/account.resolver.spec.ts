@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { AccountResolver } from './account.resolver';
 
 describe('UserResolver', () => {
