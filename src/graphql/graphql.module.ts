@@ -41,6 +41,7 @@ export class GqlContext {
     AuthModule,
     AccountSessionModule,
     AuthModule,
+    AccountSessionModule,
   ],
   providers: [QueryResolver, MutationResolver],
 })

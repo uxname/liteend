@@ -12,25 +12,12 @@ import { AccountSessionService } from '@/graphql/account-session/account-session
 export class AccountResolver {
   constructor(private accountSessionService: AccountSessionService) {}
 
-  @Query(() => [AccountSession], { name: 'sessions' })
-  rootSessions(): AccountSession[] {
-    return [] as AccountSession[];
-  }
-
   @Query(() => Account, { name: 'whoami' })
   @UseGuards(AccountExtractorGuard, AuthGuard)
-  rootWhoami(@ContextDecorator() context: GqlContext): Account {
+  whoami(@ContextDecorator() context: GqlContext): Account {
     // Should be because AuthGuard is used
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return context.account!;
-  }
-
-  @Query(() => AccountSession, { name: 'currentSession' })
-  @UseGuards(AccountExtractorGuard, AuthGuard)
-  rootCurrentSession(@ContextDecorator() context: GqlContext): AccountSession {
-    // Should be because AuthGuard is used
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return context.accountSession!;
   }
 
   @ResolveField(() => [AccountSession])
