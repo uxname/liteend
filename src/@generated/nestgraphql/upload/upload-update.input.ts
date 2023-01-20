@@ -1,33 +1,31 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
-import { DateTimeFieldUpdateOperationsInput } from '../prisma/date-time-field-update-operations.input';
-import { StringFieldUpdateOperationsInput } from '../prisma/string-field-update-operations.input';
-import { IntFieldUpdateOperationsInput } from '../prisma/int-field-update-operations.input';
+import { Int } from '@nestjs/graphql';
 
 @InputType()
 export class UploadUpdateInput {
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    createdAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    createdAt?: Date | string;
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    updatedAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    updatedAt?: Date | string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    filename?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    filename?: string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    originalFilename?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    originalFilename?: string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    extension?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    extension?: string;
 
-    @Field(() => IntFieldUpdateOperationsInput, {nullable:true})
-    size?: IntFieldUpdateOperationsInput;
+    @Field(() => Int, {nullable:true})
+    size?: number;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    mimetype?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    mimetype?: string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    uploaderIp?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    uploaderIp?: string;
 }

@@ -1,31 +1,29 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
-import { DateTimeFieldUpdateOperationsInput } from '../prisma/date-time-field-update-operations.input';
-import { StringFieldUpdateOperationsInput } from '../prisma/string-field-update-operations.input';
-import { AccountUpdaterolesInput } from './account-updateroles.input';
-import { EnumAccountStatusFieldUpdateOperationsInput } from '../prisma/enum-account-status-field-update-operations.input';
+import { AccountRole } from '../prisma/account-role.enum';
+import { AccountStatus } from '../prisma/account-status.enum';
 import { AccountSessionUpdateManyWithoutAccountNestedInput } from '../account-session/account-session-update-many-without-account-nested.input';
 
 @InputType()
 export class AccountUpdateInput {
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    createdAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    createdAt?: Date | string;
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    updatedAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    updatedAt?: Date | string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    email?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    email?: string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    passwordHash?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    passwordHash?: string;
 
-    @Field(() => AccountUpdaterolesInput, {nullable:true})
-    roles?: AccountUpdaterolesInput;
+    @Field(() => [AccountRole], {nullable:true})
+    roles?: Array<keyof typeof AccountRole>;
 
-    @Field(() => EnumAccountStatusFieldUpdateOperationsInput, {nullable:true})
-    status?: EnumAccountStatusFieldUpdateOperationsInput;
+    @Field(() => AccountStatus, {nullable:true})
+    status?: keyof typeof AccountStatus;
 
     @Field(() => AccountSessionUpdateManyWithoutAccountNestedInput, {nullable:true})
     sessions?: AccountSessionUpdateManyWithoutAccountNestedInput;

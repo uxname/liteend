@@ -1,34 +1,31 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
-import { IntFieldUpdateOperationsInput } from '../prisma/int-field-update-operations.input';
-import { DateTimeFieldUpdateOperationsInput } from '../prisma/date-time-field-update-operations.input';
-import { StringFieldUpdateOperationsInput } from '../prisma/string-field-update-operations.input';
-import { NullableStringFieldUpdateOperationsInput } from '../prisma/nullable-string-field-update-operations.input';
+import { Int } from '@nestjs/graphql';
 
 @InputType()
 export class AccountSessionUncheckedUpdateManyInput {
 
-    @Field(() => IntFieldUpdateOperationsInput, {nullable:true})
-    id?: IntFieldUpdateOperationsInput;
+    @Field(() => Int, {nullable:true})
+    id?: number;
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    createdAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    createdAt?: Date | string;
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    updatedAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    updatedAt?: Date | string;
 
-    @Field(() => IntFieldUpdateOperationsInput, {nullable:true})
-    accountId?: IntFieldUpdateOperationsInput;
+    @Field(() => Int, {nullable:true})
+    accountId?: number;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    token?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    token?: string;
 
-    @Field(() => StringFieldUpdateOperationsInput, {nullable:true})
-    ipAddr?: StringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    ipAddr?: string;
 
-    @Field(() => NullableStringFieldUpdateOperationsInput, {nullable:true})
-    userAgent?: NullableStringFieldUpdateOperationsInput;
+    @Field(() => String, {nullable:true})
+    userAgent?: string;
 
-    @Field(() => DateTimeFieldUpdateOperationsInput, {nullable:true})
-    expiresAt?: DateTimeFieldUpdateOperationsInput;
+    @Field(() => Date, {nullable:true})
+    expiresAt?: Date | string;
 }
