@@ -3,6 +3,7 @@
 - [x] Add eslint-plugin-simple-import-sort
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
+- [ ] Implement GraphQL subscriptions
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
 - [x] Config
