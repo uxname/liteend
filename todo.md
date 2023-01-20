@@ -3,6 +3,7 @@
 - [x] Add eslint-plugin-simple-import-sort
 - [ ] Migrate to some prisma DTO generator
 - [ ] GraphQL integration tests
+- [ ] Add verification types, ex.: Email
 - [x] Config
 - [ ] User management (register, login, logout, reset password, roles, etc.)
 - [x] Rename npm run db:create to something more meaningful, like db:create-migration

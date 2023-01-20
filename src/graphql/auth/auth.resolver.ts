@@ -16,7 +16,9 @@ import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-
 import { AuthService } from '@/graphql/auth/auth.service';
 import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
 import { ContextDecorator } from '@/graphql/context.decorator';
+import { EmailService } from '@/graphql/email/email.service';
 import { GqlContext } from '@/graphql/graphql.module';
+import { OneTimeCodeService } from '@/graphql/one-time-code/one-time-code.service';
 
 @Resolver()
 export class AuthResolver {
@@ -25,6 +27,8 @@ export class AuthResolver {
     private accountService: AccountService,
     private accountSessionService: AccountSessionService,
     private cryptoService: CryptoService,
+    private oneTimeCodeService: OneTimeCodeService,
+    private emailService: EmailService,
   ) {}
 
   @Mutation(() => AuthResponse)
@@ -106,11 +110,24 @@ export class AuthResolver {
   }
 
   @Mutation(() => GenerateEmailCodeResponse)
-  generateEmailCode(email: string): GenerateEmailCodeResponse {
-    console.log(email);
-    // todo: implement
-    // eslint-disable-next-line sonarjs/no-duplicate-string
-    throw new Error('Method not implemented.');
+  async generateEmailCode(
+    @Args('email') email: string,
+  ): Promise<GenerateEmailCodeResponse> {
+    const result = await this.oneTimeCodeService.createOneTimeCode(email);
+    const sendEmailResult = await this.emailService.sendEmail(
+      email,
+      'Activation code',
+      `Your activation code is: ${result.code}`,
+    );
+
+    if (sendEmailResult) {
+      return {
+        result: true,
+        expiresAt: result.expiresAt,
+      };
+    } else {
+      throw new Error('Sending email error');
+    }
   }
 
   @Mutation(() => Boolean)

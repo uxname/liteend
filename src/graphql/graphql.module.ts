@@ -12,7 +12,10 @@ import { AccountModule } from '@/graphql/account/account.module';
 
 import { AccountSessionModule } from './account-session/account-session.module';
 import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
 import { MutationResolver } from './mutation/mutation.resolver';
+import { OneTimeCodeModule } from './one-time-code/one-time-code.module';
+import { OneTimeCodeService } from './one-time-code/one-time-code.service';
 import { QueryResolver } from './query/query.resolver';
 
 // todo move to separated file
@@ -44,7 +47,9 @@ export class GqlContext {
     AccountSessionModule,
     AuthModule,
     AccountSessionModule,
+    OneTimeCodeModule,
+    EmailModule,
   ],
-  providers: [QueryResolver, MutationResolver],
+  providers: [QueryResolver, MutationResolver, OneTimeCodeService],
 })
 export class GraphqlModule {}
