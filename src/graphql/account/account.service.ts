@@ -18,6 +18,7 @@ export class AccountService {
   public async createAccount(
     email: string,
     password: string,
+    status: AccountStatus = AccountStatus.ACTIVE,
   ): Promise<Account> {
     const salt = this.config.get('SALT');
     const passwordHash = await this.crypto.hash(password, salt);
@@ -25,7 +26,7 @@ export class AccountService {
       data: {
         email,
         passwordHash,
-        status: AccountStatus.ACTIVE,
+        status,
         roles: [AccountRole.USER],
       },
     });
@@ -65,5 +66,16 @@ export class AccountService {
     } else {
       throw new Error('Invalid password');
     }
+  }
+
+  async changeStatus(email: string, status: AccountStatus): Promise<Account> {
+    return this.prisma.account.update({
+      where: {
+        email,
+      },
+      data: {
+        status,
+      },
+    });
   }
 }

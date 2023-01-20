@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
 import {
   CryptoService,
   RandomStringType,
@@ -37,7 +38,11 @@ export class AuthResolver {
     @Args('password') password: string,
     @Context() context: GqlContext,
   ): Promise<AuthResponse> {
-    const account = await this.accountService.createAccount(email, password);
+    const account = await this.accountService.createAccount(
+      email,
+      password,
+      AccountStatus.INACTIVE,
+    );
     const token = await this.cryptoService.generateRandomString(
       RandomStringType.ACCESS_TOKEN,
     );
@@ -130,11 +135,24 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  activateAccount(email: string, code: string): Account {
-    console.log(email, code);
-    // todo: implement
-    throw new Error('Method not implemented.');
+  @Mutation(() => Account)
+  async activateAccount(
+    @Args('email') email: string,
+    @Args('code') code: string,
+  ): Promise<Account> {
+    const isCodeValid = await this.oneTimeCodeService.validateOneTimeCode(
+      email,
+      code,
+    );
+    if (isCodeValid) {
+      await this.oneTimeCodeService.deleteOneTimeCode(email);
+      return await this.accountService.changeStatus(
+        email,
+        AccountStatus.ACTIVE,
+      );
+    } else {
+      throw new Error('Invalid code');
+    }
   }
 
   @Mutation(() => Boolean)

@@ -21,4 +21,25 @@ export class OneTimeCodeService {
       create: { email, code, expiresAt },
     });
   }
+
+  async validateOneTimeCode(email: string, code: string): Promise<boolean> {
+    const oneTimeCode = await this.prismaService.oneTimeCode.findUnique({
+      where: { email },
+    });
+
+    if (!oneTimeCode) {
+      return false;
+    }
+
+    if (oneTimeCode.code !== code) {
+      return false;
+    }
+
+    return oneTimeCode.expiresAt >= new Date();
+  }
+
+  async deleteOneTimeCode(email: string): Promise<boolean> {
+    await this.prismaService.oneTimeCode.delete({ where: { email } });
+    return true;
+  }
 }
