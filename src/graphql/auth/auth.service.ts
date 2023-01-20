@@ -13,7 +13,10 @@ export class AuthService {
     private cryptoService: CryptoService,
   ) {}
 
-  async validateAccount(email: string, password: string): Promise<Account> {
+  async validateAccountPassword(
+    email: string,
+    password: string,
+  ): Promise<Account> {
     const account = await this.prisma.account.findUnique({
       where: {
         email,

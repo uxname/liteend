@@ -64,7 +64,10 @@ export class AuthResolver {
     @Args('password') password: string,
     @Context() context: GqlContext,
   ): Promise<AuthResponse> {
-    const account = await this.authService.validateAccount(email, password);
+    const account = await this.authService.validateAccountPassword(
+      email,
+      password,
+    );
     const token = await this.cryptoService.generateRandomString(
       RandomStringType.ACCESS_TOKEN,
     );
@@ -98,18 +101,26 @@ export class AuthResolver {
     );
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Account)
   @UseGuards(AccountExtractorGuard, new AuthGuard())
   async changePassword(
     @Args('password') password: string,
     @Args('newPassword') newPassword: string,
     @ContextDecorator() context: GqlContext,
-  ): Promise<boolean> {
+  ): Promise<Account> {
+    const isOldPasswordValid = await this.authService.validateAccountPassword(
+      context.account!.email,
+      password,
+    );
+
+    if (!isOldPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
     return await this.accountService.changePassword(
       // Should be because AuthGuard is used
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      context.account!,
-      password,
+      context.account!.email,
       newPassword,
     );
   }
@@ -155,17 +166,23 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  resetPassword(
+  @Mutation(() => Account)
+  async resetPassword(
     @Args('email', { type: () => String })
     email: string,
     @Args('emailCode', { type: () => String })
     emailCode: string,
     @Args('newPassword', { type: () => String })
     newPassword: string,
-  ): boolean {
-    console.log(email, emailCode, newPassword);
-    // todo: implement
-    throw new Error('Method not implemented.');
+  ): Promise<Account> {
+    const isOneTimeCodeValid =
+      await this.oneTimeCodeService.validateOneTimeCode(email, emailCode);
+
+    if (isOneTimeCodeValid) {
+      await this.oneTimeCodeService.deleteOneTimeCode(email);
+      return await this.accountService.changePassword(email, newPassword);
+    } else {
+      throw new Error('Invalid code');
+    }
   }
 }

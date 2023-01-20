@@ -15,12 +15,12 @@ describe('EmailService', () => {
             port: 587,
             secure: false, // upgrade later with STARTTLS
             auth: {
-              user: 'kayley22@ethereal.email', // todo: use env vars
+              user: 'kayley22@ethereal.email',
               pass: 'wQCHuxjVWcUKUnYqyN',
             },
           },
           defaults: {
-            from: '"nest-modules" <kayley22@ethereal.email>', // todo better from
+            from: '"test" <kayley22@ethereal.email>',
           },
         }),
       ],

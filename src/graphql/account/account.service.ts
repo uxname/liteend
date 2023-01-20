@@ -40,32 +40,18 @@ export class AccountService {
     });
   }
 
-  async changePassword(
-    account: Account,
-    password: string,
-    newPassword: string,
-  ): Promise<boolean> {
+  async changePassword(email: string, newPassword: string): Promise<Account> {
     const salt = this.config.get('SALT');
-    const isPasswordValid = await this.crypto.hashVerify(
-      password,
-      salt,
-      account.passwordHash,
-    );
 
-    if (isPasswordValid) {
-      const newPasswordHash = await this.crypto.hash(newPassword, salt);
-      await this.prisma.account.update({
-        where: {
-          id: account.id,
-        },
-        data: {
-          passwordHash: newPasswordHash,
-        },
-      });
-      return true;
-    } else {
-      throw new Error('Invalid password');
-    }
+    const newPasswordHash = await this.crypto.hash(newPassword, salt);
+    return await this.prisma.account.update({
+      where: {
+        email,
+      },
+      data: {
+        passwordHash: newPasswordHash,
+      },
+    });
   }
 
   async changeStatus(email: string, status: AccountStatus): Promise<Account> {
