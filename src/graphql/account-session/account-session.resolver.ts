@@ -1,12 +1,14 @@
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { AccountSessionService } from './account-session.service';
-import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
-import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
 import { UseGuards } from '@nestjs/common';
+import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+
+import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
+import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
+import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
 import { ContextDecorator } from '@/graphql/context.decorator';
 import { GqlContext } from '@/graphql/graphql.module';
+
+import { AccountSessionService } from './account-session.service';
 
 @Resolver(() => AccountSession)
 export class AccountSessionResolver {

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AccountSessionService } from './account-session.service';
+
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { AccountSessionResolver } from '@/graphql/account-session/account-session.resolver';
+
+import { AccountSessionService } from './account-session.service';
 
 @Module({
   imports: [PrismaModule],

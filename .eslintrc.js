@@ -14,6 +14,7 @@ module.exports = {
     'promise',
     'security',
     'no-secrets',
+    'simple-import-sort',
   ],
   extends: [
     'plugin:@typescript-eslint/recommended',
@@ -73,5 +74,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error'],
     'dot-notation': 'off', // TODO: enable
     'no-use-before-define': 'off',
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
   },
 };

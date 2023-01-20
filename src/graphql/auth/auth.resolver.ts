@@ -1,18 +1,19 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
-import { AccountService } from '@/graphql/account/account.service';
-import { AccountSessionService } from '@/graphql/account-session/account-session.service';
+
+import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { CryptoService } from '@/common/crypto/crypto.service';
-import { GqlContext } from '@/graphql/graphql.module';
+import { AccountService } from '@/graphql/account/account.service';
 import {
   AuthResponse,
   GenerateEmailCodeResponse,
 } from '@/graphql/account/types';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AuthService } from '@/graphql/auth/auth.service';
-import { UseGuards } from '@nestjs/common';
+import { AccountSessionService } from '@/graphql/account-session/account-session.service';
 import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
-import { ContextDecorator } from '@/graphql/context.decorator';
+import { AuthService } from '@/graphql/auth/auth.service';
 import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
+import { ContextDecorator } from '@/graphql/context.decorator';
+import { GqlContext } from '@/graphql/graphql.module';
 
 @Resolver()
 export class AuthResolver {

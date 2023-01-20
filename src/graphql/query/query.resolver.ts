@@ -1,7 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
-import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
 
 @Resolver(() => Query)
 export class QueryResolver {

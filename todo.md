@@ -1,6 +1,6 @@
 # Todo
 
-- [ ] Add eslint-plugin-simple-import-sort
+- [x] Add eslint-plugin-simple-import-sort
 - [ ] Migrate to some prisma DTO generator
 - [ ] GraphQL integration tests
 - [x] Config
