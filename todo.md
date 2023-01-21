@@ -5,7 +5,6 @@
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
-- [ ] Implement online log viewer like http://logio.org
 - [ ] Add static serve logs directory
 - [ ] Enable CORS
 - [ ] Enable Helmet
@@ -22,7 +21,9 @@
 - [ ] Add telemetry
 - [ ] Add logger
   - [ ] Implement logging to DB, files or remote service
-  - [ ] Implement logging to files with rotation
+  - [ ] OR:
+  - [ ] Implement online log viewer like http://logio.org
+  - [x] Implement logging to files with rotation
 - [x] Add useragent to Account
 - [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
