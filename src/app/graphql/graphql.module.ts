@@ -1,5 +1,5 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request, Response } from 'express';
 import GraphQLJSON from 'graphql-type-json';
@@ -50,6 +50,6 @@ export class GqlContext {
     OneTimeCodeModule,
     EmailModule,
   ],
-  providers: [QueryResolver, MutationResolver, OneTimeCodeService],
+  providers: [QueryResolver, MutationResolver, OneTimeCodeService, Logger],
 })
 export class GraphqlModule {}

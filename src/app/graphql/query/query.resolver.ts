@@ -4,7 +4,7 @@ import GraphQLJSON from 'graphql-type-json';
 
 @Resolver(() => Query)
 export class QueryResolver {
-  private readonly logger = new Logger(QueryResolver.name);
+  constructor(private readonly logger: Logger) {}
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {
