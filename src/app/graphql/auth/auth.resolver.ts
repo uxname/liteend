@@ -3,23 +3,23 @@ import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { AccountService } from '@/app/graphql/account/account.service';
+import {
+  AuthResponse,
+  GenerateEmailCodeResponse,
+} from '@/app/graphql/account/types';
+import { AccountSessionService } from '@/app/graphql/account-session/account-session.service';
+import { AccountExtractorGuard } from '@/app/graphql/auth/account-extractor/account-extractor.guard';
+import { AuthService } from '@/app/graphql/auth/auth.service';
+import { AuthGuard } from '@/app/graphql/auth/roles/auth.guard';
+import { ContextDecorator } from '@/app/graphql/context.decorator';
+import { EmailService } from '@/app/graphql/email/email.service';
+import { GqlContext } from '@/app/graphql/graphql.module';
+import { OneTimeCodeService } from '@/app/graphql/one-time-code/one-time-code.service';
 import {
   CryptoService,
   RandomStringType,
 } from '@/common/crypto/crypto.service';
-import { AccountService } from '@/graphql/account/account.service';
-import {
-  AuthResponse,
-  GenerateEmailCodeResponse,
-} from '@/graphql/account/types';
-import { AccountSessionService } from '@/graphql/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
-import { AuthService } from '@/graphql/auth/auth.service';
-import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
-import { ContextDecorator } from '@/graphql/context.decorator';
-import { EmailService } from '@/graphql/email/email.service';
-import { GqlContext } from '@/graphql/graphql.module';
-import { OneTimeCodeService } from '@/graphql/one-time-code/one-time-code.service';
 
 @Resolver()
 export class AuthResolver {
@@ -109,6 +109,8 @@ export class AuthResolver {
     @ContextDecorator() context: GqlContext,
   ): Promise<Account> {
     const isOldPasswordValid = await this.authService.validateAccountPassword(
+      // Should be because AuthGuard is used
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       context.account!.email,
       password,
     );

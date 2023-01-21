@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { GqlContext } from '@/graphql/graphql.module';
+import { GqlContext } from '@/app/graphql/graphql.module';
 
 export const ContextDecorator = createParamDecorator<
   undefined,

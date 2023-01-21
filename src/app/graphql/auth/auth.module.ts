@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { EasyconfigModule } from 'nestjs-easyconfig';
 
+import { AccountModule } from '@/app/graphql/account/account.module';
+import { AccountSessionModule } from '@/app/graphql/account-session/account-session.module';
+import { AuthResolver } from '@/app/graphql/auth/auth.resolver';
+import { EmailModule } from '@/app/graphql/email/email.module';
+import { OneTimeCodeModule } from '@/app/graphql/one-time-code/one-time-code.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
-import { AccountModule } from '@/graphql/account/account.module';
-import { AccountSessionModule } from '@/graphql/account-session/account-session.module';
-import { AuthResolver } from '@/graphql/auth/auth.resolver';
-import { EmailModule } from '@/graphql/email/email.module';
-import { OneTimeCodeModule } from '@/graphql/one-time-code/one-time-code.module';
 
 import { AuthService } from './auth.service';
 

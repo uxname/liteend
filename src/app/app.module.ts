@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { EasyconfigModule } from 'nestjs-easyconfig';
 import { LoggerModule } from 'nestjs-pino';
-import pino from 'pino';
 
-import { GraphqlModule } from '@/graphql/graphql.module';
+import { GraphqlModule } from '@/app/graphql/graphql.module';
 
 @Module({
   imports: [

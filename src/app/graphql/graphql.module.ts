@@ -6,9 +6,9 @@ import GraphQLJSON from 'graphql-type-json';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
+import { AccountModule } from '@/app/graphql/account/account.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
-import { AccountModule } from '@/graphql/account/account.module';
 
 import { AccountSessionModule } from './account-session/account-session.module';
 import { AuthModule } from './auth/auth.module';

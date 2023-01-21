@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { GqlContext } from '@/graphql/graphql.module';
+import { GqlContext } from '@/app/graphql/graphql.module';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

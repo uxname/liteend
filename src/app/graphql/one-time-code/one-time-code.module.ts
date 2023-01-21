@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
+import { EmailModule } from '@/app/graphql/email/email.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
-import { EmailModule } from '@/graphql/email/email.module';
 
 import { OneTimeCodeService } from './one-time-code.service';
 

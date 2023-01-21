@@ -3,11 +3,11 @@ import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { AccountSessionService } from '@/graphql/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/graphql/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/graphql/auth/roles/auth.guard';
-import { ContextDecorator } from '@/graphql/context.decorator';
-import { GqlContext } from '@/graphql/graphql.module';
+import { AccountSessionService } from '@/app/graphql/account-session/account-session.service';
+import { AccountExtractorGuard } from '@/app/graphql/auth/account-extractor/account-extractor.guard';
+import { AuthGuard } from '@/app/graphql/auth/roles/auth.guard';
+import { ContextDecorator } from '@/app/graphql/context.decorator';
+import { GqlContext } from '@/app/graphql/graphql.module';
 
 @Resolver(() => Account)
 export class AccountResolver {

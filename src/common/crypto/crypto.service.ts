@@ -22,9 +22,9 @@ export class CryptoService {
     return bcrypt.compare(data + salt, hash);
   }
 
-  // eslint-disable-next-line no-magic-numbers
   public async generateRandomString(
     prefix: RandomStringType,
+    // eslint-disable-next-line no-magic-numbers
     length = 48,
   ): Promise<string> {
     return new Promise((resolve, reject) => {
