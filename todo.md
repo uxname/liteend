@@ -16,10 +16,11 @@
 - [ ] Create CLI for generating new config or change git repo url (liteend-cli generate-new-app or something like that)
   - [ ] Add CLI info to readme
   - [ ] Implement "npx liteend-cli generate-new-app" or something like that
-- [ ] Implement logging to DB, files or remote service
 - [ ] Implement start app with waiting for migration application (ex. via *.lock file)
 - [ ] Add telemetry
 - [ ] Add logger
+  - [ ] Implement logging to DB, files or remote service
+  - [ ] Implement logging to files with rotation
 - [x] Add useragent to Account
 - [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
