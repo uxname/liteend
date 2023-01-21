@@ -4,6 +4,9 @@
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
+- [ ] Add static serve logs directory
+- [ ] Enable CORS
+- [ ] Enable Helmet
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
 - [x] Config
