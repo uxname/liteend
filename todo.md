@@ -5,6 +5,7 @@
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
+- [ ] Implement online log viewer like http://logio.org
 - [ ] Add static serve logs directory
 - [ ] Enable CORS
 - [ ] Enable Helmet
