@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EasyconfigModule } from 'nestjs-easyconfig';
 import { LoggerModule } from 'nestjs-pino';
+import pino from 'pino';
 
 import { GraphqlModule } from '@/graphql/graphql.module';
 
@@ -10,7 +11,6 @@ import { GraphqlModule } from '@/graphql/graphql.module';
     GraphqlModule,
     LoggerModule.forRoot({
       pinoHttp: {
-        name: 'add some name to every JSON line',
         transport:
           process.env['NODE_ENV'] === 'production'
             ? undefined
