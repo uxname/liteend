@@ -4,6 +4,7 @@
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
+- [ ] Add database seed script
 - [ ] Add static serve logs directory
 - [ ] Enable CORS
 - [ ] Enable Helmet
