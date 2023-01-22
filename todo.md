@@ -19,4 +19,5 @@
 - [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
 - [ ] (Maybe) Implement simple mock service module
+- [ ] Improve readme file (add more info about project, add more examples, etc.)
 - [ ] DELETE THIS FILE
