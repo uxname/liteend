@@ -1,19 +1,13 @@
 # Todo
 
-- [x] Add eslint-plugin-simple-import-sort
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
-- [ ] Add static serve logs directory
 - [ ] Enable CORS
 - [ ] Enable Helmet
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
-- [x] Config
-- [x] User management (register, login, logout, reset password, roles, etc.)
-- [x] Rename npm run db:create to something more meaningful, like db:create-migration
-- [x] Rename npm run db:deploy to something more meaningful, like db:apply-migrations
 - [ ] Create CLI for generating new config or change git repo url (liteend-cli generate-new-app or something like that)
   - [ ] Add CLI info to readme
   - [ ] Implement "npx liteend-cli generate-new-app" or something like that
@@ -23,10 +17,7 @@
   - [ ] Implement logging to DB, files or remote service
   - [ ] OR:
   - [ ] Implement online log viewer like http://logio.org
-  - [x] Implement logging to files with rotation
-- [x] Add useragent to Account
 - [ ] Add i18n https://www.npmjs.com/package/nestjs-i18n
 - [ ] Add error codes and api that exposes them
-- [x] Add to every token prefix (ex access token has prefix "at_")
 - [ ] (Maybe) Implement simple mock service module
 - [ ] DELETE THIS FILE
