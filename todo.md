@@ -4,7 +4,6 @@
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
-- [ ] Enable CORS
 - [ ] Enable Helmet
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
