@@ -50,6 +50,8 @@ export class Logger implements LoggerService {
       };
     });
 
+    const FILE_APPENDER_LAYOUT_TYPE = 'basic'; // or 'json'
+
     log4js.configure({
       appenders: {
         out: {
@@ -60,7 +62,7 @@ export class Logger implements LoggerService {
           },
         },
         fileOutAll: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileAll,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -73,7 +75,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutAll',
         },
         fileOutTrace: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileVerbose,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -87,7 +89,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutTrace',
         },
         fileOutDebug: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileDebug,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -101,7 +103,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutDebug',
         },
         fileOutInfo: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileLog,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -115,7 +117,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutInfo',
         },
         fileOutWarn: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileWarn,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -129,7 +131,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutWarn',
         },
         fileOutError: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileError,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
@@ -143,7 +145,7 @@ export class Logger implements LoggerService {
           appender: 'fileOutError',
         },
         fileOutFatal: {
-          layout: { type: 'json' },
+          layout: { type: FILE_APPENDER_LAYOUT_TYPE },
           type: 'file',
           filename: logFileError,
           maxLogSize: MAX_BACKUP_SIZE_BYTES,
