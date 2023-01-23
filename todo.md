@@ -5,6 +5,7 @@
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
 - [ ] Enable Helmet
+- [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
 - [ ] Create CLI for generating new config or change git repo url (liteend-cli generate-new-app or something like that)
