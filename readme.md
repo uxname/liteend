@@ -11,17 +11,10 @@ Simple lightweight template for a backend applications, based on [NestJS](https:
 
 ```shell
 # Init project
-$ git clone ...
-$ npm install
-
-# Create and edit config:
-$ cp config/config_example.ts config/config.ts
-
-# Generate types: 
-$ npm run gen
+$ npx liteend-cli new <project-name>
 
 # Deploy database: 
-$ npm run db:deploy
+$ npm run db:migrations:apply
 
 # Seed DB: 
 $ npm run db:seed
@@ -47,13 +40,13 @@ To launch the project in a Docker container, run the command `docker-compose up 
 $ prisma/schema.prisma
 
 # Format schema: 
-$ npm run db:format
+$ npm run db:schema:format
 
 # Create migration: 
-$ npm run db:create
+$ npm run db:migrations:create
 
 # Deploy migrations to database: 
-$ npm run db:deploy
+$ npm run db:migrations:apply
 ```
 
 > More info about using Prisma: https://www.prisma.io
