@@ -10,6 +10,7 @@ import { LoggerServeService } from './logger-serve.service';
   providers: [LoggerServeService],
 })
 export class LoggerServeModule {
+  // todo add logs route to init
   static forRoot(): DynamicModule {
     return {
       module: LoggerServeModule,
