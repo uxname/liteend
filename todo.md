@@ -22,3 +22,8 @@
 - [ ] (Maybe) Implement simple mock service module
 - [ ] Improve readme file (add more info about project, add more examples, etc.)
 - [ ] DELETE THIS FILE
+
+# Todo LiteEnd-CLI
+
+- [ ] Change git remote url always (when not specified - change it to "")
+- [ ] Fix changing passwords in .env (pg won't accept it)
