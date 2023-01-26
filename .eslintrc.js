@@ -17,7 +17,6 @@ module.exports = {
     'simple-import-sort',
   ],
   extends: [
-    'plugin:@typescript-eslint/recommended',
     'plugin:sonarjs/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:security/recommended',
