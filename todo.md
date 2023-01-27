@@ -6,6 +6,7 @@
 - [ ] Implement GraphQL subscriptions
 - [ ] Add database seed script
 - [ ] Enable Helmet
+- [ ] Maybe migrate to Fastify
 - [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
