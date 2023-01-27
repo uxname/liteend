@@ -9,7 +9,7 @@ async function bootstrap() {
   const logger = app.get(Logger);
   app.useLogger(logger);
 
-  const port = process.env['PORT'];
+  const port = process.env.PORT;
   if (!port) {
     throw new Error('No port specified');
   }
