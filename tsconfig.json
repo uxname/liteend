@@ -6,6 +6,7 @@
         "strictNullChecks": true,
         "noImplicitAny": true,
         "module": "CommonJS",
+        "skipLibCheck": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "moduleResolution": "Node",
