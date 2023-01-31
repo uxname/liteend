@@ -4,6 +4,7 @@
 - [ ] Move some services to separate modules (ex. Account, AccountSession, etc.)
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
+- [ ] Add commit message linter
 - [ ] Add database seed script
 - [ ] Enable Helmet
 - [ ] Maybe migrate to Fastify
