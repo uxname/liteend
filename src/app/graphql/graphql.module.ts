@@ -36,6 +36,9 @@ export class GqlContext {
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
+      playground: true,
+      introspection: true,
+      persistedQueries: false,
       resolvers: { JSON: GraphQLJSON },
       context: ({ req, res }): GqlContext => ({
         req,

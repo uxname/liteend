@@ -5,12 +5,13 @@ services:
             context: .
             dockerfile: Dockerfile
         restart: unless-stopped
+        env_file:
+            - .env
         volumes:
             - ./data:/app/data:rw
-            - ./src/config/config.ts:/app/src/config/config.ts:ro
         ports:
-            - "4000:4000"
-            - "5555:5555"
+            - '${PORT}:${PORT}'
+#            - '5555:5555' todo: for prisma studio
     db:
         image: postgres:latest
         environment:
@@ -20,13 +21,13 @@ services:
             PGDATA: /data/postgres
         restart: always
         ports:
-            - "127.0.0.1:5432:5432"
+            - 127.0.0.1:${DATABASE_PORT}:5432
         volumes:
             - './data/postgres:/data/postgres'
     db_admin:
         image: dbeaver/cloudbeaver
         ports:
-            - '5100:8978'
+            - '${DB_ADMIN_PORT}:8978'
         volumes:
             - ./data:/opt/data:rw
             - ./data/db_admin:/opt/cloudbeaver/workspace

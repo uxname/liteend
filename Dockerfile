@@ -1,13 +1,9 @@
-FROM node:18.12.1-alpine3.17 AS builder
-USER node
+FROM node:lts-alpine3.17
+RUN apk add python3
 WORKDIR /app
-COPY --chown=node:node package*.json ./
+COPY package*.json ./
 RUN npm ci --legacy-peer-deps
-COPY --chown=node:node . .
-RUN npm run build && npm prune --production --legacy-peer-deps
-
-FROM builder AS production
+COPY . .
+RUN npm run db:gen && npm run build && npm prune --production --legacy-peer-deps
 ENV NODE_ENV production
-USER node
-WORKDIR /app
 CMD ["npm", "run", "start:prod"]
