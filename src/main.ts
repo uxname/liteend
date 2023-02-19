@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { Logger } from '@/common/logger/logger';
 
 import { AppModule } from './app/app.module';
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = app.get(Logger);

@@ -22,6 +22,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
+    "prestart:prod": "npm run db:migrations:apply",
     "start:prod": "node dist/src/main",
     "ts:check": "tsc --noEmit",
     "check": "npm run ts:check && npm run lint",
