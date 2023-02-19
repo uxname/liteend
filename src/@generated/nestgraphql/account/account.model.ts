@@ -31,6 +31,9 @@ export class Account {
     @Field(() => AccountStatus, {nullable:false})
     status!: keyof typeof AccountStatus;
 
+    @Field(() => String, {nullable:true})
+    avatarUrl!: string | null;
+
     @Field(() => [AccountSession], {nullable:true})
     sessions?: Array<AccountSession>;
 

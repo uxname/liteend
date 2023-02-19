@@ -27,4 +27,7 @@ export class AccountCreateManyInput {
 
     @Field(() => AccountStatus, {nullable:false})
     status!: keyof typeof AccountStatus;
+
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
 }

@@ -23,4 +23,7 @@ export class AccountCreateWithoutSessionsInput {
 
     @Field(() => AccountStatus, {nullable:false})
     status!: keyof typeof AccountStatus;
+
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
 }

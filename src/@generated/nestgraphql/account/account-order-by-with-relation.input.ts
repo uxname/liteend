@@ -27,6 +27,9 @@ export class AccountOrderByWithRelationInput {
     @Field(() => SortOrder, {nullable:true})
     status?: keyof typeof SortOrder;
 
+    @Field(() => SortOrder, {nullable:true})
+    avatarUrl?: keyof typeof SortOrder;
+
     @Field(() => AccountSessionOrderByRelationAggregateInput, {nullable:true})
     sessions?: AccountSessionOrderByRelationAggregateInput;
 }

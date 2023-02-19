@@ -5,6 +5,7 @@ import { DateTimeFilter } from '../prisma/date-time-filter.input';
 import { StringFilter } from '../prisma/string-filter.input';
 import { EnumAccountRoleNullableListFilter } from '../prisma/enum-account-role-nullable-list-filter.input';
 import { EnumAccountStatusFilter } from '../prisma/enum-account-status-filter.input';
+import { StringNullableFilter } from '../prisma/string-nullable-filter.input';
 import { AccountSessionListRelationFilter } from '../account-session/account-session-list-relation-filter.input';
 
 @InputType()
@@ -39,6 +40,9 @@ export class AccountWhereInput {
 
     @Field(() => EnumAccountStatusFilter, {nullable:true})
     status?: EnumAccountStatusFilter;
+
+    @Field(() => StringNullableFilter, {nullable:true})
+    avatarUrl?: StringNullableFilter;
 
     @Field(() => AccountSessionListRelationFilter, {nullable:true})
     sessions?: AccountSessionListRelationFilter;

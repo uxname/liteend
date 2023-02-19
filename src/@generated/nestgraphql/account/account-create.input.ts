@@ -25,6 +25,9 @@ export class AccountCreateInput {
     @Field(() => AccountStatus, {nullable:false})
     status!: keyof typeof AccountStatus;
 
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
+
     @Field(() => AccountSessionCreateNestedManyWithoutAccountInput, {nullable:true})
     sessions?: AccountSessionCreateNestedManyWithoutAccountInput;
 }

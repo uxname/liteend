@@ -4,6 +4,7 @@ import { EasyconfigService } from 'nestjs-easyconfig';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { UpdateAccountInput } from '@/app/graphql/account/types';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -62,6 +63,15 @@ export class AccountService {
       data: {
         status,
       },
+    });
+  }
+
+  updateAccount(account: Account, input: UpdateAccountInput) {
+    return this.prisma.account.update({
+      where: {
+        id: account.id,
+      },
+      data: input,
     });
   }
 }

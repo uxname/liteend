@@ -25,6 +25,9 @@ export class AccountUpdateInput {
     @Field(() => AccountStatus, {nullable:true})
     status?: keyof typeof AccountStatus;
 
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
+
     @Field(() => AccountSessionUpdateManyWithoutAccountNestedInput, {nullable:true})
     sessions?: AccountSessionUpdateManyWithoutAccountNestedInput;
 }

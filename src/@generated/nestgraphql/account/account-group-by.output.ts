@@ -34,6 +34,9 @@ export class AccountGroupBy {
     @Field(() => AccountStatus, {nullable:false})
     status!: keyof typeof AccountStatus;
 
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
+
     @Field(() => AccountCountAggregate, {nullable:true})
     _count?: AccountCountAggregate;
 

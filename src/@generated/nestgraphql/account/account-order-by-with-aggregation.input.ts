@@ -31,6 +31,9 @@ export class AccountOrderByWithAggregationInput {
     @Field(() => SortOrder, {nullable:true})
     status?: keyof typeof SortOrder;
 
+    @Field(() => SortOrder, {nullable:true})
+    avatarUrl?: keyof typeof SortOrder;
+
     @Field(() => AccountCountOrderByAggregateInput, {nullable:true})
     _count?: AccountCountOrderByAggregateInput;
 

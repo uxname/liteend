@@ -24,4 +24,7 @@ export class AccountMaxAggregate {
 
     @Field(() => AccountStatus, {nullable:true})
     status?: keyof typeof AccountStatus;
+
+    @Field(() => String, {nullable:true})
+    avatarUrl?: string;
 }

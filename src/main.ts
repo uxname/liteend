@@ -11,6 +11,14 @@ async function bootstrap() {
       crossOriginEmbedderPolicy: false,
       crossOriginOpenerPolicy: false,
       crossOriginResourcePolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          // eslint-disable-next-line quotes
+          'img-src': ["'self'", 'data:', 'cdn.jsdelivr.net'], // for graphql playground
+          // eslint-disable-next-line quotes
+          'script-src': ["'self'", 'cdn.jsdelivr.net', "'unsafe-inline'"], // for graphql playground
+        },
+      },
     }),
   );
   const logger = app.get(Logger);

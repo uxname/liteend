@@ -7,7 +7,8 @@ export enum AccountScalarFieldEnum {
     email = "email",
     passwordHash = "passwordHash",
     roles = "roles",
-    status = "status"
+    status = "status",
+    avatarUrl = "avatarUrl"
 }
 
 

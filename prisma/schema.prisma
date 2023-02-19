@@ -28,6 +28,8 @@ model Account {
   roles        AccountRole[]
   status       AccountStatus
 
+  avatarUrl String?
+
   sessions AccountSession[]
 }
 

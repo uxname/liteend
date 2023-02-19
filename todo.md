@@ -2,6 +2,7 @@
 
 - [ ] File upload
 - [ ] Implement run prisma:studio in project
+- [ ] Hide 404 error message in production
 - [ ] Move some services to separate modules (ex. Account, AccountSession, etc.)
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
