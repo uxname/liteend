@@ -49,6 +49,7 @@
     "express-basic-auth": "^1.2.1",
     "graphql": "^16.6.0",
     "graphql-type-json": "^0.3.2",
+    "helmet": "^6.0.1",
     "log4js": "^6.7.1",
     "log4js-json-layout": "^2.2.3",
     "nestjs-easyconfig": "^2.7.0",

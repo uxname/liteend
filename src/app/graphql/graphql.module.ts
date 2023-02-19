@@ -29,10 +29,6 @@ export class GqlContext {
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      cors: {
-        origin: '*',
-        credentials: true,
-      },
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',

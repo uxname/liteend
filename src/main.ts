@@ -1,10 +1,18 @@
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
 
 import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(
+    helmet({
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false,
+      crossOriginResourcePolicy: false,
+    }),
+  );
   const logger = app.get(Logger);
   app.useLogger(logger);
 
