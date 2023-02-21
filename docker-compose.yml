@@ -13,19 +13,20 @@ services:
             - '${PORT}:${PORT}'
 #            - '5555:5555' todo: for prisma studio
     db:
-        image: postgres:latest
+        image: postgres:15-alpine3.17
         environment:
             POSTGRES_USER: ${DATABASE_USER}
             POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
             POSTGRES_DB: ${DATABASE_NAME}
             PGDATA: /data/postgres
-        restart: always
+        restart: unless-stopped
         ports:
             - 127.0.0.1:${DATABASE_PORT}:5432
         volumes:
             - './data/postgres:/data/postgres'
     db_admin:
         image: dbeaver/cloudbeaver
+        restart: unless-stopped
         ports:
             - '${DB_ADMIN_PORT}:8978'
         volumes:
