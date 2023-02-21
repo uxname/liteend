@@ -96,3 +96,10 @@ Give a ⭐️ if this project helped you!
 
 Copyright © 2023 [uxname@gmail.com](https://github.com/uxname).<br />
 This project is [MIT](https://mit-license.org/) licensed.
+
+## 🔍 Telemetry
+The LiteEnd project collects telemetry data to help improve the product and enhance user experience. Telemetry data collected includes information such as product name, version, architecture, operating system, NodeJS version, a unique instance identifier, and launch timestamp.
+
+The telemetry data collected is used to understand how users are using the product and to identify any issues or areas for improvement. All telemetry data collected is treated as confidential and is never shared with third parties.
+
+To opt-out of telemetry, users can set the `DISABLE_TELEMETRY` environment variable to `true` when running LiteEnd.

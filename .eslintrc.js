@@ -35,7 +35,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js', 'src/@generated/'],
+  ignorePatterns: ['.eslintrc.js', 'src/@generated/', 'src/common/telemetry.ts'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
