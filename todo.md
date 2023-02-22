@@ -1,7 +1,6 @@
 # Todo
 
 - [ ] File upload
-- [ ] Implement debug query (return app ver. etc.)
 - [ ] Implement run prisma:studio in project
 - [ ] Move some services to separate modules (ex. Account, AccountSession, etc.)
 - [ ] Migrate to some prisma DTO generator
