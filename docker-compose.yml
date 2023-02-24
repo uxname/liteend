@@ -21,9 +21,10 @@ services:
             PGDATA: /data/postgres
         restart: unless-stopped
         ports:
-            - 127.0.0.1:${DATABASE_PORT}:5432
+            - 127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}
         volumes:
             - './data/postgres:/data/postgres'
+        command: -p 5433
     db_admin:
         image: dbeaver/cloudbeaver
         restart: unless-stopped
