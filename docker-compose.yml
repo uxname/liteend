@@ -24,7 +24,7 @@ services:
             - 127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}
         volumes:
             - './data/postgres:/data/postgres'
-        command: -p 5433
+        command: -p ${DATABASE_PORT}
     db_admin:
         image: dbeaver/cloudbeaver
         restart: unless-stopped
