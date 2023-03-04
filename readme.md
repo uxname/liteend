@@ -58,8 +58,6 @@ port: http://localhost:5000
 
 **Important:** In production mode, be sure to set up a password for the database admin page
 
-The default SQLite database path is `/opt/data/data.sqlite3`.
-
 ## 🍀 Code quality
 
 > TL;DR: Run `npm run check` before **every** commit
