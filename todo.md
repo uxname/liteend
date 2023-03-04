@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] Move common folder to separate module
 - [ ] Remove info about sqlite from readme
 - [ ] Add Bull job scheduler
 - [ ] Fix Helmet SSL error!
