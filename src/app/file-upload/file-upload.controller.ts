@@ -54,16 +54,22 @@ export class FileUploadController {
       storage,
       fileFilter: (request, file, callback) => {
         if (
-          !/\.(jpg|jpeg|png|gif|svg|webp|bmp|tiff|ico|avif)$/i.test(
-            file.originalname,
-          )
+          file.mimetype === 'image/png' ||
+          file.mimetype === 'image/jpeg' ||
+          file.mimetype === 'image/gif' ||
+          file.mimetype === 'image/svg+xml' ||
+          file.mimetype === 'image/webp'
         ) {
-          return callback(
+          callback(null, true);
+        } else {
+          callback(
             new BadRequestException('Only image files are allowed!'),
             false,
           );
         }
-        return callback(null, true);
+      },
+      limits: {
+        fileSize: 1024 * 1024 * 10, // 10 MB
       },
     }),
   )
