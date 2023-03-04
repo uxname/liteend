@@ -4,7 +4,7 @@ import * as https from 'node:https';
 import os from 'node:os';
 import path from 'node:path';
 
-import packageJson from '../../package.json';
+import packageJson from '../../app-info.json';
 
 const telemetryFilepath = path.join(process.cwd(), 'data', 'telemetry.json');
 const telemetryFileExists = fs.existsSync(telemetryFilepath);
