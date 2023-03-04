@@ -1,9 +1,6 @@
 # Todo
 
-- [ ] Remove info about sqlite from readme
 - [ ] Add Bull job scheduler
-- [ ] Fix Helmet SSL error!
-- [ ] File upload
 - [ ] Implement run prisma:studio in project
 - [ ] Move some services to separate modules (ex. Account, AccountSession, etc.)
 - [ ] Migrate to some prisma DTO generator
