@@ -5,6 +5,7 @@ import { EasyconfigModule } from 'nestjs-easyconfig';
 import { GraphqlModule } from '@/app/graphql/graphql.module';
 import { Page404Filter } from '@/app/page-404/page-404.filter';
 import { LoggerModule } from '@/common/logger/logger.module';
+import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { FileUploadController } from './file-upload/file-upload.controller';
 
@@ -13,6 +14,7 @@ import { FileUploadController } from './file-upload/file-upload.controller';
     EasyconfigModule.register({ path: '.env', safe: true, parseLog: false }),
     GraphqlModule,
     LoggerModule,
+    PrismaModule,
   ],
   providers: [
     {

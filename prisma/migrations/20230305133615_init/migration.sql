@@ -13,6 +13,7 @@ CREATE TABLE "Account" (
     "passwordHash" TEXT NOT NULL,
     "roles" "AccountRole"[],
     "status" "AccountStatus" NOT NULL,
+    "avatarUrl" TEXT,
 
     CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
 );
@@ -34,7 +35,7 @@ CREATE TABLE "Upload" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "filename" TEXT NOT NULL,
+    "filepath" TEXT NOT NULL,
     "originalFilename" TEXT NOT NULL,
     "extension" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
@@ -65,7 +66,7 @@ CREATE UNIQUE INDEX "Account_email_key" ON "Account"("email");
 CREATE UNIQUE INDEX "OneTimeCode_email_key" ON "OneTimeCode"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Upload_filename_key" ON "Upload"("filename");
+CREATE UNIQUE INDEX "Upload_filepath_key" ON "Upload"("filepath");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AccountSession_token_key" ON "AccountSession"("token");

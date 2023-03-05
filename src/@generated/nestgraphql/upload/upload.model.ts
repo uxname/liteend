@@ -15,7 +15,7 @@ export class Upload {
     updatedAt!: Date;
 
     @Field(() => String, {nullable:false})
-    filename!: string;
+    filepath!: string;
 
     @Field(() => String, {nullable:false})
     originalFilename!: string;

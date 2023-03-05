@@ -59,7 +59,7 @@ model Upload {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  filename         String @unique
+  filepath         String @unique
   originalFilename String
   extension        String
   size             Int

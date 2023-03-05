@@ -26,7 +26,7 @@ export class UploadScalarWhereWithAggregatesInput {
     updatedAt?: DateTimeWithAggregatesFilter;
 
     @Field(() => StringWithAggregatesFilter, {nullable:true})
-    filename?: StringWithAggregatesFilter;
+    filepath?: StringWithAggregatesFilter;
 
     @Field(() => StringWithAggregatesFilter, {nullable:true})
     originalFilename?: StringWithAggregatesFilter;

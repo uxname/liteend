@@ -15,7 +15,7 @@ export class UploadCountAggregate {
     updatedAt!: number;
 
     @Field(() => Int, {nullable:false})
-    filename!: number;
+    filepath!: number;
 
     @Field(() => Int, {nullable:false})
     originalFilename!: number;

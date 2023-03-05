@@ -9,5 +9,5 @@ export class UploadWhereUniqueInput {
     id?: number;
 
     @Field(() => String, {nullable:true})
-    filename?: string;
+    filepath?: string;
 }

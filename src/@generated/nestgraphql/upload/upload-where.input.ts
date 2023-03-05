@@ -26,7 +26,7 @@ export class UploadWhereInput {
     updatedAt?: DateTimeFilter;
 
     @Field(() => StringFilter, {nullable:true})
-    filename?: StringFilter;
+    filepath?: StringFilter;
 
     @Field(() => StringFilter, {nullable:true})
     originalFilename?: StringFilter;

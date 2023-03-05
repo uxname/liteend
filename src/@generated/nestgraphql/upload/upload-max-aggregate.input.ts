@@ -14,7 +14,7 @@ export class UploadMaxAggregateInput {
     updatedAt?: true;
 
     @Field(() => Boolean, {nullable:true})
-    filename?: true;
+    filepath?: true;
 
     @Field(() => Boolean, {nullable:true})
     originalFilename?: true;

@@ -12,7 +12,7 @@ export class UploadCreateInput {
     updatedAt?: Date | string;
 
     @Field(() => String, {nullable:false})
-    filename!: string;
+    filepath!: string;
 
     @Field(() => String, {nullable:false})
     originalFilename!: string;

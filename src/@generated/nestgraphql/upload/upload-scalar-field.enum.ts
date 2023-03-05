@@ -4,7 +4,7 @@ export enum UploadScalarFieldEnum {
     id = "id",
     createdAt = "createdAt",
     updatedAt = "updatedAt",
-    filename = "filename",
+    filepath = "filepath",
     originalFilename = "originalFilename",
     extension = "extension",
     size = "size",

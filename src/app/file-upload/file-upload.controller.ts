@@ -7,6 +7,7 @@ import * as process from 'node:process';
 import {
   BadRequestException,
   Controller,
+  Ip,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -15,6 +16,8 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
@@ -48,6 +51,8 @@ const storage = diskStorage({
 
 @Controller()
 export class FileUploadController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Post('upload')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'files', maxCount: 10 }], {
@@ -73,12 +78,24 @@ export class FileUploadController {
       },
     }),
   )
-  uploadFile(
+  async uploadFile(
     @UploadedFiles()
     files: {
       files?: Express.Multer.File[];
     },
+    @Ip() ip: string,
   ) {
+    await this.prisma.upload.createMany({
+      data:
+        files.files?.map((file) => ({
+          filepath: file.path.replace(UPLOAD_DIR, ''),
+          originalFilename: file.originalname,
+          extension: path.extname(file.originalname),
+          size: file.size,
+          mimetype: file.mimetype,
+          uploaderIp: ip,
+        })) ?? [],
+    });
     return (
       files.files?.map((file) => ({
         filename: file.filename,

@@ -15,7 +15,7 @@ export class UploadCountOrderByAggregateInput {
     updatedAt?: keyof typeof SortOrder;
 
     @Field(() => SortOrder, {nullable:true})
-    filename?: keyof typeof SortOrder;
+    filepath?: keyof typeof SortOrder;
 
     @Field(() => SortOrder, {nullable:true})
     originalFilename?: keyof typeof SortOrder;
