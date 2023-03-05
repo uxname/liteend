@@ -46,7 +46,7 @@ const storage = diskStorage({
   },
 });
 
-@Controller('file-upload')
+@Controller()
 export class FileUploadController {
   @Post('upload')
   @UseInterceptors(
