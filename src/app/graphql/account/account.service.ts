@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EasyconfigService } from 'nestjs-easyconfig';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
@@ -10,18 +9,15 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class AccountService {
-  constructor(
-    private prisma: PrismaService,
-    private config: EasyconfigService,
-    private crypto: CryptoService,
-  ) {}
+  constructor(private prisma: PrismaService, private crypto: CryptoService) {}
 
   public async createAccount(
     email: string,
     password: string,
     status: AccountStatus = AccountStatus.ACTIVE,
   ): Promise<Account> {
-    const salt = this.config.get('SALT');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const salt = process.env.SALT!;
     const passwordHash = await this.crypto.hash(password, salt);
     return this.prisma.account.create({
       data: {
@@ -42,10 +38,11 @@ export class AccountService {
   }
 
   async changePassword(email: string, newPassword: string): Promise<Account> {
-    const salt = this.config.get('SALT');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const salt = process.env.SALT!;
 
     const newPasswordHash = await this.crypto.hash(newPassword, salt);
-    return await this.prisma.account.update({
+    return this.prisma.account.update({
       where: {
         email,
       },

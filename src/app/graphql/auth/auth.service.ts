@@ -1,5 +1,6 @@
+import process from 'node:process';
+
 import { Injectable } from '@nestjs/common';
-import { EasyconfigService } from 'nestjs-easyconfig';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { CryptoService } from '@/common/crypto/crypto.service';
@@ -9,7 +10,6 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private config: EasyconfigService,
     private cryptoService: CryptoService,
   ) {}
 
@@ -23,7 +23,8 @@ export class AuthService {
       },
     });
     if (account) {
-      const salt = this.config.get('SALT');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const salt = process.env.SALT!;
       const isPasswordValid = await this.cryptoService.hashVerify(
         password,
         salt,

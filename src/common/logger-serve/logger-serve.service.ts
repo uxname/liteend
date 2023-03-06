@@ -5,7 +5,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import express from 'express';
 import basicAuth from 'express-basic-auth';
-import { EasyconfigService } from 'nestjs-easyconfig';
 import serveIndex from 'serve-index';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class LoggerServeService {
   constructor(
     private adapterHost: HttpAdapterHost,
     private readonly log: Logger,
-    private readonly config: EasyconfigService,
   ) {
     const app = this.adapterHost.httpAdapter.getInstance();
 
@@ -21,8 +19,8 @@ export class LoggerServeService {
       authorizeAsync: true,
       authorizer: (username, password, callback) => {
         // eslint-disable-next-line security/detect-object-injection
-        const user = config.get('LOGS_ADMIN_PANEL_USER');
-        const password_ = config.get('LOGS_ADMIN_PANEL_PASSWORD');
+        const user = process.env.LOGS_ADMIN_PANEL_USER;
+        const password_ = process.env.LOGS_ADMIN_PANEL_PASSWORD;
         // eslint-disable-next-line security/detect-possible-timing-attacks
         if (username === user && password === password_) {
           callback(undefined, true);

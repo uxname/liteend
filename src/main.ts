@@ -35,7 +35,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.PORT;
+  const port = Number(process.env.PORT);
   if (!port) {
     throw new Error('No port specified');
   }

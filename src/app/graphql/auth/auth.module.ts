@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { EasyconfigModule } from 'nestjs-easyconfig';
 
 import { AccountModule } from '@/app/graphql/account/account.module';
 import { AccountSessionModule } from '@/app/graphql/account-session/account-session.module';
@@ -13,7 +12,6 @@ import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    EasyconfigModule,
     CryptoModule,
     PrismaModule,
     AccountModule,
