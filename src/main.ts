@@ -1,6 +1,7 @@
 import * as process from 'node:process';
 
 import { NestFactory } from '@nestjs/core';
+import compression from 'compression';
 import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
@@ -20,6 +21,19 @@ async function bootstrap() {
   );
   const logger = app.get(Logger);
   app.useLogger(logger);
+  app.use(
+    compression({
+      level: -1, // https://github.com/expressjs/compression#level
+      threshold: 1024, // in bytes
+      filter: (request, response) => {
+        if (request.headers['x-no-compression']) {
+          return false;
+        }
+        // eslint-disable-next-line unicorn/no-array-callback-reference,unicorn/no-array-method-this-argument
+        return compression.filter(request, response);
+      },
+    }),
+  );
 
   const port = process.env.PORT;
   if (!port) {
