@@ -7,6 +7,7 @@ import { LoggerModule } from '@/common/logger/logger.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { FileUploadController } from './file-upload/file-upload.controller';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [GraphqlModule, LoggerModule, PrismaModule],
@@ -16,6 +17,6 @@ import { FileUploadController } from './file-upload/file-upload.controller';
       useClass: Page404Filter,
     },
   ],
-  controllers: [FileUploadController],
+  controllers: [FileUploadController, HealthController],
 })
 export class AppModule {}

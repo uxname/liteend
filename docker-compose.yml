@@ -11,7 +11,12 @@ services:
             - ./data:/app/data:rw
         ports:
             - '${PORT}:${PORT}'
-#            - '5555:5555' todo: for prisma studio
+        healthcheck:
+            test: ["CMD-SHELL", "/app/healthcheck.sh"]
+            interval: 2s
+            timeout: 10s
+            retries: 3
+
     db:
         image: postgres:15-alpine3.17
         environment:
