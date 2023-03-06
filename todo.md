@@ -6,7 +6,7 @@
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
 - [ ] Add commit message linter
-- [ ] Add database seed script
+- [ ] Improve seed script (use faker js and real password hashes)
 - [ ] Maybe migrate to Fastify
 - [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
