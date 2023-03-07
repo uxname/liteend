@@ -1,8 +1,8 @@
 import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
-import { Account } from '../account/account.model';
 import { HideField } from '@nestjs/graphql';
+import { Account } from '../account/account.model';
 
 @ObjectType()
 export class AccountSession {
@@ -15,9 +15,6 @@ export class AccountSession {
 
     @Field(() => Date, {nullable:false})
     updatedAt!: Date;
-
-    @Field(() => Account, {nullable:false})
-    account?: Account;
 
     @Field(() => Int, {nullable:false})
     accountId!: number;
@@ -33,4 +30,7 @@ export class AccountSession {
 
     @Field(() => Date, {nullable:false})
     expiresAt!: Date;
+
+    @Field(() => Account, {nullable:false})
+    account?: Account;
 }

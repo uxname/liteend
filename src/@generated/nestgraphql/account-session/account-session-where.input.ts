@@ -2,9 +2,9 @@ import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
 import { IntFilter } from '../prisma/int-filter.input';
 import { DateTimeFilter } from '../prisma/date-time-filter.input';
-import { AccountRelationFilter } from '../account/account-relation-filter.input';
 import { StringFilter } from '../prisma/string-filter.input';
 import { StringNullableFilter } from '../prisma/string-nullable-filter.input';
+import { AccountRelationFilter } from '../account/account-relation-filter.input';
 
 @InputType()
 export class AccountSessionWhereInput {
@@ -27,9 +27,6 @@ export class AccountSessionWhereInput {
     @Field(() => DateTimeFilter, {nullable:true})
     updatedAt?: DateTimeFilter;
 
-    @Field(() => AccountRelationFilter, {nullable:true})
-    account?: AccountRelationFilter;
-
     @Field(() => IntFilter, {nullable:true})
     accountId?: IntFilter;
 
@@ -44,4 +41,7 @@ export class AccountSessionWhereInput {
 
     @Field(() => DateTimeFilter, {nullable:true})
     expiresAt?: DateTimeFilter;
+
+    @Field(() => AccountRelationFilter, {nullable:true})
+    account?: AccountRelationFilter;
 }

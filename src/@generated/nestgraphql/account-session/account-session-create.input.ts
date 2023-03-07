@@ -11,9 +11,6 @@ export class AccountSessionCreateInput {
     @Field(() => Date, {nullable:true})
     updatedAt?: Date | string;
 
-    @Field(() => AccountCreateNestedOneWithoutSessionsInput, {nullable:false})
-    account!: AccountCreateNestedOneWithoutSessionsInput;
-
     @Field(() => String, {nullable:false})
     token!: string;
 
@@ -25,4 +22,7 @@ export class AccountSessionCreateInput {
 
     @Field(() => Date, {nullable:false})
     expiresAt!: Date | string;
+
+    @Field(() => AccountCreateNestedOneWithoutSessionsInput, {nullable:false})
+    account!: AccountCreateNestedOneWithoutSessionsInput;
 }

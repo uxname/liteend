@@ -11,9 +11,6 @@ export class AccountSessionUpdateInput {
     @Field(() => Date, {nullable:true})
     updatedAt?: Date | string;
 
-    @Field(() => AccountUpdateOneRequiredWithoutSessionsNestedInput, {nullable:true})
-    account?: AccountUpdateOneRequiredWithoutSessionsNestedInput;
-
     @Field(() => String, {nullable:true})
     token?: string;
 
@@ -25,4 +22,7 @@ export class AccountSessionUpdateInput {
 
     @Field(() => Date, {nullable:true})
     expiresAt?: Date | string;
+
+    @Field(() => AccountUpdateOneRequiredWithoutSessionsNestedInput, {nullable:true})
+    account?: AccountUpdateOneRequiredWithoutSessionsNestedInput;
 }

@@ -15,9 +15,6 @@ export class AccountSessionOrderByWithRelationInput {
     @Field(() => SortOrder, {nullable:true})
     updatedAt?: keyof typeof SortOrder;
 
-    @Field(() => AccountOrderByWithRelationInput, {nullable:true})
-    account?: AccountOrderByWithRelationInput;
-
     @Field(() => SortOrder, {nullable:true})
     accountId?: keyof typeof SortOrder;
 
@@ -32,4 +29,7 @@ export class AccountSessionOrderByWithRelationInput {
 
     @Field(() => SortOrder, {nullable:true})
     expiresAt?: keyof typeof SortOrder;
+
+    @Field(() => AccountOrderByWithRelationInput, {nullable:true})
+    account?: AccountOrderByWithRelationInput;
 }
