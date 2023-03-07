@@ -23,7 +23,7 @@
     "start:dev": "npx cross-env NODE_ENV=development nest start --watch",
     "start:debug": "npx cross-env NODE_ENV=development nest start --debug --watch",
     "prestart:prod": "npm run db:migrations:apply",
-    "start:prod": "npx cross-env NODE_ENV=production node dist/src/main",
+    "start:prod": "npx cross-env NODE_ENV=production node --enable-source-maps dist/src/main",
     "ts:check": "tsc --noEmit",
     "check": "npm run ts:check && npm run lint",
     "lint": "eslint .",
