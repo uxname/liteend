@@ -20,6 +20,7 @@ import {
   CryptoService,
   RandomStringType,
 } from '@/common/crypto/crypto.service';
+import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
 @Resolver()
 export class AuthResolver {
@@ -37,6 +38,7 @@ export class AuthResolver {
     @Args('email') email: string,
     @Args('password') password: string,
     @Context() context: GqlContext,
+    @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.accountService.createAccount(
       email,
@@ -49,7 +51,7 @@ export class AuthResolver {
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
-      context.req.ip,
+      ip,
       context.req.headers['user-agent'],
     );
     return {
@@ -63,6 +65,7 @@ export class AuthResolver {
     @Args('email') email: string,
     @Args('password') password: string,
     @Context() context: GqlContext,
+    @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.authService.validateAccountPassword(
       email,
@@ -75,7 +78,7 @@ export class AuthResolver {
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
-      context.req.ip,
+      ip,
       context.req.headers['user-agent'],
     );
     return {

@@ -7,7 +7,6 @@ import * as process from 'node:process';
 import {
   BadRequestException,
   Controller,
-  Ip,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -18,6 +17,7 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
@@ -83,7 +83,7 @@ export class FileUploadController {
     files: {
       files?: Express.Multer.File[];
     },
-    @Ip() ip: string,
+    @RealIp() ip: string,
   ) {
     await this.prisma.upload.createMany({
       data:
