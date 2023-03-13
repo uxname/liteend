@@ -12,7 +12,7 @@ async function getTextFromUser(query: string): Promise<string> {
     output: process.stdout,
   });
 
-  return new Promise<string>((resolve, _) => {
+  return new Promise<string>((resolve) => {
     rl.question(query, (text: string) => {
       resolve(text);
       rl.close();
