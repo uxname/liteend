@@ -1,10 +1,37 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-magic-numbers,unicorn/prefer-top-level-await,promise/catch-or-return */
+import * as readline from 'node:readline';
+
 import { AccountRole, AccountStatus, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+async function getTextFromUser(query: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise<string>((resolve, _) => {
+    rl.question(query, (text: string) => {
+      resolve(text);
+      rl.close();
+    });
+  });
+}
+
 async function main() {
+  const answer = await getTextFromUser(
+    'Do you want to clear the database? (y/N):',
+  );
+
+  if (answer === 'y') {
+    await prisma.accountSession.deleteMany({});
+    await prisma.oneTimeCode.deleteMany({});
+    await prisma.account.deleteMany({});
+    await prisma.upload.deleteMany({});
+  }
+
   console.log('Start seeding ...');
   const EXPIRES_AT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const RND = Math.random().toString(36).slice(2, 15);
