@@ -42,6 +42,7 @@
     "@nestjs/core": "^9.3.9",
     "@nestjs/graphql": "^10.2.0",
     "@nestjs/platform-express": "^9.3.9",
+    "@nestjs/swagger": "^6.2.1",
     "@prisma/client": "^4.11.0",
     "apollo-server-express": "^3.12.0",
     "bcrypt": "^5.1.0",

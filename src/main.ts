@@ -1,16 +1,27 @@
 import * as process from 'node:process';
 
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
 import { sendStatistic } from '@/common/telemetry';
 
+import appInfo from '../app-info.json';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle(appInfo.name)
+    .setDescription(`${appInfo.name} REST API documentation`)
+    .setVersion(appInfo.version)
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
   app.use(
     helmet({
       crossOriginEmbedderPolicy: false,
