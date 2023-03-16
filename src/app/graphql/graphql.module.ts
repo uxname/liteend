@@ -36,7 +36,7 @@ export class GqlContext {
       introspection: true,
       persistedQueries: false,
       resolvers: { JSON: GraphQLJSON },
-      context: ({ req, res }): GqlContext => ({
+      context: ({ req, res }: { req: Request; res: Response }): GqlContext => ({
         req,
         res,
         account: undefined,
