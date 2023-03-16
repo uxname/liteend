@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common/services/logger.service';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
