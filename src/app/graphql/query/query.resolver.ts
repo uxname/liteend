@@ -10,7 +10,6 @@ export class QueryResolver {
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {
-    this.logger.error(process.env);
     this.logger.log({ resolver: 'echo', text });
     return text;
   }
