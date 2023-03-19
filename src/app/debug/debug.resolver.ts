@@ -1,6 +1,7 @@
-import { Logger } from '@nestjs/common/services/logger.service';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
+
+import { Logger } from '@/common/logger/logger';
 
 import appInfo from '../../../app-info.json';
 

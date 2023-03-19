@@ -1,6 +1,7 @@
-import { Controller, Get, HttpStatus, Logger, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import express from 'express';
 
+import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Controller('health')
@@ -9,6 +10,7 @@ export class HealthController {
     private readonly prisma: PrismaService,
     private readonly logger: Logger,
   ) {}
+
   @Get()
   async getHealth(@Res() response: express.Response): Promise<unknown> {
     try {
