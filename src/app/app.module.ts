@@ -18,8 +18,8 @@ import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
-import { FileUploadController } from './file-upload/file-upload.controller';
-import { HealthController } from './health/health.controller';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -50,6 +50,8 @@ import { HealthController } from './health/health.controller';
     LoggerModule,
     PrismaModule,
     LoggerServeModule,
+    FileUploadModule,
+    HealthModule,
   ],
   providers: [
     {
@@ -57,6 +59,5 @@ import { HealthController } from './health/health.controller';
       useClass: Page404Filter,
     },
   ],
-  controllers: [FileUploadController, HealthController],
 })
 export class AppModule {}
