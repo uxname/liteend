@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { AccountSessionModule } from '@/app/graphql/account-session/account-session.module';
+import { AccountSessionModule } from '@/app/account-session/account-session.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 

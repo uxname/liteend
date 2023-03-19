@@ -10,13 +10,13 @@ import {
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { AccountService } from '@/app/graphql/account/account.service';
-import { UpdateAccountInput } from '@/app/graphql/account/types';
-import { AccountSessionService } from '@/app/graphql/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/app/graphql/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/app/graphql/auth/roles/auth.guard';
-import { ContextDecorator } from '@/app/graphql/context.decorator';
-import { GqlContext } from '@/app/graphql/graphql.module';
+import { AccountService } from '@/app/account/account.service';
+import { UpdateAccountInput } from '@/app/account/types';
+import { AccountSessionService } from '@/app/account-session/account-session.service';
+import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
+import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { ContextDecorator } from '@/app/context.decorator';
+import { GqlContext } from '@/app/gql-context';
 
 @Resolver(() => Account)
 export class AccountResolver {

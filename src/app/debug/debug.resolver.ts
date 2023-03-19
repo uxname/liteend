@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common/services/logger.service';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
-import appInfo from '@/../app-info.json';
+import appInfo from '../../../app-info.json';
 
 @Resolver(() => Query)
 export class DebugResolver {

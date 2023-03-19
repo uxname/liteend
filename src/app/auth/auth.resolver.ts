@@ -3,19 +3,16 @@ import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
-import { AccountService } from '@/app/graphql/account/account.service';
-import {
-  AuthResponse,
-  GenerateEmailCodeResponse,
-} from '@/app/graphql/account/types';
-import { AccountSessionService } from '@/app/graphql/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/app/graphql/auth/account-extractor/account-extractor.guard';
-import { AuthService } from '@/app/graphql/auth/auth.service';
-import { AuthGuard } from '@/app/graphql/auth/roles/auth.guard';
-import { ContextDecorator } from '@/app/graphql/context.decorator';
-import { EmailService } from '@/app/graphql/email/email.service';
-import { GqlContext } from '@/app/graphql/graphql.module';
-import { OneTimeCodeService } from '@/app/graphql/one-time-code/one-time-code.service';
+import { AccountService } from '@/app/account/account.service';
+import { AuthResponse, GenerateEmailCodeResponse } from '@/app/account/types';
+import { AccountSessionService } from '@/app/account-session/account-session.service';
+import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
+import { AuthService } from '@/app/auth/auth.service';
+import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { ContextDecorator } from '@/app/context.decorator';
+import { EmailService } from '@/app/email/email.service';
+import { GqlContext } from '@/app/gql-context';
+import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
 import {
   CryptoService,
   RandomStringType,
