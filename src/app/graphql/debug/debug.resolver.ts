@@ -1,16 +1,21 @@
 import { Logger } from '@nestjs/common/services/logger.service';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
 import appInfo from '@/../app-info.json';
 
 @Resolver(() => Query)
-export class QueryResolver {
+export class DebugResolver {
   constructor(private readonly logger: Logger) {}
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {
     this.logger.log({ resolver: 'echo', text });
+    return text;
+  }
+
+  @Mutation(() => String, { name: 'echo' })
+  echoMutation(@Args('text', { type: () => String }) text: string): string {
     return text;
   }
 

@@ -12,11 +12,10 @@ import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { AccountSessionModule } from './account-session/account-session.module';
 import { AuthModule } from './auth/auth.module';
+import { DebugResolver } from './debug/debug.resolver';
 import { EmailModule } from './email/email.module';
-import { MutationResolver } from './mutation/mutation.resolver';
 import { OneTimeCodeModule } from './one-time-code/one-time-code.module';
 import { OneTimeCodeService } from './one-time-code/one-time-code.service';
-import { QueryResolver } from './query/query.resolver';
 
 // todo move to separated file
 export class GqlContext {
@@ -53,6 +52,6 @@ export class GqlContext {
     OneTimeCodeModule,
     EmailModule,
   ],
-  providers: [QueryResolver, MutationResolver, OneTimeCodeService],
+  providers: [DebugResolver, OneTimeCodeService],
 })
 export class GraphqlModule {}
