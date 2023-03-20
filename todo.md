@@ -1,6 +1,7 @@
 # Todo
 
 - [ ] Add Bull job scheduler
+- [ ] Fix tests
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
