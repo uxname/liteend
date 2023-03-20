@@ -2,10 +2,8 @@
 
 - [ ] Add Bull job scheduler
 - [ ] Implement run prisma:studio in project
-- [ ] Move some services to separate modules (ex. Account, AccountSession, etc.)
 - [ ] Migrate to some prisma DTO generator
 - [ ] Implement GraphQL subscriptions
-- [ ] Add commit message linter
 - [ ] Improve seed script (use faker js and real password hashes)
 - [ ] Maybe migrate to Fastify
 - [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
