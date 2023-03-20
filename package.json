@@ -67,6 +67,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@jetbrains/eslint-config": "^5.4.1",
     "@nestjs/cli": "^9.2.0",
     "@nestjs/schematics": "^9.0.4",

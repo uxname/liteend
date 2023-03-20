@@ -2,7 +2,10 @@
 /* eslint-disable no-magic-numbers,unicorn/prefer-top-level-await,promise/catch-or-return */
 import * as readline from 'node:readline';
 
+import { faker } from '@faker-js/faker';
 import { AccountRole, AccountStatus, PrismaClient } from '@prisma/client';
+
+import { CryptoService } from '@/common/crypto/crypto.service';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +23,8 @@ async function getTextFromUser(query: string): Promise<string> {
   });
 }
 
+const crypto = new CryptoService();
+
 async function main() {
   const answer = await getTextFromUser(
     'Do you want to clear the database? (y/N):',
@@ -34,20 +39,25 @@ async function main() {
 
   console.log('Start seeding ...');
   const EXPIRES_AT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const RND = Math.random().toString(36).slice(2, 15);
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const salt = process.env.SALT!;
+  const password = '123';
+
+  const newPasswordHash = await crypto.hash(password, salt);
 
   // Create accounts
   await prisma.account.create({
     data: {
-      email: `admin_${RND}@example.com`,
-      passwordHash: 'password',
+      email: faker.internet.email().toLowerCase(),
+      passwordHash: newPasswordHash,
       roles: [AccountRole.ADMIN, AccountRole.USER],
       status: AccountStatus.ACTIVE,
       avatarUrl: 'https://example.com/avatar.png',
       sessions: {
         create: {
-          token: `token1${RND}`,
-          ipAddr: '127.0.0.1',
+          token: faker.random.numeric(42),
+          ipAddr: faker.internet.ipv4(),
           expiresAt: EXPIRES_AT,
         },
       },
@@ -56,14 +66,14 @@ async function main() {
 
   await prisma.account.create({
     data: {
-      email: `user_${RND}@example.com`,
-      passwordHash: 'password',
+      email: faker.internet.email().toLowerCase(),
+      passwordHash: newPasswordHash,
       roles: [AccountRole.USER],
       status: AccountStatus.ACTIVE,
       sessions: {
         create: {
-          token: `token2${RND}`,
-          ipAddr: '127.0.0.1',
+          token: faker.random.numeric(42),
+          ipAddr: faker.internet.ipv4(),
           expiresAt: EXPIRES_AT,
         },
       },
@@ -73,8 +83,8 @@ async function main() {
   // Create one-time codes
   await prisma.oneTimeCode.create({
     data: {
-      email: `user_${RND}@example.com`,
-      code: '123456',
+      email: faker.internet.email().toLowerCase(),
+      code: faker.random.numeric(6),
       expiresAt: EXPIRES_AT,
     },
   });
@@ -82,7 +92,7 @@ async function main() {
   // Create uploads
   await prisma.upload.create({
     data: {
-      filepath: `/path/to/upload_${RND}.jpg`,
+      filepath: `/path/to/upload_${faker.random.numeric(6)}.jpg`,
       originalFilename: 'upload1.jpg',
       extension: 'jpg',
       size: 1024,
@@ -93,7 +103,7 @@ async function main() {
 
   await prisma.upload.create({
     data: {
-      filepath: `/path/to/upload2_${RND}.jpg`,
+      filepath: `/path/to/upload2_${faker.random.numeric(6)}.jpg`,
       originalFilename: 'upload2.jpg',
       extension: 'jpg',
       size: 2048,
