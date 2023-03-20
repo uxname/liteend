@@ -5,6 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
+
 @Catch(NotFoundException)
 export class Page404Filter implements ExceptionFilter {
   catch(_exception: NotFoundException, host: ArgumentsHost) {
