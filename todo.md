@@ -3,6 +3,7 @@
 - [ ] Add Bull job scheduler
 - [ ] Fix tests
 - [ ] Add rate limiter
+- [ ] Implement log class names in logger
 - [ ] [Maybe] Move AccountExtractor from guard to middleware
 - [ ] Implement GraphQL subscriptions or websockets
 - [ ] Implement run prisma:studio in project
