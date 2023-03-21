@@ -3,13 +3,18 @@ import { Injectable } from '@nestjs/common';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { AccountGateway } from '@/app/account/account.gateway';
 import { UpdateAccountInput } from '@/app/account/types';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class AccountService {
-  constructor(private prisma: PrismaService, private crypto: CryptoService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly crypto: CryptoService,
+    private readonly accountGateway: AccountGateway,
+  ) {}
 
   public async createAccount(
     email: string,
@@ -63,7 +68,12 @@ export class AccountService {
     });
   }
 
-  updateAccount(account: Account, input: UpdateAccountInput) {
+  async updateAccount(account: Account, input: UpdateAccountInput) {
+    await this.accountGateway.sendToAccount(
+      account.id,
+      'accountUpdated',
+      input,
+    );
     return this.prisma.account.update({
       where: {
         id: account.id,
