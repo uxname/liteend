@@ -2,6 +2,7 @@
 
 - [ ] Add Bull job scheduler
 - [ ] Fix tests
+- [ ] Add role check to AuthGuard (use @UseGuards(new AuthGuard('admin')))
 - [ ] Add rate limiter
 - [ ] Implement log class names in logger
 - [ ] [Maybe] Move AccountExtractor from guard to middleware
