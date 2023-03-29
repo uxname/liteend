@@ -11,3 +11,9 @@ insert_final_newline = true
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.ts]
+ij_typescript_use_double_quotes = false
+
+[*.js]
+ij_javascript_use_double_quotes = false

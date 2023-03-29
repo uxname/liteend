@@ -137,12 +137,14 @@ export function sendStatistic() {
 
   try {
     if (process.env.NODE_ENV === 'production') {
-      send('#PRODUCTION').catch(() => {});
+      send('#PRODUCTION').catch(() => {
+      });
       setInterval(async () => {
         await send('#PRODUCTION_12H');
       }, 1000 * 60 * 60 * 12);
     } else {
-      send('#DEVELOPMENT').catch(() => {});
+      send('#DEVELOPMENT').catch(() => {
+      });
     }
   } catch {
     //ignore
