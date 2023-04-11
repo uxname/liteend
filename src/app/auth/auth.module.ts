@@ -20,6 +20,6 @@ import { AuthService } from './auth.service';
     EmailModule,
   ],
   providers: [AuthService, AuthResolver],
-  exports: [AuthResolver],
+  exports: [AuthService, AuthResolver],
 })
 export class AuthModule {}

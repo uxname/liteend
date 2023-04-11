@@ -1,6 +1,8 @@
+import type { Config } from '@jest/types';
+
 import packageJson from './package.json';
 
-export default {
+const config: Config.InitialOptions = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testTimeout: 30_000,
@@ -20,3 +22,5 @@ export default {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
 };
+
+export default config;

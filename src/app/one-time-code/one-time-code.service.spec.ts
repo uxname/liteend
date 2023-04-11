@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { PrismaModule } from '@/common/prisma/prisma.module';
+
 import { OneTimeCodeService } from './one-time-code.service';
 
 describe('OneTimeCodeService', () => {
@@ -7,6 +9,7 @@ describe('OneTimeCodeService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [PrismaModule],
       providers: [OneTimeCodeService],
     }).compile();
 

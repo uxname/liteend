@@ -15,8 +15,8 @@ describe('EmailService', () => {
             port: 587,
             secure: false, // upgrade later with STARTTLS
             auth: {
-              user: 'kayley22@ethereal.email',
-              pass: 'wQCHuxjVWcUKUnYqyN',
+              user: 'porter.carroll23@ethereal.email',
+              pass: 'n3eKNckQJxcJ3h8Jvy',
             },
           },
           defaults: {

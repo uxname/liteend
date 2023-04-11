@@ -11,6 +11,6 @@ import { AccountService } from './account.service';
 @Module({
   imports: [PrismaModule, CryptoModule, AccountSessionModule],
   providers: [AccountService, AccountResolver, AccountGateway],
-  exports: [AccountService],
+  exports: [AccountService, AccountResolver, AccountGateway],
 })
 export class AccountModule {}
