@@ -1,5 +1,10 @@
+import process from 'node:process';
+
+import { BullModule } from '@nestjs/bull';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MailerModule } from '@nestjs-modules/mailer';
+
+import { LoggerModule } from '@/common/logger/logger.module';
 
 import { EmailService } from './email.service';
 
@@ -9,14 +14,26 @@ describe('EmailService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        LoggerModule,
+        BullModule.forRoot({
+          redis: {
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT),
+            username: process.env.REDIS_USERNAME,
+            password: process.env.REDIS_PASSWORD,
+          },
+        }),
+        BullModule.registerQueue({
+          name: 'email',
+        }),
         MailerModule.forRoot({
           transport: {
-            host: 'smtp.ethereal.email',
-            port: 587,
+            host: process.env.EMAIL_HOST,
+            port: Number(process.env.EMAIL_PORT),
             secure: false, // upgrade later with STARTTLS
             auth: {
-              user: 'porter.carroll23@ethereal.email',
-              pass: 'n3eKNckQJxcJ3h8Jvy',
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASSWORD,
             },
           },
           defaults: {
@@ -40,6 +57,10 @@ describe('EmailService', () => {
     const text = 'Test email';
 
     const result = await service.sendEmail(to, subject, text);
-    expect(result.messageId).toBeDefined();
+    expect(result.id).toBeDefined();
   });
+
+  // afterAll(async () => {
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  // });
 });

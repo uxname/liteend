@@ -16,7 +16,22 @@ services:
             interval: 2s
             timeout: 10s
             retries: 3
-
+    redis:
+      image: redis:7.0.9-alpine3.17
+      restart: unless-stopped
+      ports:
+        - ${REDIS_PORT}:${REDIS_PORT}
+      command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
+      volumes:
+        - ./data/redis:/data
+    redis_admin:
+      image: rediscommander/redis-commander:latest
+      restart: unless-stopped
+      ports:
+        - ${REDIS_ADMIN_PORT}:8081
+      environment:
+        - HTTP_USER=${REDIS_ADMIN_USER}
+        - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
     db:
         image: postgres:15-alpine3.17
         environment:

@@ -14,7 +14,7 @@ describe('Logger', () => {
   });
 
   test('should be defined', () => {
-    logger.debug('Test');
+    logger.debug('Test logger message');
     expect(logger).toBeDefined();
   });
 });
