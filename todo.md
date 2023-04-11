@@ -1,7 +1,6 @@
 # Todo
 
 - [ ] Add Bull job scheduler
-- [ ] Fix tests
 - [ ] Logger/middleware for ALL resolvers/controllers/etc.
 - [ ] Add role check to AuthGuard (use @UseGuards(new AuthGuard('admin'))). Maybe add new RoleGuard
 - [ ] Add rate limiter
