@@ -49,7 +49,9 @@ import { HealthModule } from './health/health.module';
     EmailModule,
     LoggerModule,
     PrismaModule,
-    LoggerServeModule,
+    LoggerServeModule.forRoot({
+      route: '/logs',
+    }),
     FileUploadModule,
     HealthModule,
   ],

@@ -2,18 +2,22 @@ import { DynamicModule, Module } from '@nestjs/common';
 
 import { LoggerServeService } from './logger-serve.service';
 
-// Create LoggerServeModule that creates a LoggerServeService instance, configures it, and exports it.
+interface LoggerServeModuleParameters {
+  route: string;
+}
 
-@Module({
-  imports: [],
-  providers: [LoggerServeService],
-})
+@Module({})
 export class LoggerServeModule {
-  // todo add logs route to init
-  static forRoot(): DynamicModule {
+  static forRoot(parameters: LoggerServeModuleParameters): DynamicModule {
     return {
       module: LoggerServeModule,
-      providers: [LoggerServeService],
+      providers: [
+        LoggerServeService,
+        {
+          provide: 'ROUTE',
+          useValue: parameters.route,
+        },
+      ],
       exports: [LoggerServeService],
     };
   }

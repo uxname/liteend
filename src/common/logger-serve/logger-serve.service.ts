@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 import * as process from 'node:process';
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import express from 'express';
 import basicAuth from 'express-basic-auth';
@@ -10,8 +10,9 @@ import serveIndex from 'serve-index';
 @Injectable()
 export class LoggerServeService {
   constructor(
-    private adapterHost: HttpAdapterHost,
+    private readonly adapterHost: HttpAdapterHost,
     private readonly log: Logger,
+    @Inject('ROUTE') private readonly route: string,
   ) {
     const app = this.adapterHost.httpAdapter.getInstance();
 
@@ -40,7 +41,7 @@ export class LoggerServeService {
 
     const logsDirectory = path.join(process.cwd(), 'data', 'logs');
     app.use(
-      '/logs',
+      this.route,
       authMiddleware,
       express.static(logsDirectory),
       serveIndex(logsDirectory, { icons: true }),
