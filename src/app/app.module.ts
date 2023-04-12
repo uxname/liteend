@@ -1,5 +1,5 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request, Response } from 'express';
@@ -14,6 +14,7 @@ import { GqlContext } from '@/app/gql-context';
 import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';
 import { Page404Filter } from '@/app/page-404/page-404.filter';
 import { CryptoModule } from '@/common/crypto/crypto.module';
+import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
@@ -49,9 +50,7 @@ import { HealthModule } from './health/health.module';
     EmailModule,
     LoggerModule,
     PrismaModule,
-    LoggerServeModule.forRoot({
-      route: '/logs',
-    }),
+    LoggerServeModule,
     FileUploadModule,
     HealthModule,
   ],
@@ -62,4 +61,8 @@ import { HealthModule } from './health/health.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpLoggerMiddleware).forRoutes('*');
+  }
+}

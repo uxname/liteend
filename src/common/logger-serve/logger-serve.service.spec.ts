@@ -3,10 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { LoggerModule } from '@/common/logger/logger.module';
 
-import { LoggerServeService } from './logger-serve.service';
+import { LoggerServeController } from './logger-serve.controller';
 
 describe('LoggerServeService', () => {
-  let service: LoggerServeService;
+  let service: LoggerServeController;
 
   beforeEach(async () => {
     const adapterHostMock = {
@@ -30,11 +30,11 @@ describe('LoggerServeService', () => {
           provide: 'ROUTE',
           useValue: '/logs',
         },
-        LoggerServeService,
+        LoggerServeController,
       ],
     }).compile();
 
-    service = module.get<LoggerServeService>(LoggerServeService);
+    service = module.get<LoggerServeController>(LoggerServeController);
   });
 
   test('should be defined', () => {
