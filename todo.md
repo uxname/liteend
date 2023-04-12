@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] Logger/middleware for ALL resolvers/controllers/etc.
 - [ ] Add role check to AuthGuard (use @UseGuards(new AuthGuard('admin'))). Maybe add new RoleGuard
 - [ ] Add rate limiter
 - [ ] Implement log class names in logger
