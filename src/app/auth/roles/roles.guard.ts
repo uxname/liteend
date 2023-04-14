@@ -40,7 +40,7 @@ export class RolesGuard implements CanActivate {
           throw new HttpException(
             `Your roles (${accountRoles.join(
               ', ',
-            )}) is not: ${this.allowedRoles.join(', ')}`,
+            )}) are not: ${this.allowedRoles.join(', ')}`,
             HttpStatus.UNAUTHORIZED,
           );
         }
