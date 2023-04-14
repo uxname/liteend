@@ -73,7 +73,7 @@
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
     "@jetbrains/eslint-config": "^5.4.1",
-    "@nestjs/cli": "^9.3.0",
+    "@nestjs/cli": "^9.4.0",
     "@nestjs/schematics": "^9.1.0",
     "@nestjs/testing": "^9.4.0",
     "@types/bcrypt": "^5.0.0",
