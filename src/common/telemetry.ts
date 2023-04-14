@@ -4,7 +4,7 @@ import * as https from 'node:https';
 import os from 'node:os';
 import path from 'node:path';
 
-import packageJson from '../../app-info.json';
+import appInfo from '../../app-info.json';
 
 const telemetryFilepath = path.join(process.cwd(), 'data', 'telemetry.json');
 const telemetryFileExists = fs.existsSync(telemetryFilepath);
@@ -24,8 +24,8 @@ const p = 'PaQHW7znR2BdPNJFMvk9UyQMqQ9J2quU';
 function getTelemetryData(): ITelemetry {
   if (!telemetryFileExists) {
     const telemetry: ITelemetry = {
-      Product: 'LiteEnd',
-      Version: packageJson.version.toString(),
+      Product: appInfo.name.toString(),
+      Version: appInfo.version.toString(),
       Arch: os.arch().toString(),
       OS: process.platform.toString(),
       NodeJS: process.version.toString(),
@@ -81,13 +81,13 @@ async function sendMessage(m: string, c: number, t: string) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function encryptStringIv(text: string): string {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', p, iv);
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  return iv.toString('hex') + encrypted;
-}
+// function encryptStringIv(text: string): string {
+//   const iv = crypto.randomBytes(16);
+//   const cipher = crypto.createCipheriv('aes-256-cbc', p, iv);
+//   let encrypted = cipher.update(text, 'utf8', 'hex');
+//   encrypted += cipher.final('hex');
+//   return iv.toString('hex') + encrypted;
+// }
 
 function decryptStringIv(text: string): string {
   const iv = Buffer.from(text.slice(0, 32), 'hex');
