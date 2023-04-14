@@ -4,7 +4,7 @@ import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
 import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { AuthGuard } from '@/app/auth/auth/auth.guard';
 import { ContextDecorator } from '@/app/context.decorator';
 import { GqlContext } from '@/app/gql-context';
 

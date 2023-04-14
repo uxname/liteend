@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { AuthGuard } from '@/app/auth/auth/auth.guard';
 import { Logger } from '@/common/logger/logger';
 
 @WebSocketGateway({

@@ -14,7 +14,7 @@ import { AccountService } from '@/app/account/account.service';
 import { UpdateAccountInput } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { AuthGuard } from '@/app/auth/auth/auth.guard';
 import { ContextDecorator } from '@/app/context.decorator';
 import { GqlContext } from '@/app/gql-context';
 

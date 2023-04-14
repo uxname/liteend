@@ -2,13 +2,15 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
+import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
 import { AccountService } from '@/app/account/account.service';
 import { AuthResponse, GenerateEmailCodeResponse } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
 import { AuthService } from '@/app/auth/auth.service';
-import { AuthGuard } from '@/app/auth/roles/auth.guard';
+import { AuthGuard } from '@/app/auth/auth/auth.guard';
+import { RolesGuard } from '@/app/auth/roles/roles.guard';
 import { ContextDecorator } from '@/app/context.decorator';
 import { EmailService } from '@/app/email/email.service';
 import { GqlContext } from '@/app/gql-context';
@@ -49,6 +51,7 @@ export class AuthResolver {
       account.id,
       token,
       ip,
+      // eslint-disable-next-line sonarjs/no-duplicate-string
       context.req.headers['user-agent'],
     );
     return {
@@ -68,6 +71,34 @@ export class AuthResolver {
       email,
       password,
     );
+    const token = await this.cryptoService.generateRandomString(
+      RandomStringType.ACCESS_TOKEN,
+    );
+
+    await this.accountSessionService.createAccountSession(
+      account.id,
+      token,
+      ip,
+      context.req.headers['user-agent'],
+    );
+    return {
+      token,
+      account,
+    };
+  }
+
+  @UseGuards(AccountExtractorGuard, new RolesGuard([AccountRole.ADMIN]))
+  @Mutation(() => AuthResponse)
+  async loginAs(
+    @Args('email') email: string,
+    @Context() context: GqlContext,
+    @RealIp() ip: string,
+  ) {
+    const account = await this.accountService.getAccountByEmail(email);
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
     const token = await this.cryptoService.generateRandomString(
       RandomStringType.ACCESS_TOKEN,
     );
