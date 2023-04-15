@@ -2,7 +2,6 @@
 
 - [ ] Add rate limiter
 - [ ] Implement log class names in logger
-- [ ] [Maybe] Move AccountExtractor from guard to middleware
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Improve seed script (use faker js and real password hashes)
