@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] Move Account extractor to middleware (guard is not the best place for it).
 - [ ] Add rate limiter
 - [ ] Implement log class names in logger
 - [ ] [Maybe] Move AccountExtractor from guard to middleware
