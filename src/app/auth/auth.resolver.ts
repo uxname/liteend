@@ -7,14 +7,13 @@ import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.en
 import { AccountService } from '@/app/account/account.service';
 import { AuthResponse, GenerateEmailCodeResponse } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
 import { AuthService } from '@/app/auth/auth.service';
 import { AuthGuard } from '@/app/auth/auth/auth.guard';
+import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RolesGuard } from '@/app/auth/roles/roles.guard';
-import { ContextDecorator } from '@/app/context.decorator';
 import { EmailService } from '@/app/email/email.service';
-import { GqlContext } from '@/app/gql-context';
 import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
+import { RequestContextDecorator } from '@/app/request-context.decorator';
 import {
   CryptoService,
   RandomStringType,
@@ -36,7 +35,7 @@ export class AuthResolver {
   async register(
     @Args('email') email: string,
     @Args('password') password: string,
-    @Context() context: GqlContext,
+    @Context() context: RequestContext,
     @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.accountService.createAccount(
@@ -64,7 +63,7 @@ export class AuthResolver {
   async login(
     @Args('email') email: string,
     @Args('password') password: string,
-    @Context() context: GqlContext,
+    @Context() context: RequestContext,
     @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.authService.validateAccountPassword(
@@ -87,11 +86,11 @@ export class AuthResolver {
     };
   }
 
-  @UseGuards(AccountExtractorGuard, new RolesGuard([AccountRole.ADMIN]))
+  @UseGuards(new RolesGuard([AccountRole.ADMIN]))
   @Mutation(() => AuthResponse)
   async loginAs(
     @Args('email') email: string,
-    @Context() context: GqlContext,
+    @Context() context: RequestContext,
     @RealIp() ip: string,
   ) {
     const account = await this.accountService.getAccountByEmail(email);
@@ -116,13 +115,13 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(AccountExtractorGuard, new AuthGuard())
+  @UseGuards(new AuthGuard())
   async logout(
     @Args('sessionIds', {
       type: () => [Number],
     })
     sessionIds: number[],
-    @ContextDecorator() context: GqlContext,
+    @RequestContextDecorator() context: RequestContext,
   ): Promise<boolean> {
     return await this.accountSessionService.deleteSessions(
       // Should be because AuthGuard is used
@@ -133,11 +132,11 @@ export class AuthResolver {
   }
 
   @Mutation(() => Account)
-  @UseGuards(AccountExtractorGuard, new AuthGuard())
+  @UseGuards(new AuthGuard())
   async changePassword(
     @Args('password') password: string,
     @Args('newPassword') newPassword: string,
-    @ContextDecorator() context: GqlContext,
+    @RequestContextDecorator() context: RequestContext,
   ): Promise<Account> {
     const isOldPasswordValid = await this.authService.validateAccountPassword(
       // Should be because AuthGuard is used

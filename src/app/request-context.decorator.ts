@@ -1,13 +1,13 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { GqlContext } from '@/app/gql-context';
+import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 
-export const ContextDecorator = createParamDecorator<
+export const RequestContextDecorator = createParamDecorator<
   undefined,
   ExecutionContext,
-  Promise<GqlContext | undefined>
+  Promise<RequestContext | undefined>
 >(async (_, context: ExecutionContext) => {
   const gqlContext = GqlExecutionContext.create(context);
-  return gqlContext.getContext<GqlContext>();
+  return gqlContext.getContext().req.requestContext;
 });

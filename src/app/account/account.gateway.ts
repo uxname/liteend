@@ -1,4 +1,3 @@
-import { UseGuards } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -12,8 +11,6 @@ import {
 import { Server, Socket } from 'socket.io';
 
 import { AccountSessionService } from '@/app/account-session/account-session.service';
-import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
-import { AuthGuard } from '@/app/auth/auth/auth.guard';
 import { Logger } from '@/common/logger/logger';
 
 @WebSocketGateway({
@@ -21,7 +18,6 @@ import { Logger } from '@/common/logger/logger';
     origin: '*',
   },
 })
-@UseGuards(AccountExtractorGuard, AuthGuard)
 export class AccountGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -89,8 +85,6 @@ export class AccountGateway
   @SubscribeMessage('echo')
   async findAll(@MessageBody() text: string): Promise<WsResponse<string>> {
     this.logger.log(`Echo: ${text}`);
-    // eslint-disable-next-line no-magic-numbers
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     return { event: 'echo', data: `You said: ${text}` };
   }
 }

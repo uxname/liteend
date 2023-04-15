@@ -3,10 +3,9 @@ import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { AccountExtractorGuard } from '@/app/auth/account-extractor/account-extractor.guard';
 import { AuthGuard } from '@/app/auth/auth/auth.guard';
-import { ContextDecorator } from '@/app/context.decorator';
-import { GqlContext } from '@/app/gql-context';
+import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
+import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 import { AccountSessionService } from './account-session.service';
 
@@ -15,8 +14,10 @@ export class AccountSessionResolver {
   constructor(private readonly accountSessionService: AccountSessionService) {}
 
   @Query(() => AccountSession, { name: 'currentSession' })
-  @UseGuards(AccountExtractorGuard, AuthGuard)
-  currentSession(@ContextDecorator() context: GqlContext): AccountSession {
+  @UseGuards(AuthGuard)
+  currentSession(
+    @RequestContextDecorator() context: RequestContext,
+  ): AccountSession {
     // Should be because AuthGuard is used
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return context.accountSession!;
@@ -24,7 +25,7 @@ export class AccountSessionResolver {
 
   // Resolver for AccountSession.Account
   @ResolveField(() => Account)
-  @UseGuards(AccountExtractorGuard, AuthGuard)
+  @UseGuards(AuthGuard)
   async account(@Parent() accountSession: AccountSession): Promise<Account> {
     return this.accountSessionService.getAccount(accountSession);
   }
