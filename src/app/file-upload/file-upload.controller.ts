@@ -7,15 +7,19 @@ import * as process from 'node:process';
 import {
   BadRequestException,
   Controller,
+  Get,
+  Param,
   Post,
+  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
+import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
@@ -51,7 +55,10 @@ const storage = diskStorage({
 
 @Controller()
 export class FileUploadController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Post('upload')
   @UseInterceptors(
@@ -102,5 +109,19 @@ export class FileUploadController {
         path: file.path.replace(UPLOAD_DIR, ''),
       })) ?? []
     );
+  }
+
+  @Get('/uploads/:fileName(*)')
+  async getFile(
+    @Param('fileName') fileName: string,
+    @Res() response: Response,
+  ): Promise<void> {
+    const filePath = path.join(UPLOAD_DIR, fileName);
+    const mimeType = this.fileUploadService.getMimeType(filePath);
+    response.type(mimeType);
+
+    const stream = fs.createReadStream(filePath);
+
+    stream.pipe(response);
   }
 }
