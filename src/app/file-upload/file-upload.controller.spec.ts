@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { FileUploadController } from './file-upload.controller';
@@ -10,6 +11,7 @@ describe('FileUploadController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
+      providers: [FileUploadService],
       controllers: [FileUploadController],
     }).compile();
 
