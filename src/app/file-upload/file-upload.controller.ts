@@ -106,7 +106,7 @@ export class FileUploadController {
     return (
       files.files?.map((file) => ({
         filename: file.filename,
-        path: file.path.replace(UPLOAD_DIR, ''),
+        path: file.path.replace(UPLOAD_DIR, '/uploads'),
       })) ?? []
     );
   }
