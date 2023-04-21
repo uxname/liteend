@@ -6,10 +6,8 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Controller('health')
 export class HealthController {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly logger: Logger,
-  ) {}
+  private readonly logger: Logger = new Logger(HealthController.name);
+  constructor(private readonly prisma: PrismaService) {}
 
   @Get()
   async getHealth(@Res() response: express.Response): Promise<unknown> {

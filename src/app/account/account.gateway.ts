@@ -26,11 +26,9 @@ export class AccountGateway
 
   // account id -> clients
   clients: Map<number, Set<Socket>> = new Map();
+  private readonly logger = new Logger(AccountGateway.name);
 
-  constructor(
-    private readonly logger: Logger,
-    private readonly accountSessionService: AccountSessionService,
-  ) {}
+  constructor(private readonly accountSessionService: AccountSessionService) {}
 
   async handleConnection(client: Socket): Promise<void> {
     const authorization = client.handshake.auth.authorization;

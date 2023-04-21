@@ -7,7 +7,7 @@ import appInfo from '../../../app-info.json';
 
 @Resolver(() => Query)
 export class DebugResolver {
-  constructor(private readonly logger: Logger) {}
+  private readonly logger: Logger = new Logger(DebugResolver.name);
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {

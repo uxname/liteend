@@ -31,7 +31,7 @@ async function bootstrap() {
       contentSecurityPolicy: false,
     }),
   );
-  const logger = app.get(Logger);
+  const logger = new Logger('Main');
   app.useLogger(logger);
   app.use(
     compression({

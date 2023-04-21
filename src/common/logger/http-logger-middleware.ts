@@ -8,7 +8,7 @@ import { Logger } from '@/common/logger/logger';
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
   private readonly jsonParser: NextHandleFunction = bodyParser.json();
-  constructor(private readonly logger: Logger) {}
+  private readonly logger: Logger = new Logger(HttpLoggerMiddleware.name);
 
   minifyGraphqlQuery(query: string): string {
     const commentRegex = /#[^\n\r]*(\r?\n|$)/g;

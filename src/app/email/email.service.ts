@@ -20,11 +20,12 @@ interface ProcessEmailSendParameters {
 
 @Processor('email')
 export class EmailService {
+  private readonly logger: Logger = new Logger(EmailService.name);
+
   constructor(
     @InjectQueue('email')
     private readonly emailQueue: Queue<ProcessEmailSendParameters>,
     private readonly mailerService: MailerService,
-    private readonly logger: Logger,
   ) {}
 
   async sendEmail(

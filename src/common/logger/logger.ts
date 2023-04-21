@@ -12,8 +12,8 @@ import log4js, { Logger as Log4jsLogger } from 'log4js';
 const MAX_BACKUP_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
 const MAX_BACKUP_COUNT = 100; // maximum number of log files.
 
-export function getLogger(): Log4jsLogger {
-  return log4js.getLogger('app');
+function getLogger(tag: string): Log4jsLogger {
+  return log4js.getLogger(tag);
 }
 
 function safeCycles() {
@@ -33,8 +33,8 @@ function safeCycles() {
 export class Logger implements LoggerService {
   private readonly logger: Log4jsLogger;
 
-  constructor() {
-    this.logger = getLogger();
+  constructor(tag: string) {
+    this.logger = getLogger(tag);
 
     const logDirectory = path.join(process.cwd(), 'data', 'logs');
     const logFileAll = path.join(logDirectory, 'all', 'all.log');
@@ -178,7 +178,7 @@ export class Logger implements LoggerService {
 
     // Add warning on using default console object
     function addWarnings() {
-      const log = getLogger();
+      const log = getLogger('console');
 
       for (const method of ['trace', 'debug', 'log', 'info', 'warn', 'error']) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
