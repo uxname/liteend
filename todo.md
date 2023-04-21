@@ -2,9 +2,7 @@
 
 - [ ] Add rate limiter
 - [ ] Implement run prisma:studio in project
-- [ ] Migrate to some prisma DTO generator
 - [ ] Improve seed script (use faker js and real password hashes)
-- [ ] Maybe migrate to Fastify
 - [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
