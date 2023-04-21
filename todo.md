@@ -1,7 +1,6 @@
 # Todo
 
 - [ ] Add rate limiter
-- [ ] Implement log class names in logger
 - [ ] Implement run prisma:studio in project
 - [ ] Migrate to some prisma DTO generator
 - [ ] Improve seed script (use faker js and real password hashes)
