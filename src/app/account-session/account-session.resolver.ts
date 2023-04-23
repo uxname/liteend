@@ -3,7 +3,7 @@ import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { AuthGuard } from '@/app/auth/auth/auth.guard';
+import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 

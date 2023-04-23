@@ -13,7 +13,7 @@ import { AccountSession } from '@/@generated/nestgraphql/account-session/account
 import { AccountService } from '@/app/account/account.service';
 import { UpdateAccountInput } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
-import { AuthGuard } from '@/app/auth/auth/auth.guard';
+import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
