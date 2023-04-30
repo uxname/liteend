@@ -1,5 +1,6 @@
 # Todo
 
+- [ ] process.env.ACTIVATE_SIGNER_PUBLIC_KEY !!!as string!!!
 - [ ] Add rate limiter
 - [ ] Implement run prisma:studio in project
 - [ ] Improve seed script (use faker js and real password hashes)
