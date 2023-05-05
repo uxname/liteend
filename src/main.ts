@@ -3,6 +3,7 @@ import * as process from 'node:process';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
+import dotenv from 'dotenv';
 import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
@@ -10,6 +11,8 @@ import { sendStatistic } from '@/common/telemetry';
 
 import appInfo from '../app-info.json';
 import { AppModule } from './app/app.module';
+
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
