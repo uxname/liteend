@@ -40,6 +40,10 @@ export class HttpLoggerMiddleware implements NestMiddleware {
       ) {
         let graphqlQuery = request.body.query || request.body.mutation;
         graphqlQuery = this.minifyGraphqlQuery(graphqlQuery);
+        // remove introspection queries from playground
+        if (graphqlQuery.includes('IntrospectionQuery')) {
+          return;
+        }
         logMessage += ` [GraphQL]: ${graphqlQuery}`;
       }
 
