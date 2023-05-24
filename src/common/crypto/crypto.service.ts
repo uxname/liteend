@@ -26,13 +26,19 @@ export class CryptoService {
     prefix: RandomStringType,
     // eslint-disable-next-line no-magic-numbers
     length = 48,
+    lengthIncludePrefix = true,
   ): Promise<string> {
+    const BYTES_PER_CHAR = 2;
+    const lengthInBytes = length / BYTES_PER_CHAR;
     return new Promise((resolve, reject) => {
-      crypto.randomBytes(length, (error, buffer) => {
+      crypto.randomBytes(lengthInBytes, (error, buffer) => {
         if (error) {
           reject(error);
+        } else if (lengthIncludePrefix) {
+          const result = prefix + buffer.toString('hex');
+          resolve(result.slice(0, length));
         } else {
-          resolve(buffer.toString('hex'));
+          resolve(prefix + buffer.toString('hex'));
         }
       });
     });
