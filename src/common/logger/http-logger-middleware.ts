@@ -13,12 +13,12 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   minifyGraphqlQuery(query: string): string {
     const commentRegex = /#[^\n\r]*(\r?\n|$)/g;
     const whitespaceRegex = /\s+/g;
-    const queryWithoutComments = query.replace(commentRegex, '');
-    const queryWithoutParameters = queryWithoutComments.replace(
+    const queryWithoutComments = query.replaceAll(commentRegex, '');
+    const queryWithoutParameters = queryWithoutComments.replaceAll(
       /\([\S\s]*?\)/g,
       '',
     );
-    return queryWithoutParameters.replace(whitespaceRegex, ' ');
+    return queryWithoutParameters.replaceAll(whitespaceRegex, ' ');
   }
 
   use(request: Request, response: Response, next: NextFunction) {
