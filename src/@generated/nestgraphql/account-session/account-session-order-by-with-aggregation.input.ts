@@ -1,6 +1,7 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
 import { SortOrder } from '../prisma/sort-order.enum';
+import { SortOrderInput } from '../prisma/sort-order.input';
 import { AccountSessionCountOrderByAggregateInput } from './account-session-count-order-by-aggregate.input';
 import { AccountSessionAvgOrderByAggregateInput } from './account-session-avg-order-by-aggregate.input';
 import { AccountSessionMaxOrderByAggregateInput } from './account-session-max-order-by-aggregate.input';
@@ -28,8 +29,8 @@ export class AccountSessionOrderByWithAggregationInput {
     @Field(() => SortOrder, {nullable:true})
     ipAddr?: keyof typeof SortOrder;
 
-    @Field(() => SortOrder, {nullable:true})
-    userAgent?: keyof typeof SortOrder;
+    @Field(() => SortOrderInput, {nullable:true})
+    userAgent?: SortOrderInput;
 
     @Field(() => SortOrder, {nullable:true})
     expiresAt?: keyof typeof SortOrder;
