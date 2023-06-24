@@ -2,7 +2,6 @@
 
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
-- [ ] Implement run prisma:studio in project
 - [ ] Improve seed script (use faker js and real password hashes)
 - [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
