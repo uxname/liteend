@@ -24,6 +24,7 @@ import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
+import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
 
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { HealthModule } from './health/health.module';
@@ -62,6 +63,7 @@ import { HealthModule } from './health/health.module';
     EmailModule,
     LoggerModule,
     PrismaModule,
+    PrismaStudioModule,
     LoggerServeModule,
     FileUploadModule,
     HealthModule,
