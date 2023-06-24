@@ -23,8 +23,7 @@ export class AuthService {
       },
     });
     if (account) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const salt = process.env.SALT!;
+      const salt = process.env.SALT as string;
       const isPasswordValid = await this.cryptoService.hashVerify(
         password,
         salt,

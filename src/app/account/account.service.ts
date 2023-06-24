@@ -21,8 +21,7 @@ export class AccountService {
     password: string,
     status: AccountStatus = AccountStatus.ACTIVE,
   ): Promise<Account> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const salt = process.env.SALT!;
+    const salt = process.env.SALT as string;
     const passwordHash = await this.crypto.hash(password, salt);
     return this.prisma.account.create({
       data: {
@@ -43,8 +42,7 @@ export class AccountService {
   }
 
   async changePassword(email: string, newPassword: string): Promise<Account> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const salt = process.env.SALT!;
+    const salt = process.env.SALT as string;
 
     const newPasswordHash = await this.crypto.hash(newPassword, salt);
     return this.prisma.account.update({

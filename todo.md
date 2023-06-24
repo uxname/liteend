@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] process.env.ACTIVATE_SIGNER_PUBLIC_KEY !!!as string!!!
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
 - [ ] Implement run prisma:studio in project

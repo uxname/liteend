@@ -40,8 +40,7 @@ async function main() {
   console.log('Start seeding ...');
   const EXPIRES_AT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const salt = process.env.SALT!;
+  const salt = process.env.SALT as string;
   const password = '123';
 
   const newPasswordHash = await crypto.hash(password, salt);
