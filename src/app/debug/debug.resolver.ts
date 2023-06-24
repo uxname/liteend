@@ -1,6 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
+import { GitService } from '@/app/debug/git/git.service';
 import { Logger } from '@/common/logger/logger';
 
 import appInfo from '../../../app-info.json';
@@ -8,6 +9,8 @@ import appInfo from '../../../app-info.json';
 @Resolver(() => Query)
 export class DebugResolver {
   private readonly logger: Logger = new Logger(DebugResolver.name);
+
+  constructor(private readonly gitService: GitService) {}
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {
@@ -40,6 +43,7 @@ export class DebugResolver {
       serverTime: new Date().toISOString(),
       uptime: uptimePretty,
       appInfo,
+      lastCommit: this.gitService.getLastCommitInfo(),
     };
   }
 }
