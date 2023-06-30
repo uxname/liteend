@@ -1,5 +1,6 @@
 # Todo
 
+- [ ] Add delimeters to package.json scripts, like: "___________ DATABASE ___________": ""
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
 - [ ] Improve seed script (use faker js and real password hashes)
