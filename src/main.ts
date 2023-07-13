@@ -1,3 +1,5 @@
+import 'source-map-support/register';
+
 import * as process from 'node:process';
 
 import { NestFactory } from '@nestjs/core';
