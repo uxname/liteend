@@ -26,8 +26,8 @@ export class RolesGuard implements CanActivate {
         | AccountRole[]
         | undefined;
       if (accountRoles) {
-        const hasRole = this.allowedRoles.some((role) =>
-          accountRoles?.includes(role),
+        const hasRole = this.allowedRoles.some(
+          (role) => accountRoles?.includes(role),
         );
         if (hasRole) {
           return true;
