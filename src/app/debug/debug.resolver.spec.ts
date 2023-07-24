@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { DebugModule } from '@/app/debug/debug.module';
 import { LoggerModule } from '@/common/logger/logger.module';
 
 import { DebugResolver } from './debug.resolver';
@@ -9,7 +10,7 @@ describe('QueryResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [LoggerModule],
+      imports: [LoggerModule, DebugModule],
       providers: [DebugResolver],
     }).compile();
 

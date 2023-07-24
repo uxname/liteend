@@ -6,6 +6,6 @@ import { GitService } from './git/git.service';
 
 @Module({
   providers: [DebugResolver, GitService],
-  exports: [DebugResolver],
+  exports: [DebugResolver, GitService],
 })
 export class DebugModule {}
