@@ -2,7 +2,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: null, // hack for webstorm
+    project: ['./tsconfig.json'],
     sourceType: 'module',
   },
   plugins: [
