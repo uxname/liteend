@@ -32,7 +32,7 @@ module.exports = {
   ],
   root: true,
   env: {
-    node: true,
+    // node: true,
     jest: true,
   },
   ignorePatterns: ['.eslintrc.js', 'src/@generated/', 'src/common/telemetry.ts'],
@@ -73,7 +73,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error'],
     'dot-notation': 'off', // TODO: enable
     'no-use-before-define': 'off',
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
   },
 };
