@@ -5,7 +5,7 @@ import { AccountSessionWhereUniqueInput } from './account-session-where-unique.i
 import { Type } from 'class-transformer';
 
 @ArgsType()
-export class FindUniqueAccountSessionOrThrowArgs {
+export class DeleteOneAccountSessionArgs {
 
     @Field(() => AccountSessionWhereUniqueInput, {nullable:false})
     @Type(() => AccountSessionWhereUniqueInput)

@@ -3,6 +3,7 @@ import { ArgsType } from '@nestjs/graphql';
 import { AccountSessionWhereInput } from './account-session-where.input';
 import { Type } from 'class-transformer';
 import { AccountSessionOrderByWithRelationInput } from './account-session-order-by-with-relation.input';
+import { Prisma } from '@prisma/client';
 import { AccountSessionWhereUniqueInput } from './account-session-where-unique.input';
 import { Int } from '@nestjs/graphql';
 import { AccountSessionScalarFieldEnum } from './account-session-scalar-field.enum';
@@ -18,7 +19,7 @@ export class FindManyAccountSessionArgs {
     orderBy?: Array<AccountSessionOrderByWithRelationInput>;
 
     @Field(() => AccountSessionWhereUniqueInput, {nullable:true})
-    cursor?: AccountSessionWhereUniqueInput;
+    cursor?: Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>;
 
     @Field(() => Int, {nullable:true})
     take?: number;

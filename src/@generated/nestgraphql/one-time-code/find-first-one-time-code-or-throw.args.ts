@@ -3,6 +3,7 @@ import { ArgsType } from '@nestjs/graphql';
 import { OneTimeCodeWhereInput } from './one-time-code-where.input';
 import { Type } from 'class-transformer';
 import { OneTimeCodeOrderByWithRelationInput } from './one-time-code-order-by-with-relation.input';
+import { Prisma } from '@prisma/client';
 import { OneTimeCodeWhereUniqueInput } from './one-time-code-where-unique.input';
 import { Int } from '@nestjs/graphql';
 import { OneTimeCodeScalarFieldEnum } from './one-time-code-scalar-field.enum';
@@ -18,7 +19,7 @@ export class FindFirstOneTimeCodeOrThrowArgs {
     orderBy?: Array<OneTimeCodeOrderByWithRelationInput>;
 
     @Field(() => OneTimeCodeWhereUniqueInput, {nullable:true})
-    cursor?: OneTimeCodeWhereUniqueInput;
+    cursor?: Prisma.AtLeast<OneTimeCodeWhereUniqueInput, 'id' | 'email'>;
 
     @Field(() => Int, {nullable:true})
     take?: number;

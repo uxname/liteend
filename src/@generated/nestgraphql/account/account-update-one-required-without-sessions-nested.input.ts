@@ -4,6 +4,7 @@ import { AccountCreateWithoutSessionsInput } from './account-create-without-sess
 import { Type } from 'class-transformer';
 import { AccountCreateOrConnectWithoutSessionsInput } from './account-create-or-connect-without-sessions.input';
 import { AccountUpsertWithoutSessionsInput } from './account-upsert-without-sessions.input';
+import { Prisma } from '@prisma/client';
 import { AccountWhereUniqueInput } from './account-where-unique.input';
 import { AccountUpdateToOneWithWhereWithoutSessionsInput } from './account-update-to-one-with-where-without-sessions.input';
 
@@ -24,7 +25,7 @@ export class AccountUpdateOneRequiredWithoutSessionsNestedInput {
 
     @Field(() => AccountWhereUniqueInput, {nullable:true})
     @Type(() => AccountWhereUniqueInput)
-    connect?: AccountWhereUniqueInput;
+    connect?: Prisma.AtLeast<AccountWhereUniqueInput, 'id' | 'email'>;
 
     @Field(() => AccountUpdateToOneWithWhereWithoutSessionsInput, {nullable:true})
     @Type(() => AccountUpdateToOneWithWhereWithoutSessionsInput)

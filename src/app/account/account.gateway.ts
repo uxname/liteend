@@ -38,9 +38,8 @@ export class AccountGateway
           authorization,
         );
       if (accountSession) {
-        const account = await this.accountSessionService.getAccount(
-          accountSession,
-        );
+        const account =
+          await this.accountSessionService.getAccount(accountSession);
         const clients = this.clients.get(account.id);
         if (clients) {
           clients.add(client);

@@ -4,6 +4,7 @@ import { AccountSessionCreateWithoutAccountInput } from './account-session-creat
 import { Type } from 'class-transformer';
 import { AccountSessionCreateOrConnectWithoutAccountInput } from './account-session-create-or-connect-without-account.input';
 import { AccountSessionCreateManyAccountInputEnvelope } from './account-session-create-many-account-input-envelope.input';
+import { Prisma } from '@prisma/client';
 import { AccountSessionWhereUniqueInput } from './account-session-where-unique.input';
 
 @InputType()
@@ -23,5 +24,5 @@ export class AccountSessionCreateNestedManyWithoutAccountInput {
 
     @Field(() => [AccountSessionWhereUniqueInput], {nullable:true})
     @Type(() => AccountSessionWhereUniqueInput)
-    connect?: Array<AccountSessionWhereUniqueInput>;
+    connect?: Array<Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>>;
 }

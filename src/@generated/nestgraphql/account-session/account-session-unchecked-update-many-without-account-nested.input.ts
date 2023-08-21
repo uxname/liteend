@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 import { AccountSessionCreateOrConnectWithoutAccountInput } from './account-session-create-or-connect-without-account.input';
 import { AccountSessionUpsertWithWhereUniqueWithoutAccountInput } from './account-session-upsert-with-where-unique-without-account.input';
 import { AccountSessionCreateManyAccountInputEnvelope } from './account-session-create-many-account-input-envelope.input';
+import { Prisma } from '@prisma/client';
 import { AccountSessionWhereUniqueInput } from './account-session-where-unique.input';
 import { AccountSessionUpdateWithWhereUniqueWithoutAccountInput } from './account-session-update-with-where-unique-without-account.input';
 import { AccountSessionUpdateManyWithWhereWithoutAccountInput } from './account-session-update-many-with-where-without-account.input';
@@ -31,19 +32,19 @@ export class AccountSessionUncheckedUpdateManyWithoutAccountNestedInput {
 
     @Field(() => [AccountSessionWhereUniqueInput], {nullable:true})
     @Type(() => AccountSessionWhereUniqueInput)
-    set?: Array<AccountSessionWhereUniqueInput>;
+    set?: Array<Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>>;
 
     @Field(() => [AccountSessionWhereUniqueInput], {nullable:true})
     @Type(() => AccountSessionWhereUniqueInput)
-    disconnect?: Array<AccountSessionWhereUniqueInput>;
+    disconnect?: Array<Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>>;
 
     @Field(() => [AccountSessionWhereUniqueInput], {nullable:true})
     @Type(() => AccountSessionWhereUniqueInput)
-    delete?: Array<AccountSessionWhereUniqueInput>;
+    delete?: Array<Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>>;
 
     @Field(() => [AccountSessionWhereUniqueInput], {nullable:true})
     @Type(() => AccountSessionWhereUniqueInput)
-    connect?: Array<AccountSessionWhereUniqueInput>;
+    connect?: Array<Prisma.AtLeast<AccountSessionWhereUniqueInput, 'id' | 'token'>>;
 
     @Field(() => [AccountSessionUpdateWithWhereUniqueWithoutAccountInput], {nullable:true})
     @Type(() => AccountSessionUpdateWithWhereUniqueWithoutAccountInput)

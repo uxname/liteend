@@ -3,6 +3,7 @@ import { ArgsType } from '@nestjs/graphql';
 import { AccountWhereInput } from './account-where.input';
 import { Type } from 'class-transformer';
 import { AccountOrderByWithRelationInput } from './account-order-by-with-relation.input';
+import { Prisma } from '@prisma/client';
 import { AccountWhereUniqueInput } from './account-where-unique.input';
 import { Int } from '@nestjs/graphql';
 import { AccountCountAggregateInput } from './account-count-aggregate.input';
@@ -22,7 +23,7 @@ export class AccountAggregateArgs {
     orderBy?: Array<AccountOrderByWithRelationInput>;
 
     @Field(() => AccountWhereUniqueInput, {nullable:true})
-    cursor?: AccountWhereUniqueInput;
+    cursor?: Prisma.AtLeast<AccountWhereUniqueInput, 'id' | 'email'>;
 
     @Field(() => Int, {nullable:true})
     take?: number;

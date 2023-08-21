@@ -9,7 +9,7 @@ import { Int } from '@nestjs/graphql';
 import { AccountSessionScalarFieldEnum } from './account-session-scalar-field.enum';
 
 @ArgsType()
-export class FindFirstAccountSessionOrThrowArgs {
+export class FindFirstAccountSessionArgs {
 
     @Field(() => AccountSessionWhereInput, {nullable:true})
     @Type(() => AccountSessionWhereInput)

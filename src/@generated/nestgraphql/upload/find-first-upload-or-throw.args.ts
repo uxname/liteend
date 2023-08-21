@@ -3,6 +3,7 @@ import { ArgsType } from '@nestjs/graphql';
 import { UploadWhereInput } from './upload-where.input';
 import { Type } from 'class-transformer';
 import { UploadOrderByWithRelationInput } from './upload-order-by-with-relation.input';
+import { Prisma } from '@prisma/client';
 import { UploadWhereUniqueInput } from './upload-where-unique.input';
 import { Int } from '@nestjs/graphql';
 import { UploadScalarFieldEnum } from './upload-scalar-field.enum';
@@ -18,7 +19,7 @@ export class FindFirstUploadOrThrowArgs {
     orderBy?: Array<UploadOrderByWithRelationInput>;
 
     @Field(() => UploadWhereUniqueInput, {nullable:true})
-    cursor?: UploadWhereUniqueInput;
+    cursor?: Prisma.AtLeast<UploadWhereUniqueInput, 'id' | 'filepath'>;
 
     @Field(() => Int, {nullable:true})
     take?: number;
