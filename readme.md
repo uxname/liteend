@@ -5,7 +5,7 @@
 </p>
 
 Simple lightweight template for a backend applications, based on [NestJS](https://nestjs.com).
-[Prisma.io](https://www.prisma.io) and SQLite uses as base for data storage (Postgres and others DBMS available too).
+[Prisma.io](https://www.prisma.io) and PostgreSQL uses as base for data storage.
 
 ## 📃 Get started (TL;DR)
 
