@@ -1,9 +1,8 @@
 # Todo
 
-- [ ] Rename .env.sample to .env.example
-- [ ] Add commas to docker-compose.yml (ex. - '${PORT}:${PORT}')
 - [ ] Migrate to an nestjs config module
-- [ ] Add delimeters to package.json scripts, like: "___________ DATABASE ___________": ""
+- [ ] Add commas to docker-compose.yml (ex. - '${PORT}:${PORT}')
+- [ ] Add delimiters to package.json scripts, like: "___________ DATABASE ___________": ""
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
 - [ ] Improve seed script (use faker js and real password hashes)
