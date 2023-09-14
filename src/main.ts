@@ -1,7 +1,6 @@
 import 'source-map-support/register';
 
-import * as process from 'node:process';
-
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
@@ -9,7 +8,6 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
-import { sendStatistic } from '@/common/telemetry';
 
 import appInfo from '../app-info.json';
 import { AppModule } from './app/app.module';
@@ -18,6 +16,7 @@ dotenv.config();
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
   app.enableShutdownHooks();
 
   const config = new DocumentBuilder()
@@ -53,13 +52,13 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const port = Number(process.env.PORT);
+  const port = configService.getOrThrow<number>('PORT');
   if (!port) {
     throw new Error('No port specified');
   }
   logger.log(`App started at http://localhost:${port}`);
 
-  app.listen(port).then(sendStatistic).catch(console.error);
+  app.listen(port).catch(console.error);
 }
 
 // eslint-disable-next-line unicorn/prefer-top-level-await

@@ -1,4 +1,5 @@
 import { HttpStatus, MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Filter, Options } from 'http-proxy-middleware/dist/types';
 
@@ -12,7 +13,10 @@ export class PrismaStudioModule {
   private readonly logger = new Logger(PrismaStudioModule.name);
   private readonly ROUTE = 'studio';
 
-  constructor(private readonly prismaStudioService: PrismaStudioService) {}
+  constructor(
+    private readonly prismaStudioService: PrismaStudioService,
+    private readonly configService: ConfigService,
+  ) {}
 
   configure(consumer: MiddlewareConsumer): void {
     // noinspection JSIgnoredPromiseFromCall
@@ -24,8 +28,12 @@ export class PrismaStudioModule {
         [`^/${this.ROUTE}`]: '',
       },
       onProxyReq: (proxyRequest, request, response) => {
-        const login = process.env.PRISMA_STUDIO_LOGIN;
-        const password = process.env.PRISMA_STUDIO_PASSWORD;
+        const login = this.configService.getOrThrow<string>(
+          'PRISMA_STUDIO_LOGIN',
+        );
+        const password = this.configService.getOrThrow<string>(
+          'PRISMA_STUDIO_PASSWORD',
+        );
         const authHeader = proxyRequest.getHeader('Authorization');
         if (authHeader) {
           if (typeof authHeader !== 'string') {

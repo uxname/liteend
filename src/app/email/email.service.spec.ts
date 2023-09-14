@@ -1,9 +1,7 @@
-import process from 'node:process';
-
-import { BullModule } from '@nestjs/bull';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MailerModule } from '@nestjs-modules/mailer';
 
+import { EmailModule } from '@/app/email/email.module';
 import { LoggerModule } from '@/common/logger/logger.module';
 
 import { EmailService } from './email.service';
@@ -13,35 +11,7 @@ describe('EmailService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        LoggerModule,
-        BullModule.forRoot({
-          redis: {
-            host: process.env.REDIS_HOST,
-            port: Number(process.env.REDIS_PORT),
-            username: process.env.REDIS_USERNAME,
-            password: process.env.REDIS_PASSWORD,
-          },
-        }),
-        BullModule.registerQueue({
-          name: 'email',
-        }),
-        MailerModule.forRoot({
-          transport: {
-            host: process.env.EMAIL_HOST,
-            port: Number(process.env.EMAIL_PORT),
-            secure: false, // upgrade later with STARTTLS
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASSWORD,
-            },
-          },
-          defaults: {
-            from: '"test" <kayley22@ethereal.email>',
-          },
-        }),
-      ],
-      providers: [EmailService],
+      imports: [ConfigModule, LoggerModule, EmailModule],
     }).compile();
 
     service = module.get<EmailService>(EmailService);

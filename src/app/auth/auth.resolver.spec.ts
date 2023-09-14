@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AccountModule } from '@/app/account/account.module';
@@ -17,6 +18,7 @@ describe('AuthResolver', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        ConfigModule,
         PrismaModule,
         CryptoModule,
         AccountModule,

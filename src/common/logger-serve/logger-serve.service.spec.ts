@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -20,7 +21,7 @@ describe('LoggerServeService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [LoggerModule],
+      imports: [LoggerModule, ConfigModule.forRoot()],
       providers: [
         {
           provide: HttpAdapterHost,

@@ -5,6 +5,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request, Response } from 'express';
@@ -20,6 +21,7 @@ import { EmailModule } from '@/app/email/email.module';
 import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';
 import { Page404Filter } from '@/app/page-404/page-404.filter';
 import { CryptoModule } from '@/common/crypto/crypto.module';
+import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
@@ -67,6 +69,12 @@ import { HealthModule } from './health/health.module';
     LoggerServeModule,
     FileUploadModule,
     HealthModule,
+    DotenvValidatorModule,
+    ConfigModule.forRoot({
+      envFilePath: ['.env', '.env.example'],
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      isGlobal: true,
+    }),
   ],
   providers: [
     {

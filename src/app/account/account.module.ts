@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
 import { AccountSessionModule } from '@/app/account-session/account-session.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
@@ -9,7 +10,7 @@ import { AccountResolver } from './account.resolver';
 import { AccountService } from './account.service';
 
 @Module({
-  imports: [PrismaModule, CryptoModule, AccountSessionModule],
+  imports: [PrismaModule, CryptoModule, AccountSessionModule, ConfigModule],
   providers: [AccountService, AccountResolver, AccountGateway],
   exports: [AccountService, AccountResolver, AccountGateway],
 })

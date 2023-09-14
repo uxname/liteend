@@ -1,15 +1,15 @@
-import process from 'node:process';
-
 import {
   CanActivate,
   ExecutionContext,
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(private readonly configService: ConfigService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const response: Response = context.switchToHttp().getResponse();
@@ -30,8 +30,10 @@ export class AuthGuard implements CanActivate {
     const [username, password] = decoded.split(':');
 
     if (
-      username === process.env.LOGS_ADMIN_PANEL_USER &&
-      password === process.env.LOGS_ADMIN_PANEL_PASSWORD
+      username ===
+        this.configService.getOrThrow<string>('LOGS_ADMIN_PANEL_USER') &&
+      password ===
+        this.configService.getOrThrow<string>('LOGS_ADMIN_PANEL_PASSWORD')
     ) {
       return true;
     }

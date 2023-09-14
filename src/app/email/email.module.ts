@@ -1,37 +1,49 @@
-import * as process from 'node:process';
-
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 import { EmailService } from './email.service';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT),
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD,
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.getOrThrow<string>('REDIS_HOST'),
+          port: Number.parseInt(
+            configService.getOrThrow<string>('REDIS_PORT'),
+            10,
+          ),
+          password: configService.getOrThrow<string>('REDIS_PASSWORD'),
+        },
+      }),
+      inject: [ConfigService],
     }),
     BullModule.registerQueue({
       name: 'email',
     }),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.EMAIL_HOST,
-        port: Number(process.env.EMAIL_PORT),
-        secure: false, // upgrade later with STARTTLS
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASSWORD,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule.forRoot()],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.getOrThrow<string>('EMAIL_HOST'),
+          port: Number.parseInt(
+            configService.getOrThrow<string>('EMAIL_PORT'),
+            10,
+          ),
+          secure: false, // upgrade later with STARTTLS
+          auth: {
+            user: configService.getOrThrow<string>('EMAIL_USER'),
+            pass: configService.getOrThrow<string>('EMAIL_PASSWORD'),
+          },
         },
-      },
-      defaults: {
-        from: process.env.EMAIL_USER,
-      },
+        defaults: {
+          from: configService.getOrThrow<string>('EMAIL_USER'),
+        },
+      }),
     }),
   ],
   providers: [EmailService],

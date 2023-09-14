@@ -1,6 +1,5 @@
-import process from 'node:process';
-
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { CryptoService } from '@/common/crypto/crypto.service';
@@ -11,6 +10,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private cryptoService: CryptoService,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateAccountPassword(
@@ -23,7 +23,7 @@ export class AuthService {
       },
     });
     if (account) {
-      const salt = process.env.SALT as string;
+      const salt = this.configService.getOrThrow<string>('SALT');
       const isPasswordValid = await this.cryptoService.hashVerify(
         password,
         salt,

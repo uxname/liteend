@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AccountModule } from '@/app/account/account.module';
@@ -12,7 +13,13 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, CryptoModule, AccountModule, LoggerModule],
+      imports: [
+        PrismaModule,
+        CryptoModule,
+        AccountModule,
+        LoggerModule,
+        ConfigModule,
+      ],
       providers: [AccountService],
     }).compile();
 
