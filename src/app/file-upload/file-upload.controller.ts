@@ -91,7 +91,12 @@ export class FileUploadController {
       files?: Express.Multer.File[];
     },
     @RealIp() ip: string,
-  ) {
+  ): Promise<
+    Array<{
+      filename: string;
+      path: string;
+    }>
+  > {
     await this.prisma.upload.createMany({
       data:
         files.files?.map((file) => ({

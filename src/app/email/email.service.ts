@@ -52,7 +52,9 @@ export class EmailService {
   }
 
   @Process()
-  private async processEmailSend(job: Job<ProcessEmailSendParameters>) {
+  private async processEmailSend(
+    job: Job<ProcessEmailSendParameters>,
+  ): Promise<void> {
     const { data } = job;
     await this.mailerService.sendMail({
       to: data.to,
@@ -63,7 +65,10 @@ export class EmailService {
   }
 
   @OnQueueCompleted()
-  onCompleted(job: Job<ProcessEmailSendParameters>, result: SentMessageInfo) {
+  onCompleted(
+    job: Job<ProcessEmailSendParameters>,
+    result: SentMessageInfo,
+  ): void {
     this.logger.log({
       jobId: job.id,
       result,
@@ -71,7 +76,7 @@ export class EmailService {
   }
 
   @OnQueueFailed()
-  onFailed(job: Job<ProcessEmailSendParameters>, error: Error) {
+  onFailed(job: Job<ProcessEmailSendParameters>, error: Error): void {
     this.logger.error({
       jobId: job.id,
       attempts: job.attemptsMade,

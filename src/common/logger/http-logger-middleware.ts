@@ -21,14 +21,14 @@ export class HttpLoggerMiddleware implements NestMiddleware {
     return queryWithoutParameters.replaceAll(whitespaceRegex, ' ');
   }
 
-  use(request: Request, response: Response, next: NextFunction) {
+  use(request: Request, response: Response, next: NextFunction): void {
     const now = Date.now();
     const xRealIp = request.headers['x-real-ip'];
     const xForwardedFor = request.headers['x-forwarded-for'];
     const requesterIp =
       xRealIp || xForwardedFor || request.socket.remoteAddress;
 
-    const log = () => {
+    const log = (): void => {
       const elapsedTime = Date.now() - now;
       let logMessage = `[HTTP] ${request.method} ${request.originalUrl} ${response.statusCode} ${requesterIp} [${elapsedTime}ms]`;
 

@@ -25,7 +25,7 @@ async function getTextFromUser(query: string): Promise<string> {
 
 const crypto = new CryptoService();
 
-async function main() {
+async function main(): Promise<void> {
   const answer = await getTextFromUser(
     'Do you want to clear the database? (y/N):',
   );

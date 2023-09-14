@@ -16,7 +16,7 @@ import { AppModule } from './app/app.module';
 
 dotenv.config();
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
 

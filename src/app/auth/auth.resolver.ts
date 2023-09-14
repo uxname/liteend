@@ -92,7 +92,7 @@ export class AuthResolver {
     @Args('email') email: string,
     @Context() context: RequestContext,
     @RealIp() ip: string,
-  ) {
+  ): Promise<AuthResponse> {
     const account = await this.accountService.getAccountByEmail(email);
     if (!account) {
       throw new Error('Account not found');

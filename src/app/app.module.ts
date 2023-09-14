@@ -76,7 +76,7 @@ import { HealthModule } from './health/health.module';
   ],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(HttpLoggerMiddleware)
       .exclude({

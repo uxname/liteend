@@ -16,9 +16,9 @@ function getLogger(tag: string): Log4jsLogger {
   return log4js.getLogger(tag);
 }
 
-function safeCycles() {
+function safeCycles(): (this: any, key: string, value: any) => any {
   const seen: Array<unknown> = [];
-  return (key: unknown, value: unknown) => {
+  return (key: unknown, value: unknown): any => {
     if (!value || typeof value !== 'object') {
       return value;
     }
@@ -45,7 +45,7 @@ export class Logger implements LoggerService {
     const logFileWarn = path.join(logDirectory, 'warn', 'warn.log');
 
     log4js.addLayout('json', () => {
-      return (logEvent) => {
+      return (logEvent): unknown => {
         return JSON.stringify(logEvent, safeCycles());
       };
     });
@@ -177,14 +177,14 @@ export class Logger implements LoggerService {
     });
 
     // Add warning on using default console object
-    function addWarnings() {
+    function addWarnings(): void {
       const log = getLogger('console');
 
       for (const method of ['trace', 'debug', 'log', 'info', 'warn', 'error']) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line security/detect-object-injection
-        console[method] = (...arguments_: unknown[]) => {
+        console[method] = (...arguments_: unknown[]): void => {
           log.warn(
             `Console deprecated, use Logger. [${method}]:`,
             ...arguments_,

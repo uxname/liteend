@@ -26,7 +26,7 @@ export class LoggerServeController {
     @Param('filepath') filepath: string,
     @Query('invert') invert: string,
     @Res() response: Response,
-  ) {
+  ): Promise<void> {
     response.set('Content-Type', 'text/plain');
     const absolutePath = path.join(this.logsDirectory, filepath);
 

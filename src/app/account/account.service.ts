@@ -66,7 +66,10 @@ export class AccountService {
     });
   }
 
-  async updateAccount(account: Account, input: UpdateAccountInput) {
+  async updateAccount(
+    account: Account,
+    input: UpdateAccountInput,
+  ): Promise<Account> {
     await this.accountGateway.sendToAccount(
       account.id,
       'accountUpdated',

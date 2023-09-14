@@ -8,8 +8,13 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 export class RequestContextExtractorMiddleware implements NestMiddleware {
   constructor(private readonly prisma: PrismaService) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async use(request: Request | any, response: Response, next: NextFunction) {
+  async use(
+    request: Request & {
+      requestContext: RequestContext;
+    },
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const token = request.headers.authorization;
 
     const requestContext: RequestContext = {

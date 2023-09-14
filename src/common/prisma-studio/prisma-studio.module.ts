@@ -14,7 +14,7 @@ export class PrismaStudioModule {
 
   constructor(private readonly prismaStudioService: PrismaStudioService) {}
 
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     // noinspection JSIgnoredPromiseFromCall
     this.prismaStudioService.startStudio();
     const proxyOptions: Filter | Options = {

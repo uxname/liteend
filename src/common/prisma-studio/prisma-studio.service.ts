@@ -8,7 +8,7 @@ import { Logger } from '@/common/logger/logger';
 export class PrismaStudioService {
   private readonly logger = new Logger(PrismaStudioService.name);
 
-  async startStudio() {
+  async startStudio(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       exec('npm run db:studio-local', (error, stdout, stderr) => {
         if (error) {

@@ -17,18 +17,25 @@ module.exports = {
     'simple-import-sort',
   ],
   extends: [
-    'plugin:sonarjs/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:security/recommended',
     '@jetbrains',
     '@jetbrains/eslint-config/node',
+
+    'plugin:sonarjs/recommended',
     'plugin:security/recommended',
+
     'plugin:eslint-comments/recommended',
-    'plugin:jest/recommended',
-    'plugin:jest/style',
+
+    'plugin:@typescript-eslint/recommended',
     'plugin:promise/recommended',
+
     'plugin:unicorn/recommended',
     'plugin:prettier/recommended',
+
+    'plugin:jest/recommended',
+    'plugin:jest/style',
+
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended"
   ],
   root: true,
   env: {
@@ -38,7 +45,6 @@ module.exports = {
   ignorePatterns: ['.eslintrc.js', 'src/@generated/', 'src/common/telemetry.ts'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
@@ -75,5 +81,6 @@ module.exports = {
     'no-use-before-define': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    "@typescript-eslint/explicit-function-return-type": "error"
   },
 };
