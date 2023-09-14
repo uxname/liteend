@@ -76,13 +76,6 @@ $ npm run db:migrations:apply
 
 > More info about using Prisma: https://www.prisma.io
 
-#### 🔑 Database admin panel in docker
-
-The project has an admin panel configured to work with the database, available by default on the `5000`
-port: http://localhost:5000
-
-**Important:** In production mode, be sure to set up a password for the database admin page
-
 ## 🍀 Code quality
 
 > TL;DR: Run `npm run check` before **every** commit
