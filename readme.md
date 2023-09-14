@@ -4,7 +4,7 @@
   <a href="https://github.com/uxname/liteend" target="blank"><img src=".github/logo.png" width="400" alt="LiteEnd logo" /></a>
 </p>
 
-Simple lightweight template for a backend applications, based on [NestJS](https://nestjs.com).
+Lightweight template for a backend applications, based on [NestJS](https://nestjs.com).
 [Prisma.io](https://www.prisma.io) and PostgreSQL uses as base for data storage.
 
 ## 📃 Get started (TL;DR)
@@ -29,9 +29,34 @@ $ npm run build
 $ npm start:prod
 ```
 
+### 💧 System endpoints
+
+There available debug endpoints for view project information (ex.: logs and DB data)
+
+#### Logs
+
+```shell
+/logs/ # View logs
+/logs/all # View all logs
+/logs/error # View error logs
+# Etc. See src/common/logger-serve/logger-serve.controller.ts
+```
+
+#### Database admin panel
+
+```shell
+/studio # Prisma Studio
+```
+
 ### 🥡 Docker-compose
 
-To launch the project in a Docker container, run the command `docker-compose up -d`
+```shell
+# Launch
+$ docker-compose up -d
+
+# Rebuild and launch
+$ docker-compose up -d --build
+```
 
 ### 📦 Database workflow
 
@@ -81,6 +106,8 @@ command `npm run check`.
 Prettier is also configured to format the code, run `npm run format` to format the code (but ESLint will still check it)
 .
 
+In addition, the project has a pre-commit hook configured to check the code for errors and warnings before each commit.
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!<br />Feel free to
@@ -96,8 +123,12 @@ Copyright © 2023 [uxname@gmail.com](https://github.com/uxname).<br />
 This project is [MIT](https://mit-license.org/) licensed.
 
 ## 🔍 Telemetry
-The LiteEnd project collects telemetry data to help improve the product and enhance user experience. Telemetry data collected includes information such as product name, version, architecture, operating system, NodeJS version, a unique instance identifier, and launch timestamp.
 
-The telemetry data collected is used to understand how users are using the product and to identify any issues or areas for improvement. All telemetry data collected is treated as confidential and is never shared with third parties.
+The LiteEnd project collects telemetry data to help improve the product and enhance user experience. Telemetry data
+collected includes information such as product name, version, architecture, operating system, NodeJS version, a unique
+instance identifier, and launch timestamp.
+
+The telemetry data collected is used to understand how users are using the product and to identify any issues or areas
+for improvement. All telemetry data collected is treated as confidential and is never shared with third parties.
 
 To opt-out of telemetry, users can set the `DISABLE_TELEMETRY` environment variable to `true` when running LiteEnd.

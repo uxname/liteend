@@ -55,7 +55,7 @@ async function main(): Promise<void> {
       avatarUrl: 'https://example.com/avatar.png',
       sessions: {
         create: {
-          token: faker.random.numeric(42),
+          token: faker.string.numeric(42),
           ipAddr: faker.internet.ipv4(),
           expiresAt: EXPIRES_AT,
         },
@@ -71,7 +71,7 @@ async function main(): Promise<void> {
       status: AccountStatus.ACTIVE,
       sessions: {
         create: {
-          token: faker.random.numeric(42),
+          token: faker.string.numeric(42),
           ipAddr: faker.internet.ipv4(),
           expiresAt: EXPIRES_AT,
         },
@@ -83,7 +83,7 @@ async function main(): Promise<void> {
   await prisma.oneTimeCode.create({
     data: {
       email: faker.internet.email().toLowerCase(),
-      code: faker.random.numeric(6),
+      code: faker.string.numeric(6),
       expiresAt: EXPIRES_AT,
     },
   });
@@ -91,7 +91,7 @@ async function main(): Promise<void> {
   // Create uploads
   await prisma.upload.create({
     data: {
-      filepath: `/path/to/upload_${faker.random.numeric(6)}.jpg`,
+      filepath: `/path/to/upload_${faker.string.numeric(6)}.jpg`,
       originalFilename: 'upload1.jpg',
       extension: 'jpg',
       size: 1024,
@@ -102,7 +102,7 @@ async function main(): Promise<void> {
 
   await prisma.upload.create({
     data: {
-      filepath: `/path/to/upload2_${faker.random.numeric(6)}.jpg`,
+      filepath: `/path/to/upload2_${faker.string.numeric(6)}.jpg`,
       originalFilename: 'upload2.jpg',
       extension: 'jpg',
       size: 2048,
