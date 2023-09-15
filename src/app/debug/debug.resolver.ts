@@ -1,6 +1,8 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/@generated/i18n-types';
 import { GitService } from '@/app/debug/git/git.service';
 import { Logger } from '@/common/logger/logger';
 
@@ -11,6 +13,18 @@ export class DebugResolver {
   private readonly logger: Logger = new Logger(DebugResolver.name);
 
   constructor(private readonly gitService: GitService) {}
+
+  @Query(() => String, { name: 'testTranslation' })
+  testTranslation(
+    @Args('username', { type: () => String }) username: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): string {
+    return i18n.t('translations.hello', {
+      args: {
+        username,
+      },
+    });
+  }
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {

@@ -1,3 +1,6 @@
+import path from 'node:path';
+import * as process from 'node:process';
+
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import {
   MiddlewareConsumer,
@@ -10,6 +13,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request, Response } from 'express';
 import GraphQLJSON from 'graphql-type-json';
+import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
 import { AccountModule } from '@/app/account/account.module';
 import { AccountSessionModule } from '@/app/account-session/account-session.module';
@@ -74,6 +78,21 @@ import { HealthModule } from './health/health.module';
       envFilePath: ['.env', '.env.example'],
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true,
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(process.cwd(), 'src', 'i18n'),
+        watch: true,
+      },
+      resolvers: [AcceptLanguageResolver],
+      logging: true,
+      typesOutputPath: path.join(
+        process.cwd(),
+        'src',
+        '@generated',
+        'i18n-types.ts',
+      ),
     }),
   ],
   providers: [

@@ -4,7 +4,8 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "**/schema.prisma"
+      "**/schema.prisma",
+      { "include": "i18n/**/*", "watchAssets": true }
     ]
   }
 }
