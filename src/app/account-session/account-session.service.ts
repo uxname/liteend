@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import PrismaClient from '@prisma/client';
+import { I18nService } from 'nestjs-i18n';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
@@ -7,7 +8,10 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class AccountSessionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
 
   public async createAccountSession(
     accountId: number,
@@ -93,7 +97,7 @@ export class AccountSessionService {
       .account();
 
     if (!result) {
-      throw new Error('Account not found');
+      throw new Error(this.i18n.t('errors.accountNotFound'));
     }
     return result;
   }

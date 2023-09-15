@@ -7,6 +7,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
@@ -37,9 +38,10 @@ export class AccountResolver {
   async sessions(
     @Parent() account: Account,
     @RequestContextDecorator() context: RequestContext,
+    @I18n() i18n: I18nContext,
   ): Promise<Array<AccountSession>> {
     if (context.account?.id !== account.id) {
-      throw new Error('Unauthorized');
+      throw new Error(i18n.t('errors.unauthorized'));
     }
     return this.accountSessionService.getSessions(account);
   }

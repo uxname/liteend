@@ -1,6 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { I18n, I18nContext } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
@@ -92,10 +94,11 @@ export class AuthResolver {
     @Args('email') email: string,
     @Context() context: RequestContext,
     @RealIp() ip: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<AuthResponse> {
     const account = await this.accountService.getAccountByEmail(email);
     if (!account) {
-      throw new Error('Account not found');
+      throw new Error(i18n.t('errors.accountNotFound'));
     }
 
     const token = await this.cryptoService.generateRandomString(
@@ -137,6 +140,7 @@ export class AuthResolver {
     @Args('password') password: string,
     @Args('newPassword') newPassword: string,
     @RequestContextDecorator() context: RequestContext,
+    @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isOldPasswordValid = await this.authService.validateAccountPassword(
       // Should be because AuthGuard is used
@@ -146,7 +150,7 @@ export class AuthResolver {
     );
 
     if (!isOldPasswordValid) {
-      throw new Error('Invalid password');
+      throw new Error(i18n.t('errors.invalidPassword'));
     }
 
     return await this.accountService.changePassword(
@@ -160,6 +164,7 @@ export class AuthResolver {
   @Mutation(() => GenerateEmailCodeResponse)
   async generateEmailCode(
     @Args('email') email: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<GenerateEmailCodeResponse> {
     const result = await this.oneTimeCodeService.createOneTimeCode(email);
     const sendEmailResult = await this.emailService.sendEmail(
@@ -174,7 +179,7 @@ export class AuthResolver {
         expiresAt: result.expiresAt,
       };
     } else {
-      throw new Error('Sending email error');
+      throw new Error(i18n.t('errors.emailNotSent'));
     }
   }
 
@@ -182,6 +187,7 @@ export class AuthResolver {
   async activateAccount(
     @Args('email') email: string,
     @Args('code') code: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isCodeValid = await this.oneTimeCodeService.validateOneTimeCode(
       email,
@@ -194,7 +200,7 @@ export class AuthResolver {
         AccountStatus.ACTIVE,
       );
     } else {
-      throw new Error('Invalid code');
+      throw new Error(i18n.t('errors.invalidCode'));
     }
   }
 
@@ -206,6 +212,7 @@ export class AuthResolver {
     emailCode: string,
     @Args('newPassword', { type: () => String })
     newPassword: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isOneTimeCodeValid =
       await this.oneTimeCodeService.validateOneTimeCode(email, emailCode);
@@ -214,7 +221,7 @@ export class AuthResolver {
       await this.oneTimeCodeService.deleteOneTimeCode(email);
       return await this.accountService.changePassword(email, newPassword);
     } else {
-      throw new Error('Invalid code');
+      throw new Error(i18n.t('errors.invalidCode'));
     }
   }
 }

@@ -5,6 +5,11 @@ export type I18nTranslations = {
     "errors": {
         "accountSuspended": string;
         "unauthorized": string;
+        "accountHasNoRole": string;
+        "invalidPassword": string;
+        "accountNotFound": string;
+        "emailNotSent": string;
+        "invalidCode": string;
     };
     "translations": {
         "hello": string;

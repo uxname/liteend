@@ -1,4 +1,9 @@
 {
   "accountSuspended": "Account Suspended",
-  "unauthorized": "Unauthorized"
+  "unauthorized": "Unauthorized",
+  "accountHasNoRole": "Your roles ({accountRoles}) are not allowed ({allowedRoles})",
+  "invalidPassword": "Invalid password",
+  "accountNotFound": "Account not found",
+  "emailNotSent": "Email not sent",
+  "invalidCode": "Invalid code"
 }

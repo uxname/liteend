@@ -1,4 +1,9 @@
 {
   "accountSuspended": "Аккаунт заблокирован",
-  "unauthorized": "Неавторизованный"
+  "unauthorized": "Неавторизован",
+  "accountHasNoRole": "Ваши роли ({accountRoles}) не разрешены ({allowedRoles})",
+  "invalidPassword": "Неверный пароль",
+  "accountNotFound": "Аккаунт не найден",
+  "emailNotSent": "Ошибка отправки email",
+  "invalidCode": "Неверный код"
 }

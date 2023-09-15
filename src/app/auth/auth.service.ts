@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { I18nService } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
@@ -11,6 +13,7 @@ export class AuthService {
     private prisma: PrismaService,
     private cryptoService: CryptoService,
     private readonly configService: ConfigService,
+    private readonly i18n: I18nService<I18nTranslations>,
   ) {}
 
   async validateAccountPassword(
@@ -33,10 +36,10 @@ export class AuthService {
       if (isPasswordValid) {
         return account;
       } else {
-        throw new Error('Invalid password');
+        throw new Error(this.i18n.t('errors.invalidPassword'));
       }
     } else {
-      throw new Error('Account not found');
+      throw new Error(this.i18n.t('errors.accountNotFound'));
     }
   }
 }
