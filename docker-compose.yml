@@ -10,7 +10,7 @@ services:
         volumes:
             - ./data:/app/data:rw
         ports:
-            - '${PORT}:${PORT}'
+            - ${PORT}:${PORT}
         healthcheck:
             test: ["CMD-SHELL", "/app/healthcheck.sh"]
             interval: 2s
@@ -43,13 +43,13 @@ services:
         ports:
             - 127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}
         volumes:
-            - './data/postgres:/data/postgres'
+            - ./data/postgres:/data/postgres
         command: -p ${DATABASE_PORT}
     db_admin:
         image: dbeaver/cloudbeaver
         restart: unless-stopped
         ports:
-            - '${DB_ADMIN_PORT}:8978'
+            - ${DB_ADMIN_PORT}:8978
         volumes:
             - ./data:/opt/data:rw
             - ./data/db_admin:/opt/cloudbeaver/workspace
