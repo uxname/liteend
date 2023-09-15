@@ -2,6 +2,10 @@
 
 import { Path } from "nestjs-i18n";
 export type I18nTranslations = {
+    "errors": {
+        "accountSuspended": string;
+        "unauthorized": string;
+    };
     "translations": {
         "hello": string;
     };
