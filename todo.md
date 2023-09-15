@@ -2,7 +2,6 @@
 
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
-- [ ] Replace DBeaver with some other DB admin panel supporting arm64 (ex. pgAdmin)
 - [ ] GraphQL integration tests
 - [ ] Add verification types, ex.: Email
 - [ ] Add logger

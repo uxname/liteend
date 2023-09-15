@@ -16,6 +16,7 @@ services:
             interval: 2s
             timeout: 10s
             retries: 3
+
     redis:
       image: redis:7.0.9-alpine3.17
       restart: unless-stopped
@@ -32,6 +33,7 @@ services:
       environment:
         - HTTP_USER=${REDIS_ADMIN_USER}
         - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
+
     db:
         image: postgres:15-alpine3.17
         environment:
@@ -46,10 +48,10 @@ services:
             - ./data/postgres:/data/postgres
         command: -p ${DATABASE_PORT}
     db_admin:
-        image: dbeaver/cloudbeaver
+        image: dpage/pgadmin4:latest
         restart: unless-stopped
+        environment:
+          PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
+          PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_PASSWORD}
         ports:
-            - ${DB_ADMIN_PORT}:8978
-        volumes:
-            - ./data:/opt/data:rw
-            - ./data/db_admin:/opt/cloudbeaver/workspace
+            - ${DB_ADMIN_PORT}:80
