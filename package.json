@@ -27,7 +27,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "________________ DATABASE ________________": "",
-    "db:push": "npx prisma db push && npm run gen",
+    "db:push": "npx prisma db push && npm run db:gen",
     "db:migrations:apply": "npx prisma migrate deploy",
     "postdb:migrations:apply": "npm run db:gen",
     "db:migrations:create": "npx prisma migrate dev --create-only",
