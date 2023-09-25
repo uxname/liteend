@@ -40,7 +40,10 @@ export class ComplexityPlugin implements ApolloServerPlugin {
             `Query is too complex: ${complexity}. Maximum allowed complexity: ${MAX_COMPLEXITY}`,
           );
         }
-        thisLogger.debug(`Query complexity: ${complexity}`);
+        // eslint-disable-next-line no-magic-numbers
+        if (complexity > MAX_COMPLEXITY / 2) {
+          thisLogger.warn(`Query complexity: ${complexity}`);
+        }
       },
     };
   }

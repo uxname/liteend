@@ -13,6 +13,12 @@ import { AuthService } from '@/app/auth/auth.service';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RolesGuard } from '@/app/auth/roles-guard/roles.guard';
+import {
+  ActivateAccountInput,
+  EmailPasswordInput,
+  GenerateEmailCodeInput,
+  ResetPasswordInput,
+} from '@/app/auth/types';
 import { EmailService } from '@/app/email/email.service';
 import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
@@ -35,14 +41,16 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponse)
   async register(
-    @Args('email') email: string,
-    @Args('password') password: string,
+    @Args('data', {
+      type: () => EmailPasswordInput,
+    })
+    data: EmailPasswordInput,
     @Context() context: RequestContext,
     @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.accountService.createAccount(
-      email,
-      password,
+      data.email,
+      data.password,
       AccountStatus.INACTIVE,
     );
     const token = await this.cryptoService.generateRandomString(
@@ -63,14 +71,16 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponse)
   async login(
-    @Args('email') email: string,
-    @Args('password') password: string,
+    @Args('data', {
+      type: () => EmailPasswordInput,
+    })
+    data: EmailPasswordInput,
     @Context() context: RequestContext,
     @RealIp() ip: string,
   ): Promise<AuthResponse> {
     const account = await this.authService.validateAccountPassword(
-      email,
-      password,
+      data.email,
+      data.password,
     );
     const token = await this.cryptoService.generateRandomString(
       RandomStringType.ACCESS_TOKEN,
@@ -163,12 +173,13 @@ export class AuthResolver {
 
   @Mutation(() => GenerateEmailCodeResponse)
   async generateEmailCode(
-    @Args('email') email: string,
+    @Args('data', { type: () => GenerateEmailCodeInput })
+    data: GenerateEmailCodeInput,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<GenerateEmailCodeResponse> {
-    const result = await this.oneTimeCodeService.createOneTimeCode(email);
+    const result = await this.oneTimeCodeService.createOneTimeCode(data.email);
     const sendEmailResult = await this.emailService.sendEmail(
-      email,
+      data.email,
       'Activation code',
       `Your activation code is: ${result.code}`,
     );
@@ -185,18 +196,18 @@ export class AuthResolver {
 
   @Mutation(() => Account)
   async activateAccount(
-    @Args('email') email: string,
-    @Args('code') code: string,
+    @Args('data', { type: () => ActivateAccountInput })
+    data: ActivateAccountInput,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isCodeValid = await this.oneTimeCodeService.validateOneTimeCode(
-      email,
-      code,
+      data.email,
+      data.code,
     );
     if (isCodeValid) {
-      await this.oneTimeCodeService.deleteOneTimeCode(email);
+      await this.oneTimeCodeService.deleteOneTimeCode(data.email);
       return await this.accountService.changeStatus(
-        email,
+        data.email,
         AccountStatus.ACTIVE,
       );
     } else {
@@ -206,20 +217,22 @@ export class AuthResolver {
 
   @Mutation(() => Account)
   async resetPassword(
-    @Args('email', { type: () => String })
-    email: string,
-    @Args('emailCode', { type: () => String })
-    emailCode: string,
-    @Args('newPassword', { type: () => String })
-    newPassword: string,
+    @Args('data', { type: () => ResetPasswordInput })
+    data: ResetPasswordInput,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isOneTimeCodeValid =
-      await this.oneTimeCodeService.validateOneTimeCode(email, emailCode);
+      await this.oneTimeCodeService.validateOneTimeCode(
+        data.email,
+        data.emailCode,
+      );
 
     if (isOneTimeCodeValid) {
-      await this.oneTimeCodeService.deleteOneTimeCode(email);
-      return await this.accountService.changePassword(email, newPassword);
+      await this.oneTimeCodeService.deleteOneTimeCode(data.email);
+      return await this.accountService.changePassword(
+        data.email,
+        data.newPassword,
+      );
     } else {
       throw new Error(i18n.t('errors.invalidCode'));
     }
