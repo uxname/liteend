@@ -9,11 +9,12 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
+import { ProfileRole } from '@/@generated/nestgraphql/prisma/profile-role.enum';
+import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly allowedRoles: AccountRole[]) {}
+  constructor(private readonly allowedRoles: ProfileRole[]) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     if (context.getType() === 'ws') {
@@ -27,24 +28,25 @@ export class RolesGuard implements CanActivate {
     }
 
     const gqlContext = GqlExecutionContext.create(context);
-    const requestContext = gqlContext.getContext().req.requestContext;
-    if (requestContext.account) {
-      const accountRoles = requestContext.account.roles as
-        | AccountRole[]
+    const requestContext: RequestContext =
+      gqlContext.getContext().req.requestContext;
+    if (requestContext.profile) {
+      const profileRoles = requestContext.profile.roles as
+        | ProfileRole[]
         | undefined;
-      if (accountRoles) {
+      if (profileRoles) {
         const hasRole = this.allowedRoles.some(
-          (role) => accountRoles?.includes(role),
+          (role) => profileRoles?.includes(role),
         );
         if (hasRole) {
           return true;
         } else {
-          const accountRolesString = accountRoles.join(', ');
+          const profileRolesString = profileRoles.join(', ');
           const allowedRolesString = this.allowedRoles.join(', ');
           throw new HttpException(
             i18n.t('errors.accountHasNoRole', {
               args: {
-                accountRoles: accountRolesString,
+                accountRoles: profileRolesString,
                 allowedRoles: allowedRolesString,
               },
             }),

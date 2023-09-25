@@ -4,8 +4,8 @@ import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { ProfileRole } from '@/@generated/nestgraphql/prisma/profile-role.enum';
 import { AccountService } from '@/app/account/account.service';
 import { AuthResponse, GenerateEmailCodeResponse } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
@@ -25,12 +25,12 @@ import { RealIp } from '@/common/real-ip/real-ip.decorator';
 @Resolver()
 export class AuthResolver {
   constructor(
-    private authService: AuthService,
-    private accountService: AccountService,
-    private accountSessionService: AccountSessionService,
-    private cryptoService: CryptoService,
-    private oneTimeCodeService: OneTimeCodeService,
-    private emailService: EmailService,
+    private readonly authService: AuthService,
+    private readonly accountService: AccountService,
+    private readonly accountSessionService: AccountSessionService,
+    private readonly cryptoService: CryptoService,
+    private readonly oneTimeCodeService: OneTimeCodeService,
+    private readonly emailService: EmailService,
   ) {}
 
   @Mutation(() => AuthResponse)
@@ -88,7 +88,7 @@ export class AuthResolver {
     };
   }
 
-  @UseGuards(new RolesGuard([AccountRole.ADMIN]))
+  @UseGuards(new RolesGuard([ProfileRole.ADMIN]))
   @Mutation(() => AuthResponse)
   async loginAs(
     @Args('email') email: string,

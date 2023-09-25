@@ -2,7 +2,6 @@ import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 import { HideField } from '@nestjs/graphql';
-import { AccountStatus } from '../prisma/account-status.enum';
 
 @ObjectType()
 export class AccountMaxAggregate {
@@ -22,9 +21,6 @@ export class AccountMaxAggregate {
     @HideField()
     passwordHash?: string;
 
-    @Field(() => AccountStatus, {nullable:true})
-    status?: keyof typeof AccountStatus;
-
-    @Field(() => String, {nullable:true})
-    avatarUrl?: string;
+    @Field(() => Int, {nullable:true})
+    profileId?: number;
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import PrismaClient from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
 import { PrismaService } from '@/common/prisma/prisma.service';
@@ -10,7 +11,7 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 export class AccountSessionService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly i18n: I18nService,
+    private readonly i18n: I18nService<I18nTranslations>,
   ) {}
 
   public async createAccountSession(

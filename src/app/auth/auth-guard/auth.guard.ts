@@ -10,6 +10,7 @@ import { I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -22,11 +23,10 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const gqlContext = GqlExecutionContext.create(context);
-    const requestContext = gqlContext.getContext().req.requestContext;
-    if (requestContext.accountSession) {
-      if (
-        requestContext.accountSession.account.status !== AccountStatus.ACTIVE
-      ) {
+    const requestContext: RequestContext =
+      gqlContext.getContext().req.requestContext;
+    if (requestContext.profile) {
+      if (requestContext.profile.status !== AccountStatus.ACTIVE) {
         throw new HttpException(
           i18n.t('errors.accountSuspended'),
           HttpStatus.UNAUTHORIZED,

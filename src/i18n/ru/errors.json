@@ -5,5 +5,7 @@
   "invalidPassword": "Неверный пароль",
   "accountNotFound": "Аккаунт не найден",
   "emailNotSent": "Ошибка отправки email",
-  "invalidCode": "Неверный код"
+  "invalidCode": "Неверный код",
+  "profileNotFound": "Профиль не найден",
+  "accountsNotFound": "Аккаунты не найдены"
 }

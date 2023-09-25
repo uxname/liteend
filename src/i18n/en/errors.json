@@ -5,5 +5,7 @@
   "invalidPassword": "Invalid password",
   "accountNotFound": "Account not found",
   "emailNotSent": "Email not sent",
-  "invalidCode": "Invalid code"
+  "invalidCode": "Invalid code",
+  "profileNotFound": "Profile not found",
+  "accountsNotFound": "Accounts not found"
 }

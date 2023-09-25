@@ -3,5 +3,5 @@ node_modules/
 docker-compose.yml
 Dockerfile
 dist/
-#.env # todo: change config library to support .env files
+.env
 data

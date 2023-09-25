@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ProfileRole } from '@prisma/client';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountRole } from '@/@generated/nestgraphql/prisma/account-role.enum';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
-import { AccountGateway } from '@/app/account/account.gateway';
-import { UpdateAccountInput } from '@/app/account/types';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -14,7 +12,6 @@ export class AccountService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly crypto: CryptoService,
-    private readonly accountGateway: AccountGateway,
     private readonly configService: ConfigService,
   ) {}
 
@@ -29,8 +26,12 @@ export class AccountService {
       data: {
         email,
         passwordHash,
-        status,
-        roles: [AccountRole.USER],
+        profile: {
+          create: {
+            roles: [ProfileRole.USER],
+            status,
+          },
+        },
       },
     });
   }
@@ -63,25 +64,12 @@ export class AccountService {
         email,
       },
       data: {
-        status,
+        profile: {
+          update: {
+            status,
+          },
+        },
       },
-    });
-  }
-
-  async updateAccount(
-    account: Account,
-    input: UpdateAccountInput,
-  ): Promise<Account> {
-    await this.accountGateway.sendToAccount(
-      account.id,
-      'accountUpdated',
-      input,
-    );
-    return this.prisma.account.update({
-      where: {
-        id: account.id,
-      },
-      data: input,
     });
   }
 }

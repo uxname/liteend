@@ -1,9 +1,11 @@
 # Todo
 
+- [ ] https://docs.nestjs.com/graphql/extensions
+- [ ] https://docs.nestjs.com/graphql/complexity
+- [ ] Add class validator for resolvers (ex.: EmailAddress, etc.)
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio
 - [ ] GraphQL integration tests
-- [ ] Add verification types, ex.: Email
 - [ ] Add logger
   - [ ] Implement logging to DB, files or remote service
   - [ ] OR:

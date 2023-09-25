@@ -22,15 +22,29 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email        String        @unique
+  email        String @unique
   /// @HideField()
   passwordHash String
-  roles        AccountRole[]
-  status       AccountStatus
-
-  avatarUrl String?
 
   sessions AccountSession[]
+
+  profile   Profile? @relation(fields: [profileId], references: [id])
+  profileId Int?
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roles  ProfileRole[]
+  status AccountStatus
+
+  accounts Account[]
+
+  avatarUrl String?
+  name      String?
+  bio       String?
 }
 
 enum AccountStatus {
@@ -39,7 +53,7 @@ enum AccountStatus {
   DELETED
 }
 
-enum AccountRole {
+enum ProfileRole {
   ADMIN
   USER
 }

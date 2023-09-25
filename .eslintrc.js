@@ -77,7 +77,7 @@ module.exports = {
     'comma-dangle': ['error', 'always-multiline'],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
-    'dot-notation': 'off', // TODO: enable
+    'dot-notation': 'error',
     'no-use-before-define': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',

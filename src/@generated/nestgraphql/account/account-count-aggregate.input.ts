@@ -20,13 +20,7 @@ export class AccountCountAggregateInput {
     passwordHash?: true;
 
     @Field(() => Boolean, {nullable:true})
-    roles?: true;
-
-    @Field(() => Boolean, {nullable:true})
-    status?: true;
-
-    @Field(() => Boolean, {nullable:true})
-    avatarUrl?: true;
+    profileId?: true;
 
     @Field(() => Boolean, {nullable:true})
     _all?: true;

@@ -21,6 +21,7 @@ export class RequestContextExtractorMiddleware implements NestMiddleware {
       req: request,
       res: response,
       account: undefined,
+      profile: undefined,
       accountSession: undefined,
     };
 
@@ -29,11 +30,12 @@ export class RequestContextExtractorMiddleware implements NestMiddleware {
         where: {
           token,
         },
-        include: { account: true },
+        include: { account: { include: { profile: true } } },
       });
 
       if (session) {
         requestContext.account = session.account;
+        requestContext.profile = session.account.profile || undefined;
         requestContext.accountSession = session;
       }
     }

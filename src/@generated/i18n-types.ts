@@ -10,6 +10,8 @@ export type I18nTranslations = {
         "accountNotFound": string;
         "emailNotSent": string;
         "invalidCode": string;
+        "profileNotFound": string;
+        "accountsNotFound": string;
     };
     "translations": {
         "hello": string;

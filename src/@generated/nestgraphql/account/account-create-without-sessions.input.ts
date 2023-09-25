@@ -1,7 +1,6 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
-import { AccountRole } from '../prisma/account-role.enum';
-import { AccountStatus } from '../prisma/account-status.enum';
+import { ProfileCreateNestedOneWithoutAccountsInput } from '../profile/profile-create-nested-one-without-accounts.input';
 
 @InputType()
 export class AccountCreateWithoutSessionsInput {
@@ -18,12 +17,6 @@ export class AccountCreateWithoutSessionsInput {
     @Field(() => String, {nullable:false})
     passwordHash!: string;
 
-    @Field(() => [AccountRole], {nullable:true})
-    roles?: Array<keyof typeof AccountRole>;
-
-    @Field(() => AccountStatus, {nullable:false})
-    status!: keyof typeof AccountStatus;
-
-    @Field(() => String, {nullable:true})
-    avatarUrl?: string;
+    @Field(() => ProfileCreateNestedOneWithoutAccountsInput, {nullable:true})
+    profile?: ProfileCreateNestedOneWithoutAccountsInput;
 }

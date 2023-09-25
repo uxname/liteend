@@ -3,10 +3,9 @@ import { InputType } from '@nestjs/graphql';
 import { IntFilter } from '../prisma/int-filter.input';
 import { DateTimeFilter } from '../prisma/date-time-filter.input';
 import { StringFilter } from '../prisma/string-filter.input';
-import { EnumAccountRoleNullableListFilter } from '../prisma/enum-account-role-nullable-list-filter.input';
-import { EnumAccountStatusFilter } from '../prisma/enum-account-status-filter.input';
-import { StringNullableFilter } from '../prisma/string-nullable-filter.input';
+import { IntNullableFilter } from '../prisma/int-nullable-filter.input';
 import { AccountSessionListRelationFilter } from '../account-session/account-session-list-relation-filter.input';
+import { ProfileNullableRelationFilter } from '../profile/profile-nullable-relation-filter.input';
 
 @InputType()
 export class AccountWhereInput {
@@ -35,15 +34,12 @@ export class AccountWhereInput {
     @Field(() => StringFilter, {nullable:true})
     passwordHash?: StringFilter;
 
-    @Field(() => EnumAccountRoleNullableListFilter, {nullable:true})
-    roles?: EnumAccountRoleNullableListFilter;
-
-    @Field(() => EnumAccountStatusFilter, {nullable:true})
-    status?: EnumAccountStatusFilter;
-
-    @Field(() => StringNullableFilter, {nullable:true})
-    avatarUrl?: StringNullableFilter;
+    @Field(() => IntNullableFilter, {nullable:true})
+    profileId?: IntNullableFilter;
 
     @Field(() => AccountSessionListRelationFilter, {nullable:true})
     sessions?: AccountSessionListRelationFilter;
+
+    @Field(() => ProfileNullableRelationFilter, {nullable:true})
+    profile?: ProfileNullableRelationFilter;
 }

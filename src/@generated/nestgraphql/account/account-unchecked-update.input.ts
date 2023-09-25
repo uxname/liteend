@@ -1,8 +1,6 @@
 import { Field } from '@nestjs/graphql';
 import { InputType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
-import { AccountRole } from '../prisma/account-role.enum';
-import { AccountStatus } from '../prisma/account-status.enum';
 import { AccountSessionUncheckedUpdateManyWithoutAccountNestedInput } from '../account-session/account-session-unchecked-update-many-without-account-nested.input';
 
 @InputType()
@@ -23,14 +21,8 @@ export class AccountUncheckedUpdateInput {
     @Field(() => String, {nullable:true})
     passwordHash?: string;
 
-    @Field(() => [AccountRole], {nullable:true})
-    roles?: Array<keyof typeof AccountRole>;
-
-    @Field(() => AccountStatus, {nullable:true})
-    status?: keyof typeof AccountStatus;
-
-    @Field(() => String, {nullable:true})
-    avatarUrl?: string;
+    @Field(() => Int, {nullable:true})
+    profileId?: number;
 
     @Field(() => AccountSessionUncheckedUpdateManyWithoutAccountNestedInput, {nullable:true})
     sessions?: AccountSessionUncheckedUpdateManyWithoutAccountNestedInput;

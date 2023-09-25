@@ -21,8 +21,5 @@ export class AccountMinOrderByAggregateInput {
     passwordHash?: keyof typeof SortOrder;
 
     @Field(() => SortOrder, {nullable:true})
-    status?: keyof typeof SortOrder;
-
-    @Field(() => SortOrder, {nullable:true})
-    avatarUrl?: keyof typeof SortOrder;
+    profileId?: keyof typeof SortOrder;
 }
