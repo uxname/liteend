@@ -24,6 +24,7 @@ import { DebugModule } from '@/app/debug/debug.module';
 import { EmailModule } from '@/app/email/email.module';
 import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';
 import { Page404Filter } from '@/app/page-404/page-404.filter';
+import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
@@ -99,6 +100,7 @@ import { ProfileModule } from './profile/profile.module';
     ProfileModule,
   ],
   providers: [
+    ComplexityPlugin,
     {
       provide: APP_FILTER,
       useClass: Page404Filter,
