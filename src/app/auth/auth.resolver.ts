@@ -24,7 +24,7 @@ import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 import {
   CryptoService,
-  RandomStringType,
+  RandomStringPrefix,
 } from '@/common/crypto/crypto.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
@@ -54,7 +54,7 @@ export class AuthResolver {
       AccountStatus.INACTIVE,
     );
     const token = await this.cryptoService.generateRandomString(
-      RandomStringType.ACCESS_TOKEN,
+      RandomStringPrefix.ACCESS_TOKEN,
     );
     await this.accountSessionService.createAccountSession(
       account.id,
@@ -83,7 +83,7 @@ export class AuthResolver {
       data.password,
     );
     const token = await this.cryptoService.generateRandomString(
-      RandomStringType.ACCESS_TOKEN,
+      RandomStringPrefix.ACCESS_TOKEN,
     );
 
     await this.accountSessionService.createAccountSession(
@@ -112,7 +112,7 @@ export class AuthResolver {
     }
 
     const token = await this.cryptoService.generateRandomString(
-      RandomStringType.ACCESS_TOKEN,
+      RandomStringPrefix.ACCESS_TOKEN,
     );
 
     await this.accountSessionService.createAccountSession(
