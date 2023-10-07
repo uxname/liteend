@@ -17,7 +17,8 @@ describe('TotpService', () => {
 
   test('should generate and check TOTP', () => {
     expect(service).toBeDefined();
-    const token = service.generateToken();
-    expect(service.verifyToken(token)).toBe(true);
+    const secret = service.generateSecret();
+    const token = service.generateToken(secret);
+    expect(service.verifyToken(secret, token)).toBe(true);
   });
 });
