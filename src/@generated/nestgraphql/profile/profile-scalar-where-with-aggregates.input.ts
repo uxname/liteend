@@ -5,6 +5,7 @@ import { DateTimeWithAggregatesFilter } from '../prisma/date-time-with-aggregate
 import { EnumProfileRoleNullableListFilter } from '../prisma/enum-profile-role-nullable-list-filter.input';
 import { EnumAccountStatusWithAggregatesFilter } from '../prisma/enum-account-status-with-aggregates-filter.input';
 import { StringNullableWithAggregatesFilter } from '../prisma/string-nullable-with-aggregates-filter.input';
+import { BoolWithAggregatesFilter } from '../prisma/bool-with-aggregates-filter.input';
 
 @InputType()
 export class ProfileScalarWhereWithAggregatesInput {
@@ -41,4 +42,10 @@ export class ProfileScalarWhereWithAggregatesInput {
 
     @Field(() => StringNullableWithAggregatesFilter, {nullable:true})
     bio?: StringNullableWithAggregatesFilter;
+
+    @Field(() => BoolWithAggregatesFilter, {nullable:true})
+    totpEnabled?: BoolWithAggregatesFilter;
+
+    @Field(() => StringNullableWithAggregatesFilter, {nullable:true})
+    totpSecret?: StringNullableWithAggregatesFilter;
 }

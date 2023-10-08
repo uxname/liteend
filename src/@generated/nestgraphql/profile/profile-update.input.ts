@@ -28,6 +28,12 @@ export class ProfileUpdateInput {
     @Field(() => String, {nullable:true})
     bio?: string;
 
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: boolean;
+
+    @Field(() => String, {nullable:true})
+    totpSecret?: string;
+
     @Field(() => AccountUpdateManyWithoutProfileNestedInput, {nullable:true})
     accounts?: AccountUpdateManyWithoutProfileNestedInput;
 }

@@ -24,4 +24,10 @@ export class ProfileMaxAggregateInput {
 
     @Field(() => Boolean, {nullable:true})
     bio?: true;
+
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: true;
+
+    @Field(() => Boolean, {nullable:true})
+    totpSecret?: true;
 }

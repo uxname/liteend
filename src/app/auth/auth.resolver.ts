@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
@@ -77,6 +77,7 @@ export class AuthResolver {
     data: EmailPasswordInput,
     @Context() context: RequestContext,
     @RealIp() ip: string,
+    @Args('totpToken', { nullable: true }) totpToken?: string,
   ): Promise<AuthResponse> {
     const account = await this.authService.validateAccountPassword(
       data.email,
@@ -91,6 +92,7 @@ export class AuthResolver {
       token,
       ip,
       context.req.headers['user-agent'],
+      totpToken,
     );
     return {
       token,
@@ -211,6 +213,7 @@ export class AuthResolver {
         AccountStatus.ACTIVE,
       );
     } else {
+      // eslint-disable-next-line sonarjs/no-duplicate-string
       throw new Error(i18n.t('errors.invalidCode'));
     }
   }
@@ -236,5 +239,75 @@ export class AuthResolver {
     } else {
       throw new Error(i18n.t('errors.invalidCode'));
     }
+  }
+
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Args('email') email: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<boolean> {
+    const result = await this.oneTimeCodeService.createOneTimeCode(email);
+    const sendEmailResult = await this.emailService.sendEmail(
+      email,
+      'Reset password code', // todo i18n
+      `Your reset password code is: ${result.code}`, // todo i18n
+    );
+
+    if (sendEmailResult) {
+      return true;
+    } else {
+      throw new Error(i18n.t('errors.emailNotSent'));
+    }
+  }
+
+  @Mutation(() => Account)
+  async resetPasswordByCode(
+    @Args('email') email: string,
+    @Args('code') code: string,
+    @Args('newPassword') newPassword: string,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<Account> {
+    const isOneTimeCodeValid =
+      await this.oneTimeCodeService.validateOneTimeCode(email, code);
+
+    if (isOneTimeCodeValid) {
+      await this.oneTimeCodeService.deleteOneTimeCode(email);
+      return await this.accountService.changePassword(email, newPassword);
+    } else {
+      throw new Error(i18n.t('errors.invalidCode'));
+    }
+  }
+
+  @UseGuards(new AuthGuard())
+  @Query(() => String)
+  async generateTotpSecret(
+    @RequestContextDecorator() context: RequestContext,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+    @Args('token', { nullable: true }) token?: string,
+  ): Promise<string> {
+    if (!context.profile) {
+      throw new Error(i18n.t('errors.unauthorized'));
+    }
+
+    return this.authService.generateTotpSecret(context.profile.id, token);
+  }
+
+  @UseGuards(new AuthGuard())
+  @Mutation(() => Boolean)
+  async changeTotpEnabled(
+    @Args('token') token: string,
+    @Args('enabled') enabled: boolean,
+    @RequestContextDecorator() context: RequestContext,
+    @I18n() i18n: I18nContext<I18nTranslations>,
+  ): Promise<boolean> {
+    if (!context.profile) {
+      throw new Error(i18n.t('errors.unauthorized'));
+    }
+
+    return await this.authService.changeTotpEnabled(
+      context.profile.id,
+      token,
+      enabled,
+    );
   }
 }

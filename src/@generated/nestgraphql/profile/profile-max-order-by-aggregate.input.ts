@@ -25,4 +25,10 @@ export class ProfileMaxOrderByAggregateInput {
 
     @Field(() => SortOrder, {nullable:true})
     bio?: keyof typeof SortOrder;
+
+    @Field(() => SortOrder, {nullable:true})
+    totpEnabled?: keyof typeof SortOrder;
+
+    @Field(() => SortOrder, {nullable:true})
+    totpSecret?: keyof typeof SortOrder;
 }

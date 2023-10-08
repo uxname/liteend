@@ -3,6 +3,7 @@ import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 import { ProfileRole } from '../prisma/profile-role.enum';
 import { AccountStatus } from '../prisma/account-status.enum';
+import { HideField } from '@nestjs/graphql';
 import { ProfileCountAggregate } from './profile-count-aggregate.output';
 import { ProfileAvgAggregate } from './profile-avg-aggregate.output';
 import { ProfileSumAggregate } from './profile-sum-aggregate.output';
@@ -35,6 +36,12 @@ export class ProfileGroupBy {
 
     @Field(() => String, {nullable:true})
     bio?: string;
+
+    @Field(() => Boolean, {nullable:false})
+    totpEnabled!: boolean;
+
+    @HideField()
+    totpSecret?: string;
 
     @Field(() => ProfileCountAggregate, {nullable:true})
     _count?: ProfileCountAggregate;

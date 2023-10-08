@@ -35,6 +35,12 @@ export class ProfileOrderByWithAggregationInput {
     @Field(() => SortOrderInput, {nullable:true})
     bio?: SortOrderInput;
 
+    @Field(() => SortOrder, {nullable:true})
+    totpEnabled?: keyof typeof SortOrder;
+
+    @Field(() => SortOrderInput, {nullable:true})
+    totpSecret?: SortOrderInput;
+
     @Field(() => ProfileCountOrderByAggregateInput, {nullable:true})
     _count?: ProfileCountOrderByAggregateInput;
 

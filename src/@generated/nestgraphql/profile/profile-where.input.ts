@@ -5,6 +5,7 @@ import { DateTimeFilter } from '../prisma/date-time-filter.input';
 import { EnumProfileRoleNullableListFilter } from '../prisma/enum-profile-role-nullable-list-filter.input';
 import { EnumAccountStatusFilter } from '../prisma/enum-account-status-filter.input';
 import { StringNullableFilter } from '../prisma/string-nullable-filter.input';
+import { BoolFilter } from '../prisma/bool-filter.input';
 import { AccountListRelationFilter } from '../account/account-list-relation-filter.input';
 
 @InputType()
@@ -42,6 +43,12 @@ export class ProfileWhereInput {
 
     @Field(() => StringNullableFilter, {nullable:true})
     bio?: StringNullableFilter;
+
+    @Field(() => BoolFilter, {nullable:true})
+    totpEnabled?: BoolFilter;
+
+    @Field(() => StringNullableFilter, {nullable:true})
+    totpSecret?: StringNullableFilter;
 
     @Field(() => AccountListRelationFilter, {nullable:true})
     accounts?: AccountListRelationFilter;

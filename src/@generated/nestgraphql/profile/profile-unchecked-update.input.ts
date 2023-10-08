@@ -32,6 +32,12 @@ export class ProfileUncheckedUpdateInput {
     @Field(() => String, {nullable:true})
     bio?: string;
 
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: boolean;
+
+    @Field(() => String, {nullable:true})
+    totpSecret?: string;
+
     @Field(() => AccountUncheckedUpdateManyWithoutProfileNestedInput, {nullable:true})
     accounts?: AccountUncheckedUpdateManyWithoutProfileNestedInput;
 }

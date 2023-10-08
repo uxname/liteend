@@ -28,6 +28,12 @@ export class ProfileCreateInput {
     @Field(() => String, {nullable:true})
     bio?: string;
 
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: boolean;
+
+    @Field(() => String, {nullable:true})
+    totpSecret?: string;
+
     @Field(() => AccountCreateNestedManyWithoutProfileInput, {nullable:true})
     accounts?: AccountCreateNestedManyWithoutProfileInput;
 }

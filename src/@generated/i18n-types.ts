@@ -12,6 +12,8 @@ export type I18nTranslations = {
         "invalidCode": string;
         "profileNotFound": string;
         "accountsNotFound": string;
+        "invalidToken": string;
+        "totpTokenNotSet": string;
     };
     "translations": {
         "hello": string;

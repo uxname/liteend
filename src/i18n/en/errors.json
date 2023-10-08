@@ -7,5 +7,7 @@
   "emailNotSent": "Email not sent",
   "invalidCode": "Invalid code",
   "profileNotFound": "Profile not found",
-  "accountsNotFound": "Accounts not found"
+  "accountsNotFound": "Accounts not found",
+  "invalidToken": "Invalid token",
+  "totpTokenNotSet": "TOTP token not set"
 }

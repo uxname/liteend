@@ -26,4 +26,10 @@ export class ProfileUpdateManyMutationInput {
 
     @Field(() => String, {nullable:true})
     bio?: string;
+
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: boolean;
+
+    @Field(() => String, {nullable:true})
+    totpSecret?: string;
 }

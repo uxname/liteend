@@ -7,5 +7,7 @@
   "emailNotSent": "Ошибка отправки email",
   "invalidCode": "Неверный код",
   "profileNotFound": "Профиль не найден",
-  "accountsNotFound": "Аккаунты не найдены"
+  "accountsNotFound": "Аккаунты не найдены",
+  "invalidToken": "Неверный токен",
+  "totpTokenNotSet": "Токен не установлен"
 }

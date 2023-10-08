@@ -8,7 +8,9 @@ export enum ProfileScalarFieldEnum {
     status = "status",
     avatarUrl = "avatarUrl",
     name = "name",
-    bio = "bio"
+    bio = "bio",
+    totpEnabled = "totpEnabled",
+    totpSecret = "totpSecret"
 }
 
 

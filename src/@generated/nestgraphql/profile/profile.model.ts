@@ -3,6 +3,7 @@ import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 import { ProfileRole } from '../prisma/profile-role.enum';
 import { AccountStatus } from '../prisma/account-status.enum';
+import { HideField } from '@nestjs/graphql';
 import { Account } from '../account/account.model';
 import { ProfileCount } from './profile-count.output';
 
@@ -32,6 +33,12 @@ export class Profile {
 
     @Field(() => String, {nullable:true})
     bio!: string | null;
+
+    @Field(() => Boolean, {nullable:false,defaultValue:false})
+    totpEnabled!: boolean;
+
+    @HideField()
+    totpSecret!: string | null;
 
     @Field(() => [Account], {nullable:true})
     accounts?: Array<Account>;

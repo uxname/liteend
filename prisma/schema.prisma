@@ -45,6 +45,10 @@ model Profile {
   avatarUrl String?
   name      String?
   bio       String?
+
+  totpEnabled Boolean @default(false)
+  /// @HideField()
+  totpSecret  String?
 }
 
 enum AccountStatus {

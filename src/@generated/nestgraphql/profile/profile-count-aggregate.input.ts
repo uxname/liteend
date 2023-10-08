@@ -29,5 +29,11 @@ export class ProfileCountAggregateInput {
     bio?: true;
 
     @Field(() => Boolean, {nullable:true})
+    totpEnabled?: true;
+
+    @Field(() => Boolean, {nullable:true})
+    totpSecret?: true;
+
+    @Field(() => Boolean, {nullable:true})
     _all?: true;
 }

@@ -2,6 +2,7 @@ import { Field } from '@nestjs/graphql';
 import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 import { AccountStatus } from '../prisma/account-status.enum';
+import { HideField } from '@nestjs/graphql';
 
 @ObjectType()
 export class ProfileMinAggregate {
@@ -26,4 +27,10 @@ export class ProfileMinAggregate {
 
     @Field(() => String, {nullable:true})
     bio?: string;
+
+    @Field(() => Boolean, {nullable:true})
+    totpEnabled?: boolean;
+
+    @HideField()
+    totpSecret?: string;
 }

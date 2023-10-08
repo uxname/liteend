@@ -10,7 +10,7 @@ import { CryptoModule } from '@/common/crypto/crypto.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { AuthService } from './auth.service';
-import { TotpService } from './totp/totp.service';
+import { TotpModule } from './totp/totp.module';
 
 @Module({
   imports: [
@@ -21,8 +21,9 @@ import { TotpService } from './totp/totp.service';
     AccountSessionModule,
     OneTimeCodeModule,
     EmailModule,
+    TotpModule,
   ],
-  providers: [AuthService, AuthResolver, TotpService],
+  providers: [AuthService, AuthResolver],
   exports: [AuthService, AuthResolver],
 })
 export class AuthModule {}
