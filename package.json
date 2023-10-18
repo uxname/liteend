@@ -31,6 +31,7 @@
     "postdb:migrations:apply": "npm run db:gen",
     "db:migrations:create": "npx prisma migrate dev --create-only",
     "db:schema:format": "npx prisma format",
+    "predb:gen": "npx rimraf src/@generated",
     "db:gen": "npx prisma generate",
     "db:studio": "npx prisma studio --browser none",
     "db:studio-local": "npm run db:studio -- -n 127.0.0.1",
