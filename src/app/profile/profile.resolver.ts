@@ -1,5 +1,11 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { Profile } from '@/@generated/nestgraphql/profile/profile.model';
@@ -31,7 +37,11 @@ export class ProfileResolver {
   @UseGuards(AuthGuard)
   async accounts(
     @RequestContextDecorator() context: RequestContext,
+    @Parent() parent: Profile,
   ): Promise<Account[]> {
-    return this.profileService.getAccounts(context.account!.profileId!);
+    if (context.account!.profileId !== parent.id) {
+      throw new Error('You are not allowed to access this profile');
+    }
+    return this.profileService.getAccounts(parent.id);
   }
 }
