@@ -21,7 +21,7 @@ module.exports = {
     '@jetbrains/eslint-config/node',
 
     'plugin:sonarjs/recommended',
-    'plugin:security/recommended',
+    'plugin:security/recommended-legacy',
 
     'plugin:eslint-comments/recommended',
 
@@ -34,8 +34,7 @@ module.exports = {
     'plugin:jest/recommended',
     'plugin:jest/style',
 
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/eslint-recommended"
+    "plugin:@typescript-eslint/recommended"
   ],
   root: true,
   env: {
