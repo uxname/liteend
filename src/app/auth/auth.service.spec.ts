@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
+import { TotpModule } from '@/app/auth/totp/totp.module';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
@@ -18,6 +19,7 @@ describe('AuthService', () => {
       imports: [
         PrismaModule,
         CryptoModule,
+        TotpModule,
         ConfigModule.forRoot(),
         I18nModule.forRoot({
           fallbackLanguage: 'en',

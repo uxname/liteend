@@ -4,6 +4,7 @@ import process from 'node:process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
+import { TotpModule } from '@/app/auth/totp/totp.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { AccountSessionService } from './account-session.service';
@@ -15,6 +16,7 @@ describe('AccountSessionService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         PrismaModule,
+        TotpModule,
         I18nModule.forRoot({
           fallbackLanguage: 'en',
           loaderOptions: {
