@@ -73,7 +73,7 @@
     "log4js": "^6.9.1",
     "log4js-json-layout": "^2.2.3",
     "nestjs-i18n": "^10.4.5",
-    "nodemailer": "^6.9.11",
+    "nodemailer": "^6.9.12",
     "otplib": "^12.0.1",
     "prisma-nestjs-graphql": "^20.0.2",
     "reflect-metadata": "^0.2.1",
