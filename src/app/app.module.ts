@@ -1,8 +1,12 @@
 import path from 'node:path';
 import * as process from 'node:process';
 
+import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { BullBoardModule } from '@bull-board/nestjs';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import {
+  HttpStatus,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -11,7 +15,7 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
@@ -81,6 +85,46 @@ import { ProfileModule } from './profile/profile.module';
       envFilePath: ['.env', '.env.example'],
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       isGlobal: true,
+    }),
+    BullBoardModule.forRoot({
+      route: '/board',
+      adapter: ExpressAdapter, // Or FastifyAdapter from `@bull-board/fastify`
+      middleware: (
+        request: Request,
+        response: Response,
+        next: NextFunction,
+      ) => {
+        const login = process.env.BULL_BOARD_LOGIN;
+        const password = process.env.BULL_BOARD_PASSWORD;
+
+        const b64auth =
+          (request.headers.authorization || '').split(' ')[1] || '';
+        const [loginBase64, passwordBase64] = Buffer.from(b64auth, 'base64')
+          .toString()
+          .split(':');
+
+        if (
+          loginBase64 &&
+          passwordBase64 &&
+          loginBase64 === login &&
+          passwordBase64 === password
+        ) {
+          return next();
+        }
+
+        response.set('WWW-Authenticate', 'Basic realm="401"');
+        response
+          .status(HttpStatus.UNAUTHORIZED)
+          .send('Authentication required.');
+
+        return response
+          .status(HttpStatus.UNAUTHORIZED)
+          .send('Authentication required.');
+      },
+    }),
+    BullBoardModule.forFeature({
+      name: 'email',
+      adapter: BullAdapter, //or use BullAdapter if you're using bull instead of bullMQ
     }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
