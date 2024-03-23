@@ -15,7 +15,7 @@ export class OneTimeCodeService {
     // eslint-disable-next-line no-magic-numbers
     const code = Math.floor(100_000 + Math.random() * 900_000).toString();
 
-    return await this.prismaService.oneTimeCode.upsert({
+    return this.prismaService.oneTimeCode.upsert({
       where: { email },
       update: { code, expiresAt },
       create: { email, code, expiresAt },
