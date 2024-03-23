@@ -46,7 +46,15 @@ import { NextFunction, Request, Response } from 'express';
     }),
     BullBoard.forFeature({
       name: 'email',
-      adapter: BullAdapter, //or use BullAdapter if you're using bull instead of bullMQ
+      adapter: BullAdapter,
+    }),
+    BullBoard.forFeature({
+      name: 'account-session',
+      adapter: BullAdapter,
+    }),
+    BullBoard.forFeature({
+      name: 'one-time-code',
+      adapter: BullAdapter,
     }),
   ],
 })

@@ -1,11 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { InjectQueue, Process, Processor } from '@nestjs/bull';
+import { Job, Queue } from 'bull';
 
 import { OneTimeCode } from '@/@generated/nestgraphql/one-time-code/one-time-code.model';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
-@Injectable()
+interface ProcessOneTimeCodeParameters {
+  oneTimeCodeId: number;
+}
+
+@Processor('one-time-code')
 export class OneTimeCodeService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    @InjectQueue('one-time-code')
+    private readonly accountSessionQueue: Queue<ProcessOneTimeCodeParameters>,
+  ) {}
 
   async createOneTimeCode(email: string): Promise<OneTimeCode> {
     // 30 minutes
@@ -15,11 +24,15 @@ export class OneTimeCodeService {
     // eslint-disable-next-line no-magic-numbers
     const code = Math.floor(100_000 + Math.random() * 900_000).toString();
 
-    return this.prismaService.oneTimeCode.upsert({
+    const otc = await this.prismaService.oneTimeCode.upsert({
       where: { email },
       update: { code, expiresAt },
       create: { email, code, expiresAt },
     });
+
+    await this.addDeleteOneTimeCodeJob(otc.id, expiresAt);
+
+    return otc;
   }
 
   async validateOneTimeCode(email: string, code: string): Promise<boolean> {
@@ -41,5 +54,32 @@ export class OneTimeCodeService {
   async deleteOneTimeCode(email: string): Promise<boolean> {
     await this.prismaService.oneTimeCode.delete({ where: { email } });
     return true;
+  }
+
+  @Process()
+  async processOneTimeCode(
+    job: Job<ProcessOneTimeCodeParameters>,
+  ): Promise<void> {
+    const { data } = job;
+    await this.prismaService.oneTimeCode.delete({
+      where: { id: data.oneTimeCodeId },
+    });
+  }
+
+  async addDeleteOneTimeCodeJob(
+    oneTimeCodeId: number,
+    runAt: Date,
+  ): Promise<Job> {
+    return await this.accountSessionQueue.add(
+      { oneTimeCodeId },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
+        delay: runAt.getTime() - Date.now(),
+      },
+    );
   }
 }

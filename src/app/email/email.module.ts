@@ -7,20 +7,6 @@ import { EmailService } from './email.service';
 
 @Module({
   imports: [
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        redis: {
-          host: configService.getOrThrow<string>('REDIS_HOST'),
-          port: Number.parseInt(
-            configService.getOrThrow<string>('REDIS_PORT'),
-            10,
-          ),
-          password: configService.getOrThrow<string>('REDIS_PASSWORD'),
-        },
-      }),
-      inject: [ConfigService],
-    }),
     BullModule.registerQueue({
       name: 'email',
     }),

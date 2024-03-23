@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import PrismaClient from '@prisma/client';
+import { Job, Queue } from 'bull';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
@@ -8,12 +9,18 @@ import { AccountSession } from '@/@generated/nestgraphql/account-session/account
 import { TotpService } from '@/app/auth/totp/totp.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
-@Injectable()
+interface ProcessAccountSessionParameters {
+  sessionId: number;
+}
+
+@Processor('account-session')
 export class AccountSessionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly i18n: I18nService<I18nTranslations>,
     private readonly totpService: TotpService,
+    @InjectQueue('account-session')
+    private readonly accountSessionQueue: Queue<ProcessAccountSessionParameters>,
   ) {}
 
   public async createAccountSession(
@@ -50,7 +57,8 @@ export class AccountSessionService {
 
     // eslint-disable-next-line no-magic-numbers
     const expiresAtInMs = Date.now() + 1000 * 60 * 60 * 24 * 30;
-    return this.prisma.accountSession.create({
+
+    const session = await this.prisma.accountSession.create({
       data: {
         account: {
           connect: {
@@ -63,6 +71,10 @@ export class AccountSessionService {
         expiresAt: new Date(expiresAtInMs),
       },
     });
+
+    await this.addDeleteSessionJob(session.id, new Date(expiresAtInMs));
+
+    return session;
   }
 
   async getAccountSessionByToken(
@@ -129,5 +141,36 @@ export class AccountSessionService {
       throw new Error(this.i18n.t('errors.accountNotFound'));
     }
     return result;
+  }
+
+  @Process()
+  async processAccountSession(
+    job: Job<ProcessAccountSessionParameters>,
+  ): Promise<void> {
+    const { data } = job;
+    await this.prisma.accountSession.delete({
+      where: {
+        id: data.sessionId,
+      },
+    });
+  }
+
+  async addDeleteSessionJob(
+    sessionId: number,
+    runAt: Date,
+  ): Promise<Job<ProcessAccountSessionParameters>> {
+    return await this.accountSessionQueue.add(
+      {
+        sessionId,
+      },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
+        delay: runAt.getTime() - Date.now(),
+      },
+    );
   }
 }

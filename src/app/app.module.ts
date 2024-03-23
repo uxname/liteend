@@ -2,13 +2,14 @@ import path from 'node:path';
 import * as process from 'node:process';
 
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { BullModule } from '@nestjs/bull';
 import {
   MiddlewareConsumer,
   Module,
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request, Response } from 'express';
@@ -79,6 +80,20 @@ import { ProfileModule } from './profile/profile.module';
     FileUploadModule,
     HealthModule,
     DotenvValidatorModule,
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.getOrThrow<string>('REDIS_HOST'),
+          port: Number.parseInt(
+            configService.getOrThrow<string>('REDIS_PORT'),
+            10,
+          ),
+          password: configService.getOrThrow<string>('REDIS_PASSWORD'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot({
       envFilePath: ['.env', '.env.example'],
       ignoreEnvFile: process.env.NODE_ENV === 'production',
