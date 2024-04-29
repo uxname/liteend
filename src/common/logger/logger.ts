@@ -3,7 +3,7 @@
 // import cluster from 'node:cluster';
 // import path from 'node:path';
 
-import * as path from 'node:path';
+import path from 'node:path';
 import * as process from 'node:process';
 
 import { LoggerService } from '@nestjs/common';

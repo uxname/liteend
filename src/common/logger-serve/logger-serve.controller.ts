@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/no-explicit-any,security/detect-non-literal-fs-filename */
 import * as fs from 'node:fs';
-import * as path from 'node:path';
+import path from 'node:path';
 
 import {
   Controller,
