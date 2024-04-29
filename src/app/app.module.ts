@@ -45,7 +45,11 @@ import { ProfileModule } from './profile/profile.module';
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
-      playground: true,
+      playground: {
+        settings: {
+          'editor.theme': 'light',
+        },
+      },
       introspection: true,
       persistedQueries: false,
       resolvers: { JSON: GraphQLJSON },
