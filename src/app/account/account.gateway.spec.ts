@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
@@ -34,6 +35,7 @@ describe('AccountGateway', () => {
             'i18n-types.ts',
           ),
         }),
+        ConfigModule.forRoot(),
       ],
       providers: [AccountGateway],
     }).compile();

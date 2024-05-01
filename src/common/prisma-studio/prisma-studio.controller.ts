@@ -23,6 +23,7 @@ const ROUTES = [
 @Controller()
 export class PrismaStudioController {
   constructor(private readonly prismaStudioService: PrismaStudioService) {}
+
   @Get(ROUTES)
   async proxyGet(
     @Req() request: Request,

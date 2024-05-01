@@ -11,7 +11,7 @@ describe('EmailService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule, LoggerModule, EmailModule],
+      imports: [ConfigModule.forRoot(), LoggerModule, EmailModule],
     }).compile();
 
     service = module.get<EmailService>(EmailService);

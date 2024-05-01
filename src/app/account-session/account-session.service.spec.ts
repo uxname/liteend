@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 
+import { BullModule } from '@nestjs/bull';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
@@ -31,6 +32,9 @@ describe('AccountSessionService', () => {
             '@generated',
             'i18n-types.ts',
           ),
+        }),
+        BullModule.registerQueue({
+          name: 'account-session',
         }),
       ],
       providers: [AccountSessionService],
