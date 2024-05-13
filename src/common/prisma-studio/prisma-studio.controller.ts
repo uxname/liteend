@@ -7,24 +7,27 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
 
-const ROUTES = [
+const ROUTES_GET = [
   'studio',
-  'api',
   'index.css',
   'http/databrowser.js',
   'assets/index.js',
   'assets/vendor.js',
 ];
 
+const ROUTES_POST = ['api'];
+
 @Controller()
 export class PrismaStudioController {
   constructor(private readonly prismaStudioService: PrismaStudioService) {}
 
-  @Get(ROUTES)
+  @ApiExcludeEndpoint()
+  @Get(ROUTES_GET)
   async proxyGet(
     @Req() request: Request,
     @Res() _response: Response,
@@ -32,7 +35,8 @@ export class PrismaStudioController {
     await this.prismaStudioService.processRequest(request, _response);
   }
 
-  @Post(ROUTES)
+  @ApiExcludeEndpoint()
+  @Post(ROUTES_POST)
   async proxyPost(
     @Req() request: RawBodyRequest<Request>,
     @Res() _response: Response,
