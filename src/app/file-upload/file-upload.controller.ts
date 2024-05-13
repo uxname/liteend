@@ -163,7 +163,8 @@ export class FileUploadController {
     const fullFilePath = path.join(UPLOAD_DIR, filePath);
     if (!fs.existsSync(fullFilePath)) {
       // return empty response with delay for preventing information disclosure
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const randomDelay = Math.floor(Math.random() * 1500) + 500;
+      await new Promise((resolve) => setTimeout(resolve, randomDelay));
       response.status(204).end();
       return;
     }
