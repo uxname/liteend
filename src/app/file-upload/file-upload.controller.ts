@@ -15,6 +15,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { Express, Response } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -61,6 +68,28 @@ export class FileUploadController {
   ) {}
 
   @Post('upload')
+  @ApiOperation({ summary: 'Upload files' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'The file to upload',
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The file has been successfully uploaded.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'files', maxCount: 10 }], {
       storage,
@@ -116,16 +145,32 @@ export class FileUploadController {
     );
   }
 
-  @Get('/uploads/:fileName(*)')
+  @Get('/uploads/:filePath(*)')
+  @ApiOperation({ summary: 'Get file' })
+  @ApiParam({
+    name: 'filePath',
+    required: true,
+    description: 'The file path.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The file has been successfully retrieved.',
+  })
   async getFile(
-    @Param('fileName') fileName: string,
+    @Param('filePath') filePath: string,
     @Res() response: Response,
   ): Promise<void> {
-    const filePath = path.join(UPLOAD_DIR, fileName);
-    const mimeType = this.fileUploadService.getMimeType(filePath);
+    const fullFilePath = path.join(UPLOAD_DIR, filePath);
+    if (!fs.existsSync(fullFilePath)) {
+      // return empty response with delay for preventing information disclosure
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      response.status(204).end();
+      return;
+    }
+    const mimeType = this.fileUploadService.getMimeType(fullFilePath);
     response.type(mimeType);
 
-    const stream = fs.createReadStream(filePath);
+    const stream = fs.createReadStream(fullFilePath);
 
     stream.pipe(response);
   }
