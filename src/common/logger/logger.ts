@@ -1,7 +1,5 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/no-explicit-any,unicorn/prefer-module */
-// import cluster from 'node:cluster';
-// import path from 'node:path';
 
 import path from 'node:path';
 import * as process from 'node:process';
