@@ -52,12 +52,11 @@ export class HealthController {
   }
 
   async checkRedis(): Promise<boolean> {
-    try {
-      await this.client.ping();
-      return true;
-    } catch (error) {
-      this.logger.error('Redis is offline', error);
+    const pong = await this.client.ping();
+    if (pong !== 'PONG') {
+      this.logger.error('Redis is offline');
       return false;
     }
+    return true;
   }
 }
