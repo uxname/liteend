@@ -11,7 +11,7 @@ import helmet from 'helmet';
 
 import { Logger } from '@/common/logger/logger';
 
-import appInfo from '../app-info.json';
+import packageJson from '../package.json';
 import { AppModule } from './app/app.module';
 
 dotenv.config();
@@ -24,9 +24,9 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   const config = new DocumentBuilder()
-    .setTitle(appInfo.name)
-    .setDescription(`${appInfo.name} REST API documentation`)
-    .setVersion(appInfo.version)
+    .setTitle(packageJson.name)
+    .setDescription(`${packageJson.name} REST API documentation`)
+    .setVersion(packageJson.version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);

@@ -1,18 +1,43 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { GitService } from '@/app/debug/git/git.service';
 import { Logger } from '@/common/logger/logger';
 
-import appInfo from '../../../app-info.json';
+import packageJson from '../../../package.json';
+
+interface CommitInfo {
+  name: string;
+  hash: string;
+}
+
+const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
+  process.cwd(),
+  'dist',
+  'last-commit-info.json',
+);
 
 @Resolver(() => Query)
 export class DebugResolver {
   private readonly logger: Logger = new Logger(DebugResolver.name);
 
-  constructor(private readonly gitService: GitService) {}
+  private static readLastCommitInfo(): CommitInfo | undefined {
+    try {
+      return JSON.parse(readFileSync(LAST_COMMIT_INFO_FILE_PATH, 'utf8'));
+    } catch (error) {
+      console.error(
+        'Error reading last commit info. Returning empty commit info.',
+        error,
+      );
+      return undefined;
+    }
+  }
+
+  constructor() {}
 
   @Query(() => String, { name: 'testTranslation' })
   testTranslation(
@@ -56,8 +81,13 @@ export class DebugResolver {
     return {
       serverTime: new Date().toISOString(),
       uptime: uptimePretty,
-      appInfo,
-      lastCommit: this.gitService.getLastCommitInfo(),
+      appInfo: {
+        name: packageJson.name,
+        version: packageJson.version,
+        description: packageJson.description,
+      },
+      lastCommit:
+        DebugResolver.readLastCommitInfo() || 'No commit info available',
     };
   }
 }
