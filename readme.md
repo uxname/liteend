@@ -11,7 +11,10 @@ Lightweight template for a backend applications, based on [NestJS](https://nestj
 
 ```shell
 # Init project
-$ npx liteend-cli new <project-name>
+$ git clone https://github.com/uxname/liteend.git && cd liteend && cp .env.example .env && npm i
+
+# (Optional) Change git repo url
+$ git remote set-url origin <NEW_URL_HERE>
 
 # Deploy database: 
 $ npm run db:migrations:apply
