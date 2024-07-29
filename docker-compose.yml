@@ -1,9 +1,10 @@
-version: '3.3'
+version: '3.8'
 services:
     app:
         build:
             context: .
             dockerfile: Dockerfile
+            network: host
         restart: unless-stopped
         env_file:
             - .env
