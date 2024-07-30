@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ProfileRole } from '@prisma/client';
+import { I18nService } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/@generated/nestgraphql/account/account.model';
 import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { Profile } from '@/@generated/nestgraphql/profile/profile.model';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -13,6 +16,7 @@ export class AccountService {
     private readonly prisma: PrismaService,
     private readonly crypto: CryptoService,
     private readonly configService: ConfigService,
+    private readonly i18n: I18nService<I18nTranslations>,
   ) {}
 
   public async createAccount(
@@ -71,5 +75,21 @@ export class AccountService {
         },
       },
     });
+  }
+
+  async getProfile(accountId: number): Promise<Profile> {
+    const profile = await this.prisma.account
+      .findUnique({
+        where: {
+          id: accountId,
+        },
+      })
+      .profile();
+
+    if (!profile) {
+      throw new Error(this.i18n.t('errors.profileNotFound'));
+    }
+
+    return profile;
   }
 }

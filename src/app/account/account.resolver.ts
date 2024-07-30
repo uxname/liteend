@@ -9,7 +9,6 @@ import { AccountService } from '@/app/account/account.service';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { ProfileService } from '@/app/profile/profile.service';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 @Resolver(() => Account)
@@ -17,7 +16,6 @@ export class AccountResolver {
   constructor(
     private readonly accountSessionService: AccountSessionService,
     private readonly accountService: AccountService,
-    private readonly profileService: ProfileService,
   ) {}
 
   @Query(() => Account, { name: 'whoami' })
@@ -51,6 +49,6 @@ export class AccountResolver {
     if (context.account?.id !== account.id) {
       throw new Error(i18n.t('errors.unauthorized'));
     }
-    return this.profileService.getProfile(account.id);
+    return this.accountService.getProfile(account.id);
   }
 }

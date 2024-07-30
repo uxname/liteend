@@ -16,22 +16,6 @@ export class ProfileService {
     private readonly accountGateway: AccountGateway,
   ) {}
 
-  async getProfile(accountId: number): Promise<Profile> {
-    const profile = await this.prismaService.account
-      .findUnique({
-        where: {
-          id: accountId,
-        },
-      })
-      .profile();
-
-    if (!profile) {
-      throw new Error(this.i18n.t('errors.profileNotFound'));
-    }
-
-    return profile;
-  }
-
   async updateProfile(
     profileId: number,
     input: ProfileUpdateInput,
