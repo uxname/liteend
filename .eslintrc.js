@@ -25,7 +25,6 @@ module.exports = {
 
     'plugin:eslint-comments/recommended',
 
-    'plugin:@typescript-eslint/recommended',
     'plugin:promise/recommended',
 
     'plugin:unicorn/recommended',
@@ -34,7 +33,7 @@ module.exports = {
     'plugin:jest/recommended',
     'plugin:jest/style',
 
-    "plugin:@typescript-eslint/recommended"
+    'plugin:@typescript-eslint/recommended',
   ],
   root: true,
   env: {
