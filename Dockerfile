@@ -1,4 +1,4 @@
-FROM node:18-alpine3.17
+FROM node:lts-alpine
 RUN apk add python3 git && rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY package*.json ./
