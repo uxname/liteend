@@ -19,7 +19,7 @@ services:
             retries: 3
 
     redis:
-      image: redis:7.0.9-alpine3.17
+      image: redis:7.4-alpine
       restart: unless-stopped
       ports:
         - ${REDIS_PORT}:${REDIS_PORT}
@@ -36,7 +36,7 @@ services:
           - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
 
     db:
-        image: postgres:15-alpine3.17
+        image: postgres:16-alpine
         environment:
           - POSTGRES_USER=${DATABASE_USER}
           - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
