@@ -8,8 +8,8 @@
   "scripts": {
     "________________ BUILD AND RUN ________________": "",
     "save-commit-info": "npx ts-node src/common/git-commit-saver.ts",
-    "prebuild": "rimraf dist && npm run lint && npm run save-commit-info",
-    "build": "nest build",
+    "build": "rimraf dist && npm run save-commit-info && npx run-p lint build:nest",
+    "build:nest": "nest build",
     "start:dev": "npx cross-env NODE_ENV=development nest start --watch",
     "start:debug": "npx cross-env NODE_ENV=development nest start --debug --watch",
     "prestart:prod": "npm run db:migrations:apply",
