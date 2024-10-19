@@ -32,7 +32,7 @@
     "db:migrations:apply": "npx prisma migrate deploy && npm run db:gen",
     "db:migrations:create": "npx prisma migrate dev --create-only",
     "db:schema:format": "npx prisma format",
-    "db:gen": "npx rimraf src/@generated/nestgraphql && npx prisma generate",
+    "db:gen": "npx rimraf src/@generated/nestgraphql && npx prisma generate --no-hints",
     "db:studio": "npx prisma studio --browser none",
     "db:studio-local": "npm run db:studio -- -n 127.0.0.1",
     "db:seed": "ts-node src/seed.ts",
