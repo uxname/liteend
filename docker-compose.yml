@@ -35,7 +35,7 @@ services:
           - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
 
     db:
-        image: postgres:17-alpine
+        image: postgres:16-alpine
         environment:
           - POSTGRES_USER=${DATABASE_USER}
           - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
