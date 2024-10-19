@@ -20,7 +20,7 @@ import { NextFunction, Request, Response } from 'express';
         const password = process.env.BULL_BOARD_PASSWORD;
 
         const b64auth =
-          (request.headers.authorization || '').split(' ')[1] || '';
+          (request.headers.authorization ?? '').split(' ')[1] ?? '';
         const [loginBase64, passwordBase64] = Buffer.from(b64auth, 'base64')
           .toString()
           .split(':');

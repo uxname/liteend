@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
     const PREFIX = 'Basic ';
     const authHeader = request.headers.authorization;
-    if (!authHeader || !authHeader.startsWith(PREFIX)) {
+    if (!authHeader?.startsWith(PREFIX)) {
       response.setHeader(
         'WWW-Authenticate',
         'Basic realm="Authorization required"',

@@ -15,6 +15,7 @@ export class PrismaStudioService {
 
   async startStudio(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      // eslint-disable-next-line sonarjs/no-os-command-from-path
       exec('npm run db:studio-local', (error, stdout, stderr) => {
         if (error) {
           this.logger.error('Command execution error:', error);

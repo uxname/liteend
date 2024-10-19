@@ -20,7 +20,7 @@ module.exports = {
     '@jetbrains',
     '@jetbrains/eslint-config/node',
 
-    'plugin:sonarjs/recommended',
+    'plugin:sonarjs/recommended-legacy',
     'plugin:security/recommended-legacy',
 
     'plugin:eslint-comments/recommended',
@@ -79,6 +79,8 @@ module.exports = {
     'no-use-before-define': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
-    "@typescript-eslint/explicit-function-return-type": "error"
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "eslint-comments/disable-enable-pair": "off",
+    "sonarjs/todo-tag": "off"
   },
 };

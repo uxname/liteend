@@ -1,3 +1,5 @@
+import * as crypto from 'node:crypto';
+
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
@@ -22,7 +24,7 @@ export class OneTimeCodeService {
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
     // Random 6 numbers
     // eslint-disable-next-line no-magic-numbers
-    const code = Math.floor(100_000 + Math.random() * 900_000).toString();
+    const code = crypto.randomInt(100_000, 999_999).toString();
 
     const otc = await this.prismaService.oneTimeCode.upsert({
       where: { email },

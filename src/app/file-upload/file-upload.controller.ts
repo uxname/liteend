@@ -1,5 +1,5 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable security/detect-non-literal-fs-filename,unicorn/no-null,no-magic-numbers */
+import * as crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as process from 'node:process';
@@ -32,6 +32,8 @@ import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
+// Disable because limits are added to UseInterceptors in code below
+// eslint-disable-next-line sonarjs/content-length
 const storage = diskStorage({
   destination: (request, file, callback) => {
     const uploadDate = new Date();
@@ -163,7 +165,7 @@ export class FileUploadController {
     const fullFilePath = path.join(UPLOAD_DIR, filePath);
     if (!fs.existsSync(fullFilePath)) {
       // return empty response with delay for preventing information disclosure
-      const randomDelay = Math.floor(Math.random() * 1500) + 500;
+      const randomDelay = crypto.randomInt(500, 1500);
       await new Promise((resolve) => setTimeout(resolve, randomDelay));
       response.status(204).end();
       return;

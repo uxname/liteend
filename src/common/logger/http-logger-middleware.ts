@@ -11,14 +11,23 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private readonly logger: Logger = new Logger(HttpLoggerMiddleware.name);
 
   minifyGraphqlQuery(query: string): string {
-    const commentRegex = /#[^\n\r]*(\r?\n|$)/g;
-    const whitespaceRegex = /\s+/g;
-    const queryWithoutComments = query.replaceAll(commentRegex, '');
-    const queryWithoutParameters = queryWithoutComments.replaceAll(
-      /\([\S\s]*?\)/g,
-      '',
-    );
-    return queryWithoutParameters.replaceAll(whitespaceRegex, ' ');
+    const lines = query.split('\n');
+    const minifiedLines = lines.map((line) => {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith('#')) return '';
+      const parametersStart = trimmedLine.indexOf('(');
+      if (parametersStart !== -1) {
+        const parametersEnd = trimmedLine.indexOf(')');
+        if (parametersEnd !== -1) {
+          return (
+            trimmedLine.slice(0, Math.max(0, parametersStart)) +
+            trimmedLine.slice(Math.max(0, parametersEnd + 1))
+          );
+        }
+      }
+      return trimmedLine;
+    });
+    return minifiedLines.join(' ').replaceAll(/\s+/g, ' ');
   }
 
   use(request: Request, response: Response, next: NextFunction): void {

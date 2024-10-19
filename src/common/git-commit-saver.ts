@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-os-command-from-path */
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

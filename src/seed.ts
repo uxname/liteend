@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-magic-numbers,unicorn/prefer-top-level-await,promise/catch-or-return */
 import * as readline from 'node:readline';
 
@@ -41,6 +40,7 @@ async function main(): Promise<void> {
   const EXPIRES_AT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const salt = process.env.SALT as string;
+  // eslint-disable-next-line sonarjs/no-hardcoded-credentials
   const password = '123';
 
   const newPasswordHash = await crypto.hash(password, salt);
@@ -134,4 +134,6 @@ async function main(): Promise<void> {
 
 main()
   .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .finally(() => {
+    prisma.$disconnect();
+  });
