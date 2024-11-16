@@ -12,59 +12,64 @@ services:
         ports:
             - ${PORT}:${PORT}
         healthcheck:
-            test: ["CMD-SHELL", "/app/healthcheck.sh"]
+            test: [ "CMD-SHELL", "/app/healthcheck.sh" ]
             interval: 2s
             timeout: 10s
             retries: 3
 
     redis:
-      image: redis:7.4-alpine
-      restart: unless-stopped
-      ports:
-        - ${REDIS_PORT}:${REDIS_PORT}
-      command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
-      volumes:
-        - ./data/redis:/data
+        image: redis:7.4-alpine
+        restart: unless-stopped
+        ports:
+            - ${REDIS_PORT}:${REDIS_PORT}
+        command: >
+            redis-server --save 20 1 --loglevel warning
+            --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
+        volumes:
+            - ./data/redis:/data
+
     redis_admin:
         image: rediscommander/redis-commander:latest
         restart: unless-stopped
         ports:
-          - ${REDIS_ADMIN_PORT}:8081
+            - ${REDIS_ADMIN_PORT}:8081
         environment:
-          - HTTP_USER=${REDIS_ADMIN_USER}
-          - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
+            HTTP_USER: ${REDIS_ADMIN_USER}
+            HTTP_PASSWORD: ${REDIS_ADMIN_PASSWORD}
 
     db:
         image: postgres:17-alpine
-        environment:
-          - POSTGRES_USER=${DATABASE_USER}
-          - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-          - POSTGRES_DB=${DATABASE_NAME}
-          - PGDATA="/data/postgres"
         restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${DATABASE_USER}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+            POSTGRES_DB: ${DATABASE_NAME}
+            PGDATA: "/data/postgres"
         ports:
             - 127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}
         volumes:
             - ./data/postgres:/data/postgres
         command: -p ${DATABASE_PORT}
+
     db_admin:
         image: dpage/pgadmin4:latest
         restart: unless-stopped
         environment:
-            - PGADMIN_DEFAULT_EMAIL=${DB_ADMIN_EMAIL}
-            - PGADMIN_DEFAULT_PASSWORD=${DB_ADMIN_PASSWORD}
+            PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_PASSWORD}
         ports:
             - ${DB_ADMIN_PORT}:80
+
     db_backup:
-      image: dashasmyr/db-guard:latest
-      restart: unless-stopped
-      environment:
-          - HOST=db
-          - PORT=${DATABASE_PORT}
-          - USER=${DATABASE_USER}
-          - PASSWORD=${DATABASE_PASSWORD}
-          - DATABASE=${DATABASE_NAME}
-          - MAX_BACKUP_COUNT=42 # keep one week
-          - INTERVAL_SECONDS=14400 # every 4 hours
-      volumes:
-        - ./data/db_backups:/app/backups:rw
+        image: dashasmyr/db-guard:latest
+        restart: unless-stopped
+        environment:
+            HOST: db
+            PORT: ${DATABASE_PORT}
+            USER: ${DATABASE_USER}
+            PASSWORD: ${DATABASE_PASSWORD}
+            DATABASE: ${DATABASE_NAME}
+            MAX_BACKUP_COUNT: 42 # Keep one week's worth of backups
+            INTERVAL_SECONDS: 14400 # Perform backups every 4 hours
+        volumes:
+            - ./data/db_backups:/app/backups:rw

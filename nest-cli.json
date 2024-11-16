@@ -5,7 +5,10 @@
   "compilerOptions": {
     "assets": [
       "**/schema.prisma",
-      { "include": "i18n/**/*", "watchAssets": true }
+      {
+        "include": "i18n/**/*",
+        "watchAssets": true
+      }
     ]
   }
 }
