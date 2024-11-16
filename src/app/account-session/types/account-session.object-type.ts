@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-import { Account } from '@/app/account/types';
+import { Account } from '@/app/account/types/account.object-type';
 
 @ObjectType()
 export class AccountSession {

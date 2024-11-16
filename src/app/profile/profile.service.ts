@@ -3,8 +3,9 @@ import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { AccountGateway } from '@/app/account/account.gateway';
-import { Account } from '@/app/account/types';
-import { Profile, ProfileUpdateInput } from '@/app/profile/types';
+import { Account } from '@/app/account/types/account.object-type';
+import { Profile } from '@/app/profile/types/profile.object-type';
+import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()

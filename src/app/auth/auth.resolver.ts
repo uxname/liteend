@@ -4,26 +4,22 @@ import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { AccountService } from '@/app/account/account.service';
-import {
-  Account,
-  AccountStatus,
-  AuthResponse,
-  GenerateEmailCodeResponse,
-} from '@/app/account/types';
+import { Account } from '@/app/account/types/account.object-type';
+import { AccountStatus } from '@/app/account/types/account-status.enum';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AuthService } from '@/app/auth/auth.service';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RolesGuard } from '@/app/auth/roles-guard/roles.guard';
-import {
-  ActivateAccountInput,
-  EmailPasswordInput,
-  GenerateEmailCodeInput,
-  ResetPasswordInput,
-} from '@/app/auth/types';
+import { ActivateAccountInput } from '@/app/auth/types/activate-account.input';
+import { AuthResponse } from '@/app/auth/types/auth-response.object-type';
+import { EmailPasswordInput } from '@/app/auth/types/email-password.input';
+import { GenerateEmailCodeInput } from '@/app/auth/types/generate-email-code.input';
+import { GenerateEmailCodeResponse } from '@/app/auth/types/generate-email-code-response.object-type';
+import { ResetPasswordInput } from '@/app/auth/types/reset-password.input';
 import { EmailService } from '@/app/email/email.service';
 import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
-import { ProfileRole } from '@/app/profile/types';
+import { ProfileRole } from '@/app/profile/types/profile-role.enum';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 import {
   CryptoService,

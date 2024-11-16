@@ -3,12 +3,12 @@ import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { AccountService } from '@/app/account/account.service';
-import { Account } from '@/app/account/types';
+import { Account } from '@/app/account/types/account.object-type';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
-import { AccountSession } from '@/app/account-session/types';
+import { AccountSession } from '@/app/account-session/types/account-session.object-type';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { Profile } from '@/app/profile/types';
+import { Profile } from '@/app/profile/types/profile.object-type';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 @Resolver(() => Account)

@@ -10,7 +10,7 @@ import { I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { ProfileRole } from '@/app/profile/types';
+import { ProfileRole } from '@/app/profile/types/profile-role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

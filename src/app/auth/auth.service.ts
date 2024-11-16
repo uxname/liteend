@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account } from '@/app/account/types';
+import { Account } from '@/app/account/types/account.object-type';
 import { TotpService } from '@/app/auth/totp/totp.service';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';

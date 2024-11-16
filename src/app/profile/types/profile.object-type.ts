@@ -1,19 +1,7 @@
-import {
-  Field,
-  InputType,
-  Int,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-import { AccountStatus } from '@/app/account/types';
-
-export enum ProfileRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
-
-registerEnumType(ProfileRole, { name: 'ProfileRole', description: undefined });
+import { AccountStatus } from '@/app/account/types/account-status.enum';
+import { ProfileRole } from '@/app/profile/types/profile-role.enum';
 
 @ObjectType()
 export class Profile {
@@ -43,22 +31,4 @@ export class Profile {
 
   @Field(() => Boolean, { nullable: false, defaultValue: false })
   totpEnabled!: boolean;
-}
-
-@InputType()
-export class ProfileUpdateInput {
-  @Field(() => String, { nullable: true })
-  avatarUrl?: string;
-
-  @Field(() => String, { nullable: true })
-  name?: string;
-
-  @Field(() => String, { nullable: true })
-  bio?: string;
-
-  @Field(() => Boolean, { nullable: true })
-  totpEnabled?: boolean;
-
-  @Field(() => String, { nullable: true })
-  totpSecret?: string;
 }

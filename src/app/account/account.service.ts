@@ -4,8 +4,9 @@ import { ProfileRole } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account, AccountStatus } from '@/app/account/types';
-import { Profile } from '@/app/profile/types';
+import { Account } from '@/app/account/types/account.object-type';
+import { AccountStatus } from '@/app/account/types/account-status.enum';
+import { Profile } from '@/app/profile/types/profile.object-type';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
