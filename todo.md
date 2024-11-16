@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] Remove 'preview-email' from the package.json
 - [ ] Make run db and redis as non-root user
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio and /board
