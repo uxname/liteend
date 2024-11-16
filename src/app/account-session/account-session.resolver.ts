@@ -18,8 +18,7 @@ export class AccountSessionResolver {
   currentSession(
     @RequestContextDecorator() context: RequestContext,
   ): AccountSession {
-    // Should be because AuthGuard is used
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // Since AuthGuard ensures the context.accountSession exists, non-null assertion is safe here
     return context.accountSession!;
   }
 
@@ -27,6 +26,6 @@ export class AccountSessionResolver {
   @ResolveField(() => Account)
   @UseGuards(AuthGuard)
   async account(@Parent() accountSession: AccountSession): Promise<Account> {
-    return this.accountSessionService.getAccount(accountSession);
+    return this.accountSessionService.getAccount(accountSession.id);
   }
 }

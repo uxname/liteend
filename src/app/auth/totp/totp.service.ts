@@ -6,6 +6,7 @@ export class TotpService {
   generateSecret(): string {
     return authenticator.generateSecret();
   }
+
   generateToken(secret: string): string {
     return authenticator.generate(secret);
   }

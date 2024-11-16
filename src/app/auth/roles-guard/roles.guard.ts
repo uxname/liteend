@@ -17,6 +17,7 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly allowedRoles: ProfileRole[]) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Allow WebSocket connections without further checks
     if (context.getType() === 'ws') {
       return true;
     }
@@ -27,43 +28,45 @@ export class RolesGuard implements CanActivate {
       throw new HttpException('i18n not initialized', HttpStatus.FORBIDDEN);
     }
 
+    // Extract GraphQL context and RequestContext
     const gqlContext = GqlExecutionContext.create(context);
-    const requestContext: RequestContext =
+    const requestContext: RequestContext | undefined =
       gqlContext.getContext().req.requestContext;
-    if (requestContext.profile) {
-      const profileRoles = requestContext.profile.roles as
-        | ProfileRole[]
-        | undefined;
-      if (profileRoles) {
-        const hasRole = this.allowedRoles.some((role) =>
-          profileRoles?.includes(role),
-        );
-        if (hasRole) {
-          return true;
-        } else {
-          const profileRolesString = profileRoles.join(', ');
-          const allowedRolesString = this.allowedRoles.join(', ');
-          throw new HttpException(
-            i18n.t('errors.accountHasNoRole', {
-              args: {
-                accountRoles: profileRolesString,
-                allowedRoles: allowedRolesString,
-              },
-            }),
-            HttpStatus.UNAUTHORIZED,
-          );
-        }
-      } else {
-        throw new HttpException(
-          i18n.t('errors.unauthorized'),
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-    } else {
+
+    if (!requestContext?.profile) {
       throw new HttpException(
         i18n.t('errors.unauthorized'),
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    const profileRoles = requestContext.profile.roles as
+      | ProfileRole[]
+      | undefined;
+    if (!profileRoles) {
+      throw new HttpException(
+        i18n.t('errors.unauthorized'),
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const hasRole = this.allowedRoles.some((role) =>
+      profileRoles.includes(role),
+    );
+    if (hasRole) {
+      return true;
+    }
+
+    const profileRolesString = profileRoles.join(', ');
+    const allowedRolesString = this.allowedRoles.join(', ');
+    throw new HttpException(
+      i18n.t('errors.accountHasNoRole', {
+        args: {
+          accountRoles: profileRolesString,
+          allowedRoles: allowedRolesString,
+        },
+      }),
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 }

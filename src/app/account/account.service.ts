@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProfileRole } from '@prisma/client';
+import { Account, AccountStatus, Profile, ProfileRole } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account } from '@/app/account/types/account.object-type';
-import { AccountStatus } from '@/app/account/types/account-status.enum';
-import { Profile } from '@/app/profile/types/profile.object-type';
 import { CryptoService } from '@/common/crypto/crypto.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -26,6 +23,7 @@ export class AccountService {
   ): Promise<Account> {
     const salt = this.configService.getOrThrow<string>('SALT');
     const passwordHash = await this.crypto.hash(password, salt);
+
     return this.prisma.account.create({
       data: {
         email,
@@ -42,36 +40,26 @@ export class AccountService {
 
   async getAccountByEmail(email: string): Promise<Account | null> {
     return this.prisma.account.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
   }
 
   async changePassword(email: string, newPassword: string): Promise<Account> {
     const salt = this.configService.getOrThrow<string>('SALT');
-
     const newPasswordHash = await this.crypto.hash(newPassword, salt);
+
     return this.prisma.account.update({
-      where: {
-        email,
-      },
-      data: {
-        passwordHash: newPasswordHash,
-      },
+      where: { email },
+      data: { passwordHash: newPasswordHash },
     });
   }
 
   async changeStatus(email: string, status: AccountStatus): Promise<Account> {
     return this.prisma.account.update({
-      where: {
-        email,
-      },
+      where: { email },
       data: {
         profile: {
-          update: {
-            status,
-          },
+          update: { status },
         },
       },
     });
@@ -79,11 +67,7 @@ export class AccountService {
 
   async getProfile(accountId: number): Promise<Profile> {
     const profile = await this.prisma.account
-      .findUnique({
-        where: {
-          id: accountId,
-        },
-      })
+      .findUnique({ where: { id: accountId } })
       .profile();
 
     if (!profile) {

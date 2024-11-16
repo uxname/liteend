@@ -19,25 +19,32 @@ export class AuthGuard implements CanActivate {
     if (!i18n) {
       throw new HttpException('i18n not initialized', HttpStatus.FORBIDDEN);
     }
+
+    // Allow WebSocket connections without further checks
     if (context.getType() === 'ws') {
       return true;
     }
+
+    // Extract GraphQL context and RequestContext
     const gqlContext = GqlExecutionContext.create(context);
-    const requestContext: RequestContext =
+    const requestContext: RequestContext | undefined =
       gqlContext.getContext().req.requestContext;
-    if (requestContext.profile) {
-      if (requestContext.profile.status !== AccountStatus.ACTIVE) {
-        throw new HttpException(
-          i18n.t('errors.accountSuspended'),
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-      return true;
-    } else {
+
+    if (!requestContext?.profile) {
       throw new HttpException(
         i18n.t('errors.unauthorized'),
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    // Check if the user's account status is active
+    if (requestContext.profile.status !== AccountStatus.ACTIVE) {
+      throw new HttpException(
+        i18n.t('errors.accountSuspended'),
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return true;
   }
 }

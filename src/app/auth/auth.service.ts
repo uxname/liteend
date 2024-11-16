@@ -23,25 +23,24 @@ export class AuthService {
     password: string,
   ): Promise<Account> {
     const account = await this.prisma.account.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
-    if (account) {
-      const salt = this.configService.getOrThrow<string>('SALT');
-      const isPasswordValid = await this.cryptoService.hashVerify(
-        password,
-        salt,
-        account.passwordHash,
-      );
 
-      if (isPasswordValid) {
-        return account;
-      } else {
-        throw new Error(this.i18n.t('errors.invalidPassword'));
-      }
-    } else {
+    if (!account) {
       throw new Error(this.i18n.t('errors.accountNotFound'));
+    }
+
+    const salt = this.configService.getOrThrow<string>('SALT');
+    const isPasswordValid = await this.cryptoService.hashVerify(
+      password,
+      salt,
+      account.passwordHash,
+    );
+
+    if (isPasswordValid) {
+      return account;
+    } else {
+      throw new Error(this.i18n.t('errors.invalidPassword'));
     }
   }
 
@@ -52,43 +51,36 @@ export class AuthService {
     const profile = await this.prisma.profile.findUnique({
       where: { id: profileId },
     });
-    if (profile) {
-      if (profile.totpEnabled) {
-        if (!token) {
-          // eslint-disable-next-line sonarjs/no-duplicate-string
-          throw new Error(this.i18n.t('errors.invalidToken'));
-        }
 
-        if (!profile.totpSecret) {
-          throw new Error(this.i18n.t('errors.totpTokenNotSet'));
-        }
-
-        const isTokenValid = this.totpService.verifyToken(
-          profile.totpSecret,
-          token,
-        );
-
-        if (!isTokenValid) {
-          throw new Error(this.i18n.t('errors.invalidToken'));
-        }
-
-        const secret = this.totpService.generateSecret();
-        await this.prisma.profile.update({
-          where: { id: profileId },
-          data: { totpSecret: secret },
-        });
-        return secret;
-      } else {
-        const secret = this.totpService.generateSecret();
-        await this.prisma.profile.update({
-          where: { id: profileId },
-          data: { totpSecret: secret },
-        });
-        return secret;
-      }
-    } else {
+    if (!profile) {
       throw new Error(this.i18n.t('errors.profileNotFound'));
     }
+
+    if (profile.totpEnabled) {
+      if (!token) {
+        throw new Error(this.i18n.t('errors.invalidToken'));
+      }
+
+      if (!profile.totpSecret) {
+        throw new Error(this.i18n.t('errors.totpTokenNotSet'));
+      }
+
+      const isTokenValid = this.totpService.verifyToken(
+        profile.totpSecret,
+        token,
+      );
+      if (!isTokenValid) {
+        throw new Error(this.i18n.t('errors.invalidToken'));
+      }
+    }
+
+    const secret = this.totpService.generateSecret();
+    await this.prisma.profile.update({
+      where: { id: profileId },
+      data: { totpSecret: secret },
+    });
+
+    return secret;
   }
 
   async changeTotpEnabled(
@@ -99,25 +91,28 @@ export class AuthService {
     const profile = await this.prisma.profile.findUnique({
       where: { id: profileId },
     });
-    if (profile) {
-      if (!profile.totpSecret) {
-        throw new Error(this.i18n.t('errors.totpTokenNotSet'));
-      }
-      const isTokenValid = this.totpService.verifyToken(
-        profile.totpSecret,
-        token,
-      );
-      if (isTokenValid) {
-        await this.prisma.profile.update({
-          where: { id: profileId },
-          data: { totpEnabled: enabled },
-        });
-        return true;
-      } else {
-        throw new Error(this.i18n.t('errors.invalidToken'));
-      }
-    } else {
+
+    if (!profile) {
       throw new Error(this.i18n.t('errors.profileNotFound'));
     }
+
+    if (!profile.totpSecret) {
+      throw new Error(this.i18n.t('errors.totpTokenNotSet'));
+    }
+
+    const isTokenValid = this.totpService.verifyToken(
+      profile.totpSecret,
+      token,
+    );
+    if (!isTokenValid) {
+      throw new Error(this.i18n.t('errors.invalidToken'));
+    }
+
+    await this.prisma.profile.update({
+      where: { id: profileId },
+      data: { totpEnabled: enabled },
+    });
+
+    return true;
   }
 }

@@ -1,4 +1,5 @@
 import * as crypto from 'node:crypto';
+import { promisify } from 'node:util';
 
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -9,9 +10,14 @@ export enum RandomStringPrefix {
 
 @Injectable()
 export class CryptoService {
+  private readonly SALT_ROUNDS: number;
+
+  constructor() {
+    this.SALT_ROUNDS = 11;
+  }
+
   public async hash(data: string, salt: string): Promise<string> {
-    const SALT_ROUNDS = 11;
-    return bcrypt.hash(data + salt, SALT_ROUNDS);
+    return bcrypt.hash(data + salt, this.SALT_ROUNDS);
   }
 
   public async hashVerify(
@@ -29,18 +35,14 @@ export class CryptoService {
     lengthIncludePrefix = true,
   ): Promise<string> {
     const BYTES_PER_CHAR = 2;
-    const lengthInBytes = length / BYTES_PER_CHAR;
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(lengthInBytes, (error, buffer) => {
-        if (error) {
-          reject(error);
-        } else if (lengthIncludePrefix) {
-          const result = prefix + buffer.toString('hex');
-          resolve(result.slice(0, length));
-        } else {
-          resolve(prefix + buffer.toString('hex'));
-        }
-      });
-    });
+    const lengthInBytes = Math.ceil(length / BYTES_PER_CHAR); // Ensure we get enough bytes for the string length
+    const randomBytes = promisify(crypto.randomBytes);
+
+    const buffer = await randomBytes(lengthInBytes);
+    const randomString = buffer.toString('hex');
+
+    // Calculate the correct string length considering the prefix
+    const result = prefix + randomString;
+    return lengthIncludePrefix ? result.slice(0, length) : result;
   }
 }

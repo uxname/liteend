@@ -40,10 +40,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponse)
   async register(
-    @Args('data', {
-      type: () => EmailPasswordInput,
-    })
-    data: EmailPasswordInput,
+    @Args('data', { type: () => EmailPasswordInput }) data: EmailPasswordInput,
     @Context() context: RequestContext,
     @RealIp() ip: string,
   ): Promise<AuthResponse> {
@@ -59,21 +56,14 @@ export class AuthResolver {
       account.id,
       token,
       ip,
-      // eslint-disable-next-line sonarjs/no-duplicate-string
       context.req.headers['user-agent'],
     );
-    return {
-      token,
-      account,
-    };
+    return { token, account };
   }
 
   @Mutation(() => AuthResponse)
   async login(
-    @Args('data', {
-      type: () => EmailPasswordInput,
-    })
-    data: EmailPasswordInput,
+    @Args('data', { type: () => EmailPasswordInput }) data: EmailPasswordInput,
     @Context() context: RequestContext,
     @RealIp() ip: string,
     @Args('totpToken', { nullable: true }) totpToken?: string,
@@ -85,7 +75,6 @@ export class AuthResolver {
     const token = await this.cryptoService.generateRandomString(
       RandomStringPrefix.ACCESS_TOKEN,
     );
-
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
@@ -93,10 +82,7 @@ export class AuthResolver {
       context.req.headers['user-agent'],
       totpToken,
     );
-    return {
-      token,
-      account,
-    };
+    return { token, account };
   }
 
   @UseGuards(new RolesGuard([ProfileRole.ADMIN]))
@@ -111,36 +97,26 @@ export class AuthResolver {
     if (!account) {
       throw new Error(i18n.t('errors.accountNotFound'));
     }
-
     const token = await this.cryptoService.generateRandomString(
       RandomStringPrefix.ACCESS_TOKEN,
     );
-
     await this.accountSessionService.createAccountSession(
       account.id,
       token,
       ip,
       context.req.headers['user-agent'],
     );
-    return {
-      token,
-      account,
-    };
+    return { token, account };
   }
 
   @Mutation(() => Boolean)
   @UseGuards(new AuthGuard())
   async logout(
-    @Args('sessionIds', {
-      type: () => [Number],
-    })
-    sessionIds: number[],
+    @Args('sessionIds', { type: () => [Number] }) sessionIds: number[],
     @RequestContextDecorator() context: RequestContext,
   ): Promise<boolean> {
-    return await this.accountSessionService.deleteSessions(
-      // Should be because AuthGuard is used
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      context.account!,
+    return this.accountSessionService.deleteSessions(
+      context.account!.id,
       sessionIds,
     );
   }
@@ -154,19 +130,13 @@ export class AuthResolver {
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isOldPasswordValid = await this.authService.validateAccountPassword(
-      // Should be because AuthGuard is used
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       context.account!.email,
       password,
     );
-
     if (!isOldPasswordValid) {
       throw new Error(i18n.t('errors.invalidPassword'));
     }
-
-    return await this.accountService.changePassword(
-      // Should be because AuthGuard is used
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.accountService.changePassword(
       context.account!.email,
       newPassword,
     );
@@ -184,12 +154,8 @@ export class AuthResolver {
       'Activation code',
       `Your activation code is: ${result.code}`,
     );
-
     if (sendEmailResult) {
-      return {
-        result: true,
-        expiresAt: result.expiresAt,
-      };
+      return { result: true, expiresAt: result.expiresAt };
     } else {
       throw new Error(i18n.t('errors.emailNotSent'));
     }
@@ -207,20 +173,15 @@ export class AuthResolver {
     );
     if (isCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(data.email);
-      return await this.accountService.changeStatus(
-        data.email,
-        AccountStatus.ACTIVE,
-      );
+      return this.accountService.changeStatus(data.email, AccountStatus.ACTIVE);
     } else {
-      // eslint-disable-next-line sonarjs/no-duplicate-string
       throw new Error(i18n.t('errors.invalidCode'));
     }
   }
 
   @Mutation(() => Account)
   async resetPassword(
-    @Args('data', { type: () => ResetPasswordInput })
-    data: ResetPasswordInput,
+    @Args('data', { type: () => ResetPasswordInput }) data: ResetPasswordInput,
     @I18n() i18n: I18nContext<I18nTranslations>,
   ): Promise<Account> {
     const isOneTimeCodeValid =
@@ -228,13 +189,9 @@ export class AuthResolver {
         data.email,
         data.emailCode,
       );
-
     if (isOneTimeCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(data.email);
-      return await this.accountService.changePassword(
-        data.email,
-        data.newPassword,
-      );
+      return this.accountService.changePassword(data.email, data.newPassword);
     } else {
       throw new Error(i18n.t('errors.invalidCode'));
     }
@@ -251,7 +208,6 @@ export class AuthResolver {
       'Reset password code', // todo i18n
       `Your reset password code is: ${result.code}`, // todo i18n
     );
-
     if (sendEmailResult) {
       return true;
     } else {
@@ -268,10 +224,9 @@ export class AuthResolver {
   ): Promise<Account> {
     const isOneTimeCodeValid =
       await this.oneTimeCodeService.validateOneTimeCode(email, code);
-
     if (isOneTimeCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(email);
-      return await this.accountService.changePassword(email, newPassword);
+      return this.accountService.changePassword(email, newPassword);
     } else {
       throw new Error(i18n.t('errors.invalidCode'));
     }
@@ -287,7 +242,6 @@ export class AuthResolver {
     if (!context.profile) {
       throw new Error(i18n.t('errors.unauthorized'));
     }
-
     return this.authService.generateTotpSecret(context.profile.id, token);
   }
 

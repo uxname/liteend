@@ -21,11 +21,22 @@ export class OneTimeCodeService {
   async createOneTimeCode(email: string): Promise<OneTimeCode> {
     // 30 minutes
     // eslint-disable-next-line no-magic-numbers
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-    // Random 6 numbers
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes expiration time
+    // Random 6 digits code
     // eslint-disable-next-line no-magic-numbers
     const code = crypto.randomInt(100_000, 999_999).toString();
 
+    // Check if there's an existing active code
+    const existingCode = await this.prismaService.oneTimeCode.findUnique({
+      where: { email },
+    });
+
+    // Only update or create a new code if necessary
+    if (existingCode && existingCode.expiresAt > new Date()) {
+      return existingCode; // If an active code exists, return it without changing
+    }
+
+    // Upsert the one-time code (create or update)
     const otc = await this.prismaService.oneTimeCode.upsert({
       where: { email },
       update: { code, expiresAt },
@@ -42,20 +53,19 @@ export class OneTimeCodeService {
       where: { email },
     });
 
-    if (!oneTimeCode) {
+    if (!oneTimeCode || oneTimeCode.code !== code) {
       return false;
     }
 
-    if (oneTimeCode.code !== code) {
-      return false;
-    }
-
-    return oneTimeCode.expiresAt >= new Date();
+    // Explicitly check for expiration
+    return oneTimeCode.expiresAt.getTime() > Date.now();
   }
 
   async deleteOneTimeCode(email: string): Promise<boolean> {
-    await this.prismaService.oneTimeCode.delete({ where: { email } });
-    return true;
+    const result = await this.prismaService.oneTimeCode.delete({
+      where: { email },
+    });
+    return Boolean(result);
   }
 
   @Process()
@@ -63,16 +73,24 @@ export class OneTimeCodeService {
     job: Job<ProcessOneTimeCodeParameters>,
   ): Promise<void> {
     const { data } = job;
-    await this.prismaService.oneTimeCode.delete({
-      where: { id: data.oneTimeCodeId },
-    });
+    try {
+      await this.prismaService.oneTimeCode.delete({
+        where: { id: data.oneTimeCodeId },
+      });
+    } catch (error) {
+      // Log the error, in case the deletion fails
+      console.error(
+        `Failed to delete one-time code: ${data.oneTimeCodeId}`,
+        error,
+      );
+    }
   }
 
   async addDeleteOneTimeCodeJob(
     oneTimeCodeId: number,
     runAt: Date,
   ): Promise<Job> {
-    return await this.accountSessionQueue.add(
+    return this.accountSessionQueue.add(
       { oneTimeCodeId },
       {
         attempts: 3,
@@ -81,6 +99,7 @@ export class OneTimeCodeService {
           delay: 1000,
         },
         delay: runAt.getTime() - Date.now(),
+        timeout: 10_000, // Timeout after 10 seconds to prevent deadlocks
       },
     );
   }

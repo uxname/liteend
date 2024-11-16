@@ -16,15 +16,18 @@ import { Logger } from '@/common/logger/logger';
 @Plugin()
 export class ComplexityPlugin implements ApolloServerPlugin {
   private readonly logger = new Logger(ComplexityPlugin.name);
+
   constructor(private gqlSchemaHost: GraphQLSchemaHost) {}
 
   async requestDidStart(): Promise<GraphQLRequestListener> {
-    const MAX_COMPLEXITY = 200;
+    const MAX_COMPLEXITY = 200; // Define the max complexity
     const { schema } = this.gqlSchemaHost;
 
     const thisLogger = this.logger;
+
     return {
       async didResolveOperation({ request, document }): Promise<void> {
+        // Calculate the complexity of the query
         const complexity = getComplexity({
           schema,
           operationName: request.operationName,
@@ -35,11 +38,15 @@ export class ComplexityPlugin implements ApolloServerPlugin {
             simpleEstimator({ defaultComplexity: 1 }),
           ],
         });
+
+        // If the complexity exceeds the limit, throw an error
         if (complexity > MAX_COMPLEXITY) {
           throw new GraphQLError(
             `Query is too complex: ${complexity}. Maximum allowed complexity: ${MAX_COMPLEXITY}`,
           );
         }
+
+        // Log a warning if the complexity exceeds half of the max limit
         // eslint-disable-next-line no-magic-numbers
         if (complexity > MAX_COMPLEXITY / 2) {
           thisLogger.warn(`Query complexity: ${complexity}`);

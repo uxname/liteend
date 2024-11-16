@@ -22,65 +22,65 @@ export class AccountGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
-  server: Server;
+  private server: Server;
 
-  // account id -> clients
-  clients: Map<number, Set<Socket>> = new Map();
+  private clients: Map<number, Set<Socket>> = new Map();
   private readonly logger = new Logger(AccountGateway.name);
 
   constructor(private readonly accountSessionService: AccountSessionService) {}
 
   async handleConnection(client: Socket): Promise<void> {
-    const authorization = client.handshake.auth.authorization;
-    if (authorization) {
+    try {
+      const authorization = client.handshake.auth.authorization;
+      if (!authorization) return;
+
       const accountSession =
         await this.accountSessionService.getAccountSessionByToken(
           authorization,
         );
-      if (accountSession) {
-        const account =
-          await this.accountSessionService.getAccount(accountSession);
-        const clients = this.clients.get(account.id);
-        if (clients) {
-          clients.add(client);
-        } else {
-          this.clients.set(account.id, new Set([client]));
-        }
-      }
+      if (!accountSession) return;
+
+      const account = await this.accountSessionService.getAccount(
+        accountSession.id,
+      );
+      if (!account) return;
+
+      const clients = this.clients.get(account.id) || new Set<Socket>();
+      clients.add(client);
+      this.clients.set(account.id, clients);
+    } catch (error) {
+      this.logger.error('Error during handleConnection', error);
+      client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket): void {
-    for (const [account, clients] of this.clients.entries()) {
-      if (clients.has(client)) {
-        clients.delete(client);
-        if (clients.size === 0) {
-          this.clients.delete(account);
-        }
+    for (const [accountId, clients] of this.clients.entries()) {
+      if (clients.delete(client) && clients.size === 0) {
+        this.clients.delete(accountId);
       }
     }
   }
 
-  afterInit(server: Server): void {
+  afterInit(): void {
     this.logger.log('AccountGateway initialized');
-    this.server = server;
   }
 
-  public async sendToAccount(
+  async sendToAccount(
     accountId: number,
     event: string,
     data: unknown,
   ): Promise<void> {
     const clients = this.clients.get(accountId);
-    if (clients) {
-      for (const client of clients) {
-        client.emit(event, data);
-      }
+    if (!clients) return;
+
+    for (const client of clients) {
+      client.emit(event, data);
     }
   }
 
   @SubscribeMessage('echo')
-  async findAll(@MessageBody() text: string): Promise<WsResponse<string>> {
+  async handleEcho(@MessageBody() text: string): Promise<WsResponse<string>> {
     this.logger.log(`Echo: ${text}`);
     return { event: 'echo', data: `You said: ${text}` };
   }

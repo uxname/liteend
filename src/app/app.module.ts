@@ -70,8 +70,6 @@ import { ProfileModule } from './profile/profile.module';
     AccountModule,
     AuthModule,
     AccountSessionModule,
-    AuthModule,
-    AccountSessionModule,
     BullBoardModule,
     CryptoModule,
     DebugModule,

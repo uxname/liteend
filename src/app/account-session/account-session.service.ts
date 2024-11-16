@@ -1,11 +1,9 @@
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
-import PrismaClient from '@prisma/client';
+import { Account, AccountSession } from '@prisma/client';
 import { Job, Queue } from 'bull';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account } from '@/app/account/types/account.object-type';
-import { AccountSession } from '@/app/account-session/types/account-session.object-type';
 import { TotpService } from '@/app/auth/totp/totp.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -29,12 +27,10 @@ export class AccountSessionService {
     ipAddr: string,
     userAgent?: string,
     totpToken?: string,
-  ): Promise<PrismaClient.AccountSession> {
+  ): Promise<AccountSession> {
     const profile = await this.prisma.account
       .findUnique({
-        where: {
-          id: accountId,
-        },
+        where: { id: accountId },
       })
       .profile();
 
@@ -45,6 +41,7 @@ export class AccountSessionService {
       if (!profile.totpSecret) {
         throw new Error(this.i18n.t('errors.totpTokenNotSet'));
       }
+
       const isTokenValid = this.totpService.verifyToken(
         profile.totpSecret,
         totpToken,
@@ -56,23 +53,19 @@ export class AccountSessionService {
     }
 
     // eslint-disable-next-line no-magic-numbers
-    const expiresAtInMs = Date.now() + 1000 * 60 * 60 * 24 * 30;
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days from now
 
     const session = await this.prisma.accountSession.create({
       data: {
-        account: {
-          connect: {
-            id: accountId,
-          },
-        },
+        account: { connect: { id: accountId } },
         token,
         ipAddr,
         userAgent,
-        expiresAt: new Date(expiresAtInMs),
+        expiresAt,
       },
     });
 
-    await this.addDeleteSessionJob(session.id, new Date(expiresAtInMs));
+    await this.addDeleteSessionJob(session.id, expiresAt);
 
     return session;
   }
@@ -85,56 +78,31 @@ export class AccountSessionService {
         token,
       },
     });
-    return result || undefined;
-  }
-
-  async getAccountByToken(token: string): Promise<Account | undefined> {
-    const result = await this.prisma.accountSession.findUnique({
-      where: {
-        token,
-      },
-      select: {
-        account: true,
-      },
-    });
-
-    return result?.account;
+    return result ?? undefined;
   }
 
   async deleteSessions(
-    account: Account,
+    accountId: number,
     sessionIds: number[],
   ): Promise<boolean> {
     await this.prisma.accountSession.deleteMany({
       where: {
-        account: {
-          id: account.id,
-        },
-        id: {
-          in: sessionIds,
-        },
+        account: { id: accountId },
+        id: { in: sessionIds },
       },
     });
     return true;
   }
 
-  async getSessions(account: Account): Promise<Array<AccountSession>> {
+  async getSessions(accountId: number): Promise<AccountSession[]> {
     return this.prisma.accountSession.findMany({
-      where: {
-        account: {
-          id: account.id,
-        },
-      },
+      where: { account: { id: accountId } },
     });
   }
 
-  async getAccount(accountSession: AccountSession): Promise<Account> {
+  async getAccount(accountSessionId: number): Promise<Account> {
     const result = await this.prisma.accountSession
-      .findUnique({
-        where: {
-          id: accountSession.id,
-        },
-      })
+      .findUnique({ where: { id: accountSessionId } })
       .account();
 
     if (!result) {
@@ -148,27 +116,18 @@ export class AccountSessionService {
     job: Job<ProcessAccountSessionParameters>,
   ): Promise<void> {
     const { data } = job;
-    await this.prisma.accountSession.delete({
-      where: {
-        id: data.sessionId,
-      },
-    });
+    await this.prisma.accountSession.delete({ where: { id: data.sessionId } });
   }
 
   async addDeleteSessionJob(
     sessionId: number,
     runAt: Date,
   ): Promise<Job<ProcessAccountSessionParameters>> {
-    return await this.accountSessionQueue.add(
-      {
-        sessionId,
-      },
+    return this.accountSessionQueue.add(
+      { sessionId },
       {
         attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 1000,
-        },
+        backoff: { type: 'exponential', delay: 1000 },
         delay: runAt.getTime() - Date.now(),
       },
     );

@@ -5,23 +5,21 @@ import * as process from 'node:process';
 
 import { LoggerService } from '@nestjs/common';
 import log4js, { Logger as Log4jsLogger } from 'log4js';
+
 // eslint-disable-next-line no-magic-numbers
 const MAX_BACKUP_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
-const MAX_BACKUP_COUNT = 100; // maximum number of log files.
+const MAX_BACKUP_COUNT = 100; // Maximum number of log files.
 
 function getLogger(tag: string): Log4jsLogger {
   return log4js.getLogger(tag);
 }
 
+// Function to handle circular references in JSON
 function safeCycles(): (this: any, key: string, value: any) => any {
   const seen: Array<unknown> = [];
   return (key: unknown, value: unknown): any => {
-    if (!value || typeof value !== 'object') {
-      return value;
-    }
-    if (seen.includes(value)) {
-      return '[Circular]';
-    }
+    if (!value || typeof value !== 'object') return value;
+    if (seen.includes(value)) return '[Circular]';
     seen.push(value);
     return value;
   };
@@ -42,12 +40,10 @@ export class Logger implements LoggerService {
     const logFileWarn = path.join(logDirectory, 'warn', 'warn.log');
 
     log4js.addLayout('json', () => {
-      return (logEvent): unknown => {
-        return JSON.stringify(logEvent, safeCycles());
-      };
+      return (logEvent): unknown => JSON.stringify(logEvent, safeCycles());
     });
 
-    const FILE_APPENDER_LAYOUT_TYPE = 'basic'; // or 'json'
+    const FILE_APPENDER_LAYOUT_TYPE = 'basic'; // Can also be 'json'
 
     log4js.configure({
       appenders: {
@@ -173,7 +169,7 @@ export class Logger implements LoggerService {
       },
     });
 
-    // Add warning on using default console object
+    // Add warnings for deprecated console methods
     function addWarnings(): void {
       const log = getLogger('console');
 
@@ -193,23 +189,23 @@ export class Logger implements LoggerService {
     addWarnings();
   }
 
-  debug(message: any, ...optionalParameters: any[]): any {
+  debug(message: any, ...optionalParameters: any[]): void {
     this.logger.debug(message, ...optionalParameters);
   }
 
-  error(message: any, ...optionalParameters: any[]): any {
+  error(message: any, ...optionalParameters: any[]): void {
     this.logger.error(message, ...optionalParameters);
   }
 
-  log(message: any, ...optionalParameters: any[]): any {
+  log(message: any, ...optionalParameters: any[]): void {
     this.logger.info(message, ...optionalParameters);
   }
 
-  verbose(message: any, ...optionalParameters: any[]): any {
+  verbose(message: any, ...optionalParameters: any[]): void {
     this.logger.trace(message, ...optionalParameters);
   }
 
-  warn(message: any, ...optionalParameters: any[]): any {
+  warn(message: any, ...optionalParameters: any[]): void {
     this.logger.warn(message, ...optionalParameters);
   }
 }

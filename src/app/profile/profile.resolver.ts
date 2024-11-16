@@ -1,4 +1,5 @@
 import { UseGuards } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -25,8 +26,11 @@ export class ProfileResolver {
     @RequestContextDecorator() context: RequestContext,
     @Args('input') input: ProfileUpdateInput,
   ): Promise<Profile> {
-    // Should be because AuthGuard is used
-    return this.profileService.updateProfile(context.account!.profileId!, {
+    if (!context.account) {
+      throw new ForbiddenException('Account is not found');
+    }
+
+    return this.profileService.updateProfile(context.account.profileId!, {
       name: input.name,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
@@ -39,9 +43,17 @@ export class ProfileResolver {
     @RequestContextDecorator() context: RequestContext,
     @Parent() parent: Profile,
   ): Promise<Account[]> {
-    if (context.account!.profileId !== parent.id) {
-      throw new Error('You are not allowed to access this profile');
+    if (!context.account) {
+      throw new ForbiddenException('Account is not found');
     }
+
+    // Enhanced security check
+    if (context.account.profileId !== parent.id) {
+      throw new ForbiddenException(
+        'You are not allowed to access this profile',
+      );
+    }
+
     return this.profileService.getAccounts(parent.id);
   }
 }

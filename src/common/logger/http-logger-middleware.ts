@@ -10,50 +10,48 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private readonly jsonParser: NextHandleFunction = bodyParser.json();
   private readonly logger: Logger = new Logger(HttpLoggerMiddleware.name);
 
-  minifyGraphqlQuery(query: string): string {
-    const lines = query.split('\n');
-    const minifiedLines = lines.map((line) => {
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('#')) return '';
-      const parametersStart = trimmedLine.indexOf('(');
-      if (parametersStart !== -1) {
-        const parametersEnd = trimmedLine.indexOf(')');
-        if (parametersEnd !== -1) {
+  // Minifies GraphQL query by removing comments and unnecessary whitespace
+  private minifyGraphqlQuery(query: string): string {
+    return query
+      .split('\n')
+      .map((line) => {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('#')) return '';
+        const parametersStart = trimmedLine.indexOf('(');
+        if (parametersStart !== -1) {
+          const parametersEnd = trimmedLine.indexOf(')');
           return (
-            trimmedLine.slice(0, Math.max(0, parametersStart)) +
-            trimmedLine.slice(Math.max(0, parametersEnd + 1))
+            trimmedLine.slice(0, parametersStart) +
+            trimmedLine.slice(parametersEnd + 1)
           );
         }
-      }
-      return trimmedLine;
-    });
-    return minifiedLines.join(' ').replaceAll(/\s+/g, ' ');
+        return trimmedLine;
+      })
+      .join(' ')
+      .replaceAll(/\s+/g, ' ');
   }
 
+  // Main function to log HTTP requests and responses
   use(request: Request, response: Response, next: NextFunction): void {
-    const now = Date.now();
-    const xRealIp = request.headers['x-real-ip'];
-    const xForwardedFor = request.headers['x-forwarded-for'];
+    const startTime = Date.now();
     const requesterIp =
-      xRealIp || xForwardedFor || request.socket.remoteAddress;
+      request.headers['x-real-ip'] ||
+      request.headers['x-forwarded-for'] ||
+      request.socket.remoteAddress;
 
-    const log = (): void => {
-      const elapsedTime = Date.now() - now;
+    // Log the HTTP request after response finishes
+    const logRequest = (): void => {
+      const elapsedTime = Date.now() - startTime;
       let logMessage = `[HTTP] ${request.method} ${request.originalUrl} ${response.statusCode} ${requesterIp} [${elapsedTime}ms]`;
 
-      // Если есть GraphQL-запрос или мутация, то логируем их
-      if (
-        request.method === 'POST' &&
-        request.body &&
-        (request.body.query || request.body.mutation)
-      ) {
-        let graphqlQuery = request.body.query || request.body.mutation;
-        graphqlQuery = this.minifyGraphqlQuery(graphqlQuery);
-        // remove introspection queries from playground
-        if (graphqlQuery.includes('IntrospectionQuery')) {
-          return;
+      if (request.method === 'POST' && request.body) {
+        const graphqlQuery = request.body.query || request.body.mutation;
+        if (graphqlQuery) {
+          const minifiedQuery = this.minifyGraphqlQuery(graphqlQuery);
+          if (!minifiedQuery.includes('IntrospectionQuery')) {
+            logMessage += ` [GraphQL]: ${minifiedQuery}`;
+          }
         }
-        logMessage += ` [GraphQL]: ${graphqlQuery}`;
       }
 
       this.logger.debug(logMessage);
@@ -61,14 +59,12 @@ export class HttpLoggerMiddleware implements NestMiddleware {
 
     response.on('finish', () => {
       try {
-        log();
+        logRequest();
       } catch (error) {
         this.logger.error(error);
       }
     });
 
-    this.jsonParser(request, response, () => {
-      next();
-    });
+    this.jsonParser(request, response, () => next());
   }
 }

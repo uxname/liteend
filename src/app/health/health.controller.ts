@@ -23,15 +23,18 @@ export class HealthController {
   }
 
   @Get()
-  async getHealth(@Res() response: express.Response): Promise<unknown> {
-    const databaseOnline = await this.checkDatabase();
-    const redisOnline = await this.checkRedis();
+  async getHealth(@Res() response: express.Response): Promise<void> {
+    const [databaseOnline, redisOnline] = await Promise.all([
+      this.checkDatabase(),
+      this.checkRedis(),
+    ]);
 
     const status =
       databaseOnline && redisOnline
         ? HttpStatus.OK
         : HttpStatus.SERVICE_UNAVAILABLE;
-    return response.status(status).json({
+
+    response.status(status).json({
       status: status === HttpStatus.OK ? 'ok' : 'error',
       info: {
         serverTime: new Date().toISOString(),
@@ -41,7 +44,7 @@ export class HealthController {
     });
   }
 
-  async checkDatabase(): Promise<boolean> {
+  private async checkDatabase(): Promise<boolean> {
     try {
       await this.prisma.$executeRaw`SELECT 1`;
       return true;
@@ -51,12 +54,17 @@ export class HealthController {
     }
   }
 
-  async checkRedis(): Promise<boolean> {
-    const pong = await this.client.ping();
-    if (pong !== 'PONG') {
-      this.logger.error('Redis is offline');
+  private async checkRedis(): Promise<boolean> {
+    try {
+      const pong = await this.client.ping();
+      if (pong !== 'PONG') {
+        this.logger.error('Redis is offline');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      this.logger.error('Error pinging Redis', error);
       return false;
     }
-    return true;
   }
 }

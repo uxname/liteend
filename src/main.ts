@@ -18,20 +18,30 @@ dotenv.config();
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Global pipe setup for validation
   app.useGlobalPipes(new ValidationPipe());
+
+  // Use custom body parser for text
   app.useBodyParser('text');
+
   const configService = app.get(ConfigService);
   app.enableShutdownHooks();
 
-  const config = new DocumentBuilder()
+  // Swagger setup
+  const swaggerConfig = new DocumentBuilder()
     .setTitle(packageJson.name)
     .setDescription(`${packageJson.name} REST API documentation`)
     .setVersion(packageJson.version)
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('swagger', app, document);
 
+  // Enable CORS
   app.enableCors();
+
+  // Helmet for security headers
   app.use(
     helmet({
       crossOriginEmbedderPolicy: false,
@@ -40,15 +50,18 @@ async function bootstrap(): Promise<void> {
       contentSecurityPolicy: false,
     }),
   );
+
   const logger = new Logger('Main');
   app.useLogger(logger);
+
+  // Compression middleware setup
   app.use(
     compression({
-      level: -1, // https://github.com/expressjs/compression#level
-      threshold: 1024, // in bytes
+      level: -1, // Use default compression level
+      threshold: 1024, // Compress responses larger than 1 KB
       filter: (request, response) => {
         if (request.headers['x-no-compression']) {
-          return false;
+          return false; // Don't compress if the header is set
         }
         // eslint-disable-next-line unicorn/no-array-callback-reference,unicorn/no-array-method-this-argument
         return compression.filter(request, response);
@@ -60,9 +73,11 @@ async function bootstrap(): Promise<void> {
   if (!port) {
     throw new Error('No port specified');
   }
+
   logger.log(`App started at http://localhost:${port}`);
 
-  app.listen(port).catch(console.error);
+  // Start server
+  await app.listen(port);
 }
 
 // eslint-disable-next-line unicorn/prefer-top-level-await

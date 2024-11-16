@@ -21,8 +21,7 @@ export class AccountResolver {
   @Query(() => Account, { name: 'whoami' })
   @UseGuards(AuthGuard)
   whoami(@RequestContextDecorator() context: RequestContext): Account {
-    // Should be because AuthGuard is used
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // Since AuthGuard ensures the context.account exists, non-null assertion is safe here
     return context.account!;
   }
 
@@ -32,11 +31,11 @@ export class AccountResolver {
     @Parent() account: Account,
     @RequestContextDecorator() context: RequestContext,
     @I18n() i18n: I18nContext,
-  ): Promise<Array<AccountSession>> {
-    if (context.account?.id !== account.id) {
+  ): Promise<AccountSession[]> {
+    if (!this.isAuthorizedAccount(context, account)) {
       throw new Error(i18n.t('errors.unauthorized'));
     }
-    return this.accountSessionService.getSessions(account);
+    return this.accountSessionService.getSessions(account.id);
   }
 
   @ResolveField(() => Profile)
@@ -46,9 +45,16 @@ export class AccountResolver {
     @RequestContextDecorator() context: RequestContext,
     @I18n() i18n: I18nContext,
   ): Promise<Profile> {
-    if (context.account?.id !== account.id) {
+    if (!this.isAuthorizedAccount(context, account)) {
       throw new Error(i18n.t('errors.unauthorized'));
     }
     return this.accountService.getProfile(account.id);
+  }
+
+  private isAuthorizedAccount(
+    context: RequestContext,
+    account: Account,
+  ): boolean {
+    return context.account?.id === account.id;
   }
 }

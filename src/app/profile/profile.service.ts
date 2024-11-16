@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
@@ -20,6 +20,7 @@ export class ProfileService {
     profileId: number,
     input: ProfileUpdateInput,
   ): Promise<Profile> {
+    // Update profile and include associated accounts
     const result = await this.prismaService.profile.update({
       where: {
         id: profileId,
@@ -30,30 +31,27 @@ export class ProfileService {
       },
     });
 
-    for (const account of result.accounts) {
-      await this.accountGateway.sendToAccount(
-        account.id,
-        'profileUpdated',
-        input,
-      );
-    }
+    // Send update notifications to all accounts concurrently
+    await Promise.all(
+      result.accounts.map((account) =>
+        this.accountGateway.sendToAccount(account.id, 'profileUpdated', input),
+      ),
+    );
 
     return result;
   }
 
-  async getAccounts(profileId: number): Promise<Array<Account>> {
-    const result = await this.prismaService.profile
-      .findUnique({
-        where: {
-          id: profileId,
-        },
-      })
-      .accounts();
+  async getAccounts(profileId: number): Promise<Account[]> {
+    const profile = await this.prismaService.profile.findUnique({
+      where: { id: profileId },
+      include: { accounts: true }, // Make sure accounts are fetched
+    });
 
-    if (!result) {
-      throw new Error(this.i18n.t('errors.accountsNotFound'));
+    // Throw NotFoundException if profile or accounts are not found
+    if (!profile || profile.accounts.length === 0) {
+      throw new NotFoundException(this.i18n.t('errors.accountsNotFound'));
     }
 
-    return result;
+    return profile.accounts;
   }
 }

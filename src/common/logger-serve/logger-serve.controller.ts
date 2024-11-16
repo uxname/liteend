@@ -19,6 +19,12 @@ import { AuthGuard } from '@/common/logger-serve/auth/auth.guard';
 export class LoggerServeController {
   private readonly logsDirectory = path.join(process.cwd(), 'data', 'logs');
 
+  // Utility function to validate that the requested file is within the logs directory
+  private isValidFilePath(filePath: string): boolean {
+    const absolutePath = path.resolve(this.logsDirectory, filePath);
+    return absolutePath.startsWith(this.logsDirectory); // Prevent directory traversal
+  }
+
   @UseGuards(AuthGuard)
   @Get(':filepath(*)')
   async getFile(
@@ -26,6 +32,12 @@ export class LoggerServeController {
     @Query('invert') invert: string,
     @Res() response: Response,
   ): Promise<void> {
+    // Ensure that the file path is valid
+    if (!this.isValidFilePath(filepath)) {
+      response.status(HttpStatus.FORBIDDEN).send('Access denied');
+      return;
+    }
+
     response.set('Content-Type', 'text/plain');
     const absolutePath = path.join(this.logsDirectory, filepath);
 
@@ -51,6 +63,11 @@ export class LoggerServeController {
         fileStream.on('end', () => {
           const invertedData = data.split('\n').reverse().join('\n');
           response.send(invertedData);
+        });
+        fileStream.on('error', (error) => {
+          response
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .send(`Error reading file: ${error.message}`);
         });
       } else {
         fileStream.pipe(response);

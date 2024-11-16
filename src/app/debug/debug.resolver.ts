@@ -1,4 +1,3 @@
-import * as console from 'node:console';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -25,13 +24,13 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
 
 @Resolver(() => Query)
 export class DebugResolver {
-  private readonly logger: Logger = new Logger(DebugResolver.name);
+  private static readonly logger: Logger = new Logger(DebugResolver.name);
 
   private static readLastCommitInfo(): CommitInfo | undefined {
     try {
       return JSON.parse(readFileSync(LAST_COMMIT_INFO_FILE_PATH, 'utf8'));
     } catch (error) {
-      console.error(
+      this.logger.error(
         'Error reading last commit info. Returning empty commit info.',
         error,
       );
@@ -55,7 +54,7 @@ export class DebugResolver {
 
   @Query(() => String, { name: 'echo' })
   echo(@Args('text', { type: () => String }) text: string): string {
-    this.logger.log({ resolver: 'echo', text });
+    DebugResolver.logger.log({ resolver: 'echo', text });
     return text;
   }
 

@@ -56,12 +56,30 @@ export class EmailService {
     job: Job<ProcessEmailSendParameters>,
   ): Promise<void> {
     const { data } = job;
-    await this.mailerService.sendMail({
-      to: data.to,
-      subject: data.subject,
-      text: data.text,
-      html: data.html,
-    });
+
+    try {
+      await this.mailerService.sendMail({
+        to: data.to,
+        subject: data.subject,
+        text: data.text,
+        html: data.html,
+      });
+
+      this.logger.log({
+        jobId: job.id,
+        message: 'Email sent successfully',
+        recipient: data.to,
+      });
+    } catch (error) {
+      this.logger.error({
+        jobId: job.id,
+        error,
+        message: 'Failed to send email',
+        recipient: data.to,
+      });
+
+      throw error;
+    }
   }
 
   @OnQueueCompleted()
@@ -72,6 +90,7 @@ export class EmailService {
     this.logger.log({
       jobId: job.id,
       result,
+      message: 'Email sent successfully',
     });
   }
 
@@ -81,6 +100,7 @@ export class EmailService {
       jobId: job.id,
       attempts: job.attemptsMade,
       error,
+      message: 'Email sending failed',
     });
   }
 }
