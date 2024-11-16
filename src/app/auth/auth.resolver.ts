@@ -3,11 +3,13 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
-import { ProfileRole } from '@/@generated/nestgraphql/prisma/profile-role.enum';
 import { AccountService } from '@/app/account/account.service';
-import { AuthResponse, GenerateEmailCodeResponse } from '@/app/account/types';
+import {
+  Account,
+  AccountStatus,
+  AuthResponse,
+  GenerateEmailCodeResponse,
+} from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { AuthService } from '@/app/auth/auth.service';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
@@ -21,6 +23,7 @@ import {
 } from '@/app/auth/types';
 import { EmailService } from '@/app/email/email.service';
 import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
+import { ProfileRole } from '@/app/profile/types';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 import {
   CryptoService,

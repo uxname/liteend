@@ -1,6 +1,28 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 
-import { Account } from '@/@generated/nestgraphql/account/account.model';
+@ObjectType()
+export class Account {
+  @Field(() => Int, { nullable: false })
+  id!: number;
+
+  @Field(() => Date, { nullable: false })
+  createdAt!: Date;
+
+  @Field(() => Date, { nullable: false })
+  updatedAt!: Date;
+
+  @Field(() => String, { nullable: false })
+  email!: string;
+
+  @Field(() => Int, { nullable: true })
+  profileId!: number | null;
+}
 
 @ObjectType()
 export class AuthResponse {
@@ -24,3 +46,14 @@ export class UpdateAccountInput {
   @Field()
   avatarUrl: string;
 }
+
+export enum AccountStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
+}
+
+registerEnumType(AccountStatus, {
+  name: 'AccountStatus',
+  description: undefined,
+});

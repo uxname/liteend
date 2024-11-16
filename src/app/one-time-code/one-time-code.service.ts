@@ -3,7 +3,7 @@ import * as crypto from 'node:crypto';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
-import { OneTimeCode } from '@/@generated/nestgraphql/one-time-code/one-time-code.model';
+import { OneTimeCode } from '@/app/one-time-code/types';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 interface ProcessOneTimeCodeParameters {

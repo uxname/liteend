@@ -9,7 +9,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { AccountStatus } from '@/@generated/nestgraphql/prisma/account-status.enum';
+import { AccountStatus } from '@/app/account/types';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 
 @Injectable()

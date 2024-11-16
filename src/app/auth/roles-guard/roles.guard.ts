@@ -9,8 +9,8 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { ProfileRole } from '@/@generated/nestgraphql/prisma/profile-role.enum';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
+import { ProfileRole } from '@/app/profile/types';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

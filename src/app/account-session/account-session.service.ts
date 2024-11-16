@@ -4,8 +4,8 @@ import { Job, Queue } from 'bull';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
+import { Account } from '@/app/account/types';
+import { AccountSession } from '@/app/account-session/types';
 import { TotpService } from '@/app/auth/totp/totp.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 

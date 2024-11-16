@@ -2,13 +2,13 @@ import { UseGuards } from '@nestjs/common';
 import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { Profile } from '@/@generated/nestgraphql/profile/profile.model';
 import { AccountService } from '@/app/account/account.service';
+import { Account } from '@/app/account/types';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
+import { AccountSession } from '@/app/account-session/types';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
+import { Profile } from '@/app/profile/types';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 @Resolver(() => Account)

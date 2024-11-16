@@ -10,21 +10,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator nestgraphql {
-  provider           = "prisma-nestjs-graphql"
-  output             = "../src/@generated/nestgraphql"
-  noTypeId           = true
-  noAtomicOperations = true
-  emitCompiled       = true
-}
-
 model Account {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   email        String @unique
-  /// @HideField()
   passwordHash String
 
   sessions AccountSession[]
@@ -48,7 +39,6 @@ model Profile {
   bio       String?
 
   totpEnabled Boolean @default(false)
-  /// @HideField()
   totpSecret  String?
 }
 
@@ -95,7 +85,6 @@ model AccountSession {
   account   Account @relation(fields: [accountId], references: [id])
   accountId Int
 
-  /// @HideField()
   token String @unique
 
   ipAddr    String

@@ -7,12 +7,11 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { Profile } from '@/@generated/nestgraphql/profile/profile.model';
-import { ProfileUpdateInput } from '@/@generated/nestgraphql/profile/profile-update.input';
+import { Account } from '@/app/account/types';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { ProfileService } from '@/app/profile/profile.service';
+import { Profile, ProfileUpdateInput } from '@/app/profile/types';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 @Resolver(() => Profile)

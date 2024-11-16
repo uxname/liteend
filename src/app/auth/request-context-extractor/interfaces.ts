@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import { Account } from '@/@generated/nestgraphql/account/account.model';
-import { AccountSession } from '@/@generated/nestgraphql/account-session/account-session.model';
-import { Profile } from '@/@generated/nestgraphql/profile/profile.model';
+import { Account } from '@/app/account/types';
+import { AccountSession } from '@/app/account-session/types';
+import { Profile } from '@/app/profile/types';
 
 export class RequestContext {
   req: Request;
