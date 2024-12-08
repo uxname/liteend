@@ -204,15 +204,19 @@ export function createDigestFromError(error: unknown): string {
     if ('stack' in error) errorData.stack = error.stack;
   }
 
-  // Create a consistent string representation
-  const rawData = JSON.stringify(errorData, (_, value) =>
-    value === undefined ? undefined : value,
+  // Trim large properties (to mitigate potential DoS)
+  const MAX_ERROR_SIZE = 1024; // Limit the size of error details to 1KB
+
+  const trimmedErrorData = JSON.stringify(errorData, (_, value) =>
+    value && typeof value === 'string' && value.length > MAX_ERROR_SIZE
+      ? value.slice(0, MAX_ERROR_SIZE) // Truncate strings to limit size
+      : value,
   );
 
   // Generate the digest
   return crypto
     .createHash('sha256')
-    .update(rawData)
+    .update(trimmedErrorData)
     .digest('hex')
     .slice(0, DIGEST_LENGTH);
 }
