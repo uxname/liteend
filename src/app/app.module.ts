@@ -24,12 +24,16 @@ import { RequestContextExtractorMiddleware } from '@/app/auth/request-context-ex
 import { DebugModule } from '@/app/debug/debug.module';
 import { EmailModule } from '@/app/email/email.module';
 import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';
-import { Page404Filter } from '@/app/page-404/page-404.filter';
+import {
+  AllExceptionsFilter,
+  createDigestFromError,
+} from '@/common/all-exceptions-filter';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
+import { Logger } from '@/common/logger/logger';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
@@ -39,6 +43,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { HealthModule } from './health/health.module';
 import { ProfileModule } from './profile/profile.module';
 
+const logger = new Logger('AppModule');
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -66,6 +71,12 @@ import { ProfileModule } from './profile/profile.module';
         profile: undefined,
         accountSession: undefined,
       }),
+      formatError: (error) => {
+        const digest = createDigestFromError(error);
+        const errorWithDigest = { ...error, digest };
+        logger.error(errorWithDigest);
+        return errorWithDigest;
+      },
     }),
     AccountModule,
     AuthModule,
@@ -122,7 +133,7 @@ import { ProfileModule } from './profile/profile.module';
     ComplexityPlugin,
     {
       provide: APP_FILTER,
-      useClass: Page404Filter,
+      useClass: AllExceptionsFilter,
     },
   ],
 })
