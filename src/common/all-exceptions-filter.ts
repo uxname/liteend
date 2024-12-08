@@ -81,7 +81,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const { errorResponse, statusCode } = this.prepareErrorResponse(exception);
 
-    this.logError(exception);
+    this.logError(errorResponse);
 
     response.status(statusCode).json(errorResponse);
   }
@@ -95,7 +95,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const { errorResponse } = this.prepareErrorResponse(exception);
 
-    this.logError(exception);
+    this.logError(errorResponse);
 
     client.emit('error', errorResponse);
   }
@@ -169,11 +169,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
    * Logs errors with additional context
    */
   private logError(exception: unknown): void {
-    this.logger.error(
-      exception instanceof Error
-        ? exception.message
-        : 'An unidentified error occurred',
-    );
+    this.logger.error(exception);
   }
 
   /**
