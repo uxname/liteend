@@ -1,5 +1,5 @@
 FROM node:lts-alpine
-RUN apk add python3 git && rm -rf /var/cache/apk/*
+RUN apk add python3 git openssl && rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY package*.json ./
 RUN npm i --legacy-peer-deps
