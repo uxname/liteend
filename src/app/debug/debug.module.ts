@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { DebugResolver } from '@/app/debug/debug.resolver';
-import { PrismaModule } from '@/common/prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [],
   providers: [DebugResolver],
   exports: [DebugResolver],
 })

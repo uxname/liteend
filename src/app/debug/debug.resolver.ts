@@ -7,7 +7,6 @@ import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { Logger } from '@/common/logger/logger';
-import { PrismaService } from '@/common/prisma/prisma.service';
 
 import packageJson from '../../../package.json';
 
@@ -38,7 +37,7 @@ export class DebugResolver {
     }
   }
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor() {}
 
   @Query(() => String, { name: 'testTranslation' })
   testTranslation(

@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
@@ -11,29 +11,21 @@ import { Request, Response } from 'express';
 export class AuthGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
 
-  private sendUnauthorizedResponse(response: Response): void {
-    response.setHeader(
-      'WWW-Authenticate',
-      'Basic realm="Authorization required"',
-    );
-    response.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
-  }
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse<Response>();
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request: Request = context.switchToHttp().getRequest();
-    const response: Response = context.switchToHttp().getResponse();
-
-    const PREFIX = 'Basic ';
     const authHeader = request.headers.authorization;
-
-    if (!authHeader?.startsWith(PREFIX)) {
-      this.sendUnauthorizedResponse(response);
-      return false;
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      this.requestCredentials(response);
+      throw new UnauthorizedException('Missing Authorization header');
     }
 
-    const credentials = authHeader.slice(PREFIX.length);
-    const decoded = Buffer.from(credentials, 'base64').toString('utf8');
-    const [username, password] = decoded.split(':');
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials!, 'base64').toString(
+      'ascii',
+    );
+    const [username, password] = credentials.split(':');
 
     const expectedUsername = this.configService.getOrThrow<string>(
       'LOGS_ADMIN_PANEL_USER',
@@ -42,17 +34,18 @@ export class AuthGuard implements CanActivate {
       'LOGS_ADMIN_PANEL_PASSWORD',
     );
 
-    if (username === expectedUsername && password === expectedPassword) {
-      return true;
+    if (username !== expectedUsername || password !== expectedPassword) {
+      this.requestCredentials(response);
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Delay response to prevent brute force attempts
-    const PREVENT_BRUTE_FORCE_DELAY = 3000;
-    await new Promise((resolve) =>
-      setTimeout(resolve, PREVENT_BRUTE_FORCE_DELAY),
-    );
+    return true;
+  }
 
-    this.sendUnauthorizedResponse(response);
-    return false;
+  private requestCredentials(response: Response): void {
+    response.setHeader(
+      'WWW-Authenticate',
+      'Basic realm="Access to the protected resource"',
+    );
   }
 }
