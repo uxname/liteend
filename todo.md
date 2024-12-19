@@ -1,6 +1,7 @@
 # Todo
 
 - [ ] Make run db and redis as non-root user
+- [ ] Implement db backup tool
 - [ ] Add rate limiter
 - [ ] Add rate limiter for /studio and /board
 - [ ] GraphQL integration tests
