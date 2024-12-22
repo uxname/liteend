@@ -70,9 +70,6 @@ async function bootstrap(): Promise<void> {
   );
 
   const port = configService.getOrThrow<number>('PORT');
-  if (!port) {
-    throw new Error('No port specified');
-  }
 
   logger.log(`App started at http://localhost:${port}`);
 
@@ -81,4 +78,7 @@ async function bootstrap(): Promise<void> {
 }
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
-bootstrap().catch(console.error);
+bootstrap().catch((error) => {
+  const logger = new Logger('Main');
+  logger.error('Application failed to start', error);
+});
