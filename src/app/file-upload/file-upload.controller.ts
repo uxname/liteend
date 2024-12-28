@@ -30,21 +30,18 @@ import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
-// Define the directory where uploaded files will be stored
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
-// Configure disk storage options for file uploads
 // eslint-disable-next-line sonarjs/content-length
 const storage = diskStorage({
   destination: (request, file, callback) => {
     const uploadDate = new Date();
     const year = uploadDate.getFullYear();
-    const month = (uploadDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = uploadDate.getDate().toString().padStart(2, '0');
-    const hours = uploadDate.getHours().toString().padStart(2, '0');
-    const minutes = uploadDate.getMinutes().toString().padStart(2, '0');
+    const month = String(uploadDate.getMonth() + 1).padStart(2, '0');
+    const day = String(uploadDate.getDate()).padStart(2, '0');
+    const hours = String(uploadDate.getHours()).padStart(2, '0');
+    const minutes = String(uploadDate.getMinutes()).padStart(2, '0');
 
-    // Define the upload directory based on the current date and time
     const uploadDirectory = path.join(
       UPLOAD_DIR,
       year.toString(),
@@ -53,14 +50,12 @@ const storage = diskStorage({
       `${hours}-${minutes}`,
     );
 
-    // Ensure the upload directory exists; create it if not
     if (!fs.existsSync(uploadDirectory)) {
       fs.mkdirSync(uploadDirectory, { recursive: true });
     }
     callback(null, uploadDirectory);
   },
   filename: (request, file, callback) => {
-    // Use a UUID for unique file names, preserving the original file extension
     const extension = path.extname(file.originalname);
     callback(null, `${uuidv4()}${extension}`);
   },
@@ -100,7 +95,6 @@ export class FileUploadController {
     FileFieldsInterceptor([{ name: 'files', maxCount: 10 }], {
       storage,
       fileFilter: (request, file, callback) => {
-        // Allow only specific image file types
         const allowedMimeTypes = [
           'image/png',
           'image/jpeg',
@@ -134,7 +128,6 @@ export class FileUploadController {
       path: string;
     }>
   > {
-    // Store file details in the database
     await this.prisma.upload.createMany({
       data:
         files.files?.map((file) => ({
@@ -147,7 +140,6 @@ export class FileUploadController {
         })) ?? [],
     });
 
-    // Return the file details, adjusting paths for public access
     return (
       files.files?.map((file) => ({
         filename: file.filename,
@@ -173,7 +165,6 @@ export class FileUploadController {
   ): Promise<void> {
     const fullFilePath = path.join(UPLOAD_DIR, filePath);
 
-    // If the file does not exist, simulate a random delay before returning a 204 response
     if (!fs.existsSync(fullFilePath)) {
       const randomDelay = crypto.randomInt(500, 1500);
       await new Promise((resolve) => setTimeout(resolve, randomDelay));

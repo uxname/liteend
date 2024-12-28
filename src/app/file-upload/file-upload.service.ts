@@ -6,7 +6,7 @@ interface MimeTypes {
 
 @Injectable()
 export class FileUploadService {
-  MIME_TYPES: MimeTypes = {
+  private readonly MIME_TYPES: MimeTypes = {
     'application/andrew-inset': ['ez'],
     'application/applixware': ['aw'],
     'application/atom+xml': ['atom'],
@@ -344,14 +344,10 @@ export class FileUploadService {
 
   getMimeType(filename: string): string {
     const extension = this.extractExtension(filename);
+    if (!extension) return this.DEFAULT_MIME_TYPE;
 
-    if (!extension) {
-      return this.DEFAULT_MIME_TYPE;
-    }
-
-    for (const mimeType in this.MIME_TYPES) {
-      // eslint-disable-next-line security/detect-object-injection
-      if (this.MIME_TYPES[mimeType]?.includes(extension)) {
+    for (const [mimeType, extensions] of Object.entries(this.MIME_TYPES)) {
+      if (extensions.includes(extension)) {
         return mimeType;
       }
     }
@@ -361,10 +357,6 @@ export class FileUploadService {
 
   private extractExtension(filename: string): string | undefined {
     const parts = filename.split('.');
-    // eslint-disable-next-line no-magic-numbers
-    if (parts.length < 2) {
-      return undefined; // No extension found
-    }
-    return parts.pop() ?? undefined;
+    return parts.length > 1 ? parts.pop() : undefined;
   }
 }
