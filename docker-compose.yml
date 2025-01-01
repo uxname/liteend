@@ -85,20 +85,22 @@ services:
         max-file: "5"
 
   db_backup:
-    image: dashasmyr/db-guard:latest
-    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile.database-backup
     environment:
-      HOST: db
-      PORT: ${DATABASE_PORT}
-      USER: ${DATABASE_USER}
-      PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE: ${DATABASE_NAME}
-      MAX_BACKUP_COUNT: 42 # Keep one week's worth of backups
-      INTERVAL_SECONDS: 14400 # Perform backups every 4 hours
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      BACKUP_DIR: /app/data/database_backups
+      BACKUP_INTERVAL: 14400000 # 4 hours
+      BACKUP_ROTATION: 20
+      BACKUP_FORMAT: plain
+      BACKUP_COMPRESS: true
     volumes:
-      - ./data/db_backups:/app/backups:rw
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
+      - ./data/database_backups:/app/data/database_backups
+    restart: unless-stopped
+    depends_on:
+      - db

@@ -3,10 +3,6 @@ import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { Logger } from '@/common/logger/logger';
-
-const logger = new Logger('DatabaseBackup');
-
 // Environment variables with strict types
 interface EnvironmentVariables {
   DATABASE_HOST: string;
@@ -39,13 +35,21 @@ const environment: EnvironmentVariables = {
   BACKUP_COMPRESS: process.env.BACKUP_COMPRESS === 'true',
 };
 
+// safe log environment
+const safeEnvironment: EnvironmentVariables = {
+  ...environment,
+  DATABASE_PASSWORD: '***',
+};
+
+console.log('Environment variables:', safeEnvironment);
+
 // Ensure backup directory exists
 async function ensureBackupDirectoryExists(): Promise<void> {
   try {
     await fs.access(environment.BACKUP_DIR);
   } catch {
     await fs.mkdir(environment.BACKUP_DIR, { recursive: true });
-    logger.log(`Created backup directory: ${environment.BACKUP_DIR}`);
+    console.log(`Created backup directory: ${environment.BACKUP_DIR}`);
   }
 }
 
@@ -54,7 +58,9 @@ let isBackingUp: boolean = false;
 // Function to create a backup
 async function createBackup(): Promise<void> {
   if (isBackingUp) {
-    logger.warn('Another backup is already in progress. Skipping this backup.');
+    console.warn(
+      'Another backup is already in progress. Skipping this backup.',
+    );
     return;
   }
   isBackingUp = true;
@@ -83,17 +89,17 @@ async function createBackup(): Promise<void> {
       ? `pg_dump ${pgDumpOptions.join(' ')} | gzip > ${backupFilePath}`
       : `pg_dump ${pgDumpOptions.join(' ')} > ${backupFilePath}`;
 
-    logger.log(`Starting backup: ${backupFilePath}`);
+    console.log(`Starting backup: ${backupFilePath}`);
     await new Promise<void>((resolve, reject) => {
       childProcess.exec(
         dumpCommand,
         { env: { ...process.env, PGPASSWORD: environment.DATABASE_PASSWORD } },
         (error) => {
           if (error) {
-            logger.error('Backup failed:', error);
+            console.error('Backup failed:', error);
             reject(error);
           } else {
-            logger.log('Backup completed successfully.');
+            console.log('Backup completed successfully.');
             resolve();
           }
         },
@@ -102,7 +108,7 @@ async function createBackup(): Promise<void> {
 
     await rotateBackups();
   } catch (error) {
-    logger.error('Error during backup:', error);
+    console.error('Error during backup:', error);
   } finally {
     isBackingUp = false;
   }
@@ -133,11 +139,11 @@ async function rotateBackups(): Promise<void> {
       for (const { file } of filesToDelete) {
         const filePath = path.join(environment.BACKUP_DIR, file);
         await fs.unlink(filePath);
-        logger.log(`Deleted old backup: ${filePath}`);
+        console.log(`Deleted old backup: ${filePath}`);
       }
     }
   } catch (error) {
-    logger.error('Error during backup rotation:', error);
+    console.error('Error during backup rotation:', error);
   }
 }
 
@@ -147,7 +153,7 @@ async function initializeBackup(): Promise<void> {
     await ensureBackupDirectoryExists();
     await createBackup();
   } catch (error) {
-    logger.error('Error during initial backup:', error);
+    console.error('Error during initial backup:', error);
     throw error;
   }
 }
@@ -164,6 +170,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  logger.error('Fatal error in backup script:', error);
+  console.error('Fatal error in backup script:', error);
   throw error;
 });

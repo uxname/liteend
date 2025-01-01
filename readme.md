@@ -75,6 +75,9 @@ $ npm run db:migrations:create
 
 # Deploy migrations to database: 
 $ npm run db:migrations:apply
+
+# Restore database backup (file should be in backup directory):
+$ docker compose exec db_backup sh -c "npx tsx restore.ts postgres_2025-01-01T22-05-05-448Z.sql.gz"
 ```
 
 > More info about using Prisma: https://www.prisma.io
