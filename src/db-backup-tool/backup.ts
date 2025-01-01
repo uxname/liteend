@@ -39,8 +39,6 @@ const environment: EnvironmentVariables = {
   BACKUP_COMPRESS: process.env.BACKUP_COMPRESS === 'true',
 };
 
-logger.error('Environment variables:', environment);
-
 // Ensure backup directory exists
 async function ensureBackupDirectoryExists(): Promise<void> {
   try {
