@@ -45,9 +45,9 @@
   "dependencies": {
     "@apollo/gateway": "^2.9.3",
     "@apollo/server": "^4.11.2",
-    "@bull-board/api": "^6.5.3",
-    "@bull-board/express": "^6.5.3",
-    "@bull-board/nestjs": "^6.5.3",
+    "@bull-board/api": "^6.5.4",
+    "@bull-board/express": "^6.5.4",
+    "@bull-board/nestjs": "^6.5.4",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/apollo": "^12.2.2",
     "@nestjs/bull": "^10.2.3",
@@ -82,7 +82,7 @@
     "otplib": "^12.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "ts-morph": "^24.0.0",
+    "ts-morph": "^25.0.0",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
@@ -96,15 +96,15 @@
     "@types/express": "^5.0.0",
     "@types/jest": "29.5.14",
     "@types/multer": "^1.4.12",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.3",
     "@types/nodemailer": "^6.4.17",
     "@types/passport-local": "^1.0.38",
     "@types/serve-index": "^1.9.4",
     "@types/source-map-support": "^0.5.10",
     "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.13",
-    "@typescript-eslint/eslint-plugin": "^8.18.1",
-    "@typescript-eslint/parser": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-comments": "^1.0.0",
@@ -121,7 +121,7 @@
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "jest": "29.7.0",
-    "npm-check-updates": "^17.1.12",
+    "npm-check-updates": "^17.1.13",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.4.2",
     "prisma": "^6.1.0",
@@ -133,6 +133,6 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.7.2",
-    "typescript-eslint": "^8.18.1"
+    "typescript-eslint": "^8.19.0"
   }
 }
