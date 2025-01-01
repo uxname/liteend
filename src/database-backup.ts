@@ -15,13 +15,14 @@ const DATABASE_PASSWORD: string = process.env.DATABASE_PASSWORD || 'postgres';
 const DATABASE_NAME: string = process.env.DATABASE_NAME || 'postgres';
 const BACKUP_DIR: string = process.env.BACKUP_DIR || './data/database_backups';
 const BACKUP_INTERVAL: number = Number.parseInt(
-  process.env.BACKUP_INTERVAL || '2000',
+  process.env.BACKUP_INTERVAL || '86400000', // 1 day in milliseconds
   10,
-); // 1 day in milliseconds
+);
 const BACKUP_ROTATION: number = Number.parseInt(
   process.env.BACKUP_ROTATION || '5',
   10,
 );
+const BACKUP_FORMAT: string = process.env.BACKUP_FORMAT || 'custom'; // 'custom' or 'plain'
 
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {
@@ -43,7 +44,9 @@ async function createBackup(): Promise<void> {
       .toISOString()
       .replaceAll(':', '-')
       .replaceAll('.', '_');
-    const backupFileName: string = `${DATABASE_NAME}_${timestamp}.sql.gz`;
+    const backupFileName: string = `${DATABASE_NAME}_${timestamp}.${
+      BACKUP_FORMAT === 'custom' ? 'sql.gz' : 'sql'
+    }`;
     const backupFilePath: string = path.join(BACKUP_DIR, backupFileName);
 
     const pgDumpPath: string = 'pg_dump';
@@ -53,12 +56,15 @@ async function createBackup(): Promise<void> {
       `-p ${DATABASE_PORT}`,
       `-U ${DATABASE_USER}`,
       `-d ${DATABASE_NAME}`,
-      '-F c', // Custom format
+      BACKUP_FORMAT === 'custom' ? '-F c' : '-F p', // Custom or plain format
       '-b', // Include large objects
       '-v', // Verbose mode
     ];
 
-    const dumpCommand: string = `${pgDumpPath} ${pgDumpOptions.join(' ')} | gzip > ${backupFilePath}`;
+    const dumpCommand: string =
+      BACKUP_FORMAT === 'custom'
+        ? `${pgDumpPath} ${pgDumpOptions.join(' ')} | gzip > ${backupFilePath}`
+        : `${pgDumpPath} ${pgDumpOptions.join(' ')} > ${backupFilePath}`;
 
     logger.log(`Starting backup: ${backupFilePath}`);
     await new Promise<void>((resolve, reject) => {
@@ -90,7 +96,11 @@ function rotateBackups(): void {
   try {
     const files: string[] = fs
       .readdirSync(BACKUP_DIR)
-      .filter((file) => file.endsWith('.sql.gz'));
+      .filter((file) =>
+        BACKUP_FORMAT === 'custom'
+          ? file.endsWith('.sql.gz')
+          : file.endsWith('.sql'),
+      );
 
     files.sort((a, b) => {
       const aTime: number = fs
