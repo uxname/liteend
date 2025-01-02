@@ -114,20 +114,12 @@ export class Logger {
   private serialize(data: unknown): string {
     try {
       if (typeof data === 'object' && data !== null) {
-        const sanitizedData = this.sanitize(data as Record<string, unknown>);
-        return inspect(sanitizedData, { colors: this.useColors, depth: 2 });
+        return inspect(data, { colors: this.useColors, depth: 2 });
       }
       return String(data);
     } catch (error) {
       return `Serialization error: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
-  }
-
-  private sanitize(object: Record<string, unknown>): Record<string, unknown> {
-    const sensitiveKeys = new Set(['password', 'token', 'secret']);
-    return Object.fromEntries(
-      Object.entries(object).filter(([key]) => !sensitiveKeys.has(key)),
-    );
   }
 
   private log(level: LogLevel, ...messages: unknown[]): void {
