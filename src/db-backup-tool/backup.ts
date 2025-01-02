@@ -99,6 +99,12 @@ async function createBackup(): Promise<void> {
         (error) => {
           if (error) {
             logger.error('Backup failed:', error);
+            // Удаляем пустой файл, если он был создан
+            fs.unlink(backupFilePath).catch(() => {
+              logger.warn(
+                `Failed to delete empty backup file: ${backupFilePath}`,
+              );
+            });
             reject(error);
           } else {
             logger.info('Backup completed successfully.');
