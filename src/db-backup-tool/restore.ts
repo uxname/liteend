@@ -26,7 +26,7 @@ const environment: EnvironmentVariables = {
   BACKUP_DIR: process.env.BACKUP_DIR || './data/database_backups',
 };
 
-// safe log environment
+// Safe logging of environment variables
 const safeEnvironment: EnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
@@ -50,22 +50,27 @@ async function restoreBackup(backupFileName: string): Promise<void> {
 
   const isCompressed: boolean = backupFileName.endsWith('.gz');
 
-  // Команда для восстановления
+  // Command for restoration
   const restoreCommand: string = isCompressed
     ? `gunzip -c ${backupFilePath} | psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME}`
     : `psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME} -f ${backupFilePath}`;
 
   logger.info(`Starting restore from: ${backupFilePath}`);
-  await new Promise<void>((resolve, reject) => {
+  await executeCommand(restoreCommand);
+}
+
+// Execute a shell command and handle errors
+async function executeCommand(command: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
     childProcess.exec(
-      restoreCommand,
+      command,
       { env: { ...process.env, PGPASSWORD: environment.DATABASE_PASSWORD } },
       (error) => {
         if (error) {
-          logger.error('Restore failed:', error);
+          logger.error('Command execution failed:', error);
           reject(error);
         } else {
-          logger.info('Restore completed successfully.');
+          logger.info('Command executed successfully.');
           resolve();
         }
       },
