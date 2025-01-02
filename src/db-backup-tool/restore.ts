@@ -83,7 +83,7 @@ async function main(backupFileName: string): Promise<void> {
   }
 }
 
-// Example usage: node restore.js backup_file_name.sql.gz
+// Example usage: tsx restore.ts backup_file_name.sql.gz
 const backupFileName = process.argv[2];
 if (!backupFileName) {
   logger.error('Please provide the backup file name as an argument.');
