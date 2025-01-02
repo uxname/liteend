@@ -1,8 +1,12 @@
 /* eslint-disable unicorn/no-null,no-magic-numbers,security/detect-object-injection */
+import { inspect } from 'node:util';
+
 enum LogLevel {
+  DEBUG = 0,
   INFO = 1,
   WARN = 2,
   ERROR = 3,
+  CRITICAL = 4,
 }
 
 enum LogFormat {
@@ -26,9 +30,11 @@ export class Logger {
   private readonly format: LogFormat;
 
   private readonly colors = {
+    debug: '\u001B[36m', // cyan
     info: '\u001B[32m', // green
     warn: '\u001B[33m', // yellow
     error: '\u001B[31m', // red
+    critical: '\u001B[35m', // magenta
     reset: '\u001B[0m', // reset
   };
 
@@ -46,6 +52,9 @@ export class Logger {
 
   private getLevelKey(level: LogLevel): keyof typeof this.colors {
     switch (level) {
+      case LogLevel.DEBUG: {
+        return 'debug';
+      }
       case LogLevel.INFO: {
         return 'info';
       }
@@ -55,6 +64,9 @@ export class Logger {
       case LogLevel.ERROR: {
         return 'error';
       }
+      case LogLevel.CRITICAL: {
+        return 'critical';
+      }
       default: {
         throw new Error(`Unknown log level: ${level}`);
       }
@@ -62,37 +74,26 @@ export class Logger {
   }
 
   private getLevelName(level: LogLevel): string {
-    switch (level) {
-      case LogLevel.INFO: {
-        return 'INFO';
-      }
-      case LogLevel.WARN: {
-        return 'WARN';
-      }
-      case LogLevel.ERROR: {
-        return 'ERROR';
-      }
-      default: {
-        throw new Error(`Unknown log level: ${level}`);
-      }
-    }
+    return LogLevel[level] || 'UNKNOWN';
   }
 
-  private formatMessage(level: LogLevel, ...arguments_: unknown[]): string {
+  private formatMessage(level: LogLevel, ...messages: unknown[]): string {
     const timestamp = this.logTime ? new Date().toISOString() : undefined;
     const levelKey = this.getLevelKey(level);
     const levelColor = this.useColors ? this.colors[levelKey] : '';
     const resetColor = this.useColors ? this.colors.reset : '';
     const levelName = this.getLevelName(level);
 
+    const message = messages
+      .map((message_) => this.serialize(message_))
+      .join(' ');
+
     if (this.format === LogFormat.JSON) {
       const logObject = {
         timestamp,
         name: this.name,
         level: levelName,
-        message: arguments_
-          .map((argument) => this.serialize(argument))
-          .join(' '),
+        message,
       };
       return JSON.stringify(logObject);
     }
@@ -101,63 +102,71 @@ export class Logger {
       timestamp && `[${timestamp}]`,
       `[${this.name}]`,
       `[${levelName}]`,
-      ...arguments_.map((argument) => this.serialize(argument)),
+      message,
     ];
 
-    const message = parts.filter(Boolean).join(' ');
-
-    return this.useColors ? `${levelColor}${message}${resetColor}` : message;
+    const formattedMessage = parts.filter(Boolean).join(' ');
+    return this.useColors
+      ? `${levelColor}${formattedMessage}${resetColor}`
+      : formattedMessage;
   }
 
-  private serialize(argument: unknown): string {
+  private serialize(data: unknown): string {
     try {
-      if (
-        typeof argument === 'object' &&
-        argument !== null &&
-        !Array.isArray(argument)
-      ) {
-        const sanitizedArgument = this.sanitize(
-          argument as Record<string, unknown>,
-        );
-        return JSON.stringify(sanitizedArgument, undefined, 2);
+      if (typeof data === 'object' && data !== null) {
+        const sanitizedData = this.sanitize(data as Record<string, unknown>);
+        return inspect(sanitizedData, { colors: this.useColors, depth: 2 });
       }
-      return String(argument);
+      return String(data);
     } catch (error) {
-      return `Serialization error: ${error}`;
+      return `Serialization error: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }
 
   private sanitize(object: Record<string, unknown>): Record<string, unknown> {
     const sensitiveKeys = new Set(['password', 'token', 'secret']);
-    const sanitized: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(object)) {
-      if (!sensitiveKeys.has(key)) {
-        sanitized[key] = value;
-      }
-    }
-    return sanitized;
+    return Object.fromEntries(
+      Object.entries(object).filter(([key]) => !sensitiveKeys.has(key)),
+    );
   }
 
-  private log(level: LogLevel, ...arguments_: unknown[]): void {
+  private log(level: LogLevel, ...messages: unknown[]): void {
     if (!this.shouldLog(level)) return;
 
-    const formattedMessage = this.formatMessage(level, ...arguments_);
-    if (level === LogLevel.ERROR) {
-      console.error(formattedMessage);
-    } else {
-      console.log(formattedMessage);
+    const formattedMessage = this.formatMessage(level, ...messages);
+    switch (level) {
+      case LogLevel.ERROR:
+      case LogLevel.CRITICAL: {
+        console.error(formattedMessage);
+        break;
+      }
+      case LogLevel.WARN: {
+        console.warn(formattedMessage);
+        break;
+      }
+      default: {
+        console.log(formattedMessage);
+      }
     }
   }
 
-  public info(...arguments_: unknown[]): void {
-    this.log(LogLevel.INFO, ...arguments_);
+  public debug(...messages: unknown[]): void {
+    this.log(LogLevel.DEBUG, ...messages);
   }
 
-  public warn(...arguments_: unknown[]): void {
-    this.log(LogLevel.WARN, ...arguments_);
+  public info(...messages: unknown[]): void {
+    this.log(LogLevel.INFO, ...messages);
   }
 
-  public error(...arguments_: unknown[]): void {
-    this.log(LogLevel.ERROR, ...arguments_);
+  public warn(...messages: unknown[]): void {
+    this.log(LogLevel.WARN, ...messages);
+  }
+
+  public error(...messages: unknown[]): void {
+    this.log(LogLevel.ERROR, ...messages);
+  }
+
+  public critical(...messages: unknown[]): void {
+    this.log(LogLevel.CRITICAL, ...messages);
   }
 }
