@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/os-command,unicorn/no-await-expression-member,security/detect-non-literal-fs-filename,unicorn/prefer-top-level-await,security/detect-child-process */
+/* eslint-disable sonarjs/os-command,unicorn/no-await-expression-member,security/detect-non-literal-fs-filename,unicorn/prefer-top-level-await,security/detect-child-process,promise/no-promise-in-callback */
 import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -7,7 +7,7 @@ import { Logger } from './logger';
 
 const logger = new Logger({ name: 'Backup' });
 
-// Environment variables with strict types
+// Environment variables with strict types and validation
 interface EnvironmentVariables {
   DATABASE_HOST: string;
   DATABASE_PORT: string;
@@ -39,7 +39,7 @@ const environment: EnvironmentVariables = {
   BACKUP_COMPRESS: process.env.BACKUP_COMPRESS === 'true',
 };
 
-// safe log environment
+// Safe logging of environment variables
 const safeEnvironment: EnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
@@ -92,34 +92,41 @@ async function createBackup(): Promise<void> {
       : `pg_dump ${pgDumpOptions.join(' ')} > ${backupFilePath}`;
 
     logger.info(`Starting backup: ${backupFilePath}`);
-    await new Promise<void>((resolve, reject) => {
-      childProcess.exec(
-        dumpCommand,
-        { env: { ...process.env, PGPASSWORD: environment.DATABASE_PASSWORD } },
-        (error) => {
-          if (error) {
-            logger.error('Backup failed:', error);
-            // Удаляем пустой файл, если он был создан
-            fs.unlink(backupFilePath).catch(() => {
-              logger.warn(
-                `Failed to delete empty backup file: ${backupFilePath}`,
-              );
-            });
-            reject(error);
-          } else {
-            logger.info('Backup completed successfully.');
-            resolve();
-          }
-        },
-      );
-    });
-
+    await executeCommand(dumpCommand, backupFilePath);
     await rotateBackups();
   } catch (error) {
     logger.error('Error during backup:', error);
   } finally {
     isBackingUp = false;
   }
+}
+
+// Execute a shell command and handle errors
+async function executeCommand(
+  command: string,
+  backupFilePath: string,
+): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    childProcess.exec(
+      command,
+      { env: { ...process.env, PGPASSWORD: environment.DATABASE_PASSWORD } },
+      (error) => {
+        if (error) {
+          logger.error('Backup failed:', error);
+          fs.unlink(backupFilePath).catch((unlinkError) => {
+            logger.warn(
+              `Failed to delete empty backup file: ${backupFilePath}`,
+              unlinkError,
+            );
+          });
+          reject(error);
+        } else {
+          logger.info('Backup completed successfully.');
+          resolve();
+        }
+      },
+    );
+  });
 }
 
 // Function to rotate backups
