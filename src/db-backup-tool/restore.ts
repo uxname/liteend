@@ -3,6 +3,10 @@ import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { Logger } from './logger';
+
+const logger = new Logger({ name: 'Restore' });
+
 // Environment variables with strict types
 interface EnvironmentVariables {
   DATABASE_HOST: string;
@@ -28,7 +32,7 @@ const safeEnvironment: EnvironmentVariables = {
   DATABASE_PASSWORD: '***',
 };
 
-console.log('Environment variables:', safeEnvironment);
+logger.info('Environment variables:', safeEnvironment);
 
 // Function to restore a backup
 async function restoreBackup(backupFileName: string): Promise<void> {
@@ -40,7 +44,7 @@ async function restoreBackup(backupFileName: string): Promise<void> {
   try {
     await fs.access(backupFilePath);
   } catch {
-    console.error(`Backup file not found: ${backupFilePath}`);
+    logger.error(`Backup file not found: ${backupFilePath}`);
     throw new Error('Backup file not found');
   }
 
@@ -51,17 +55,17 @@ async function restoreBackup(backupFileName: string): Promise<void> {
     ? `gunzip -c ${backupFilePath} | psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME}`
     : `psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME} -f ${backupFilePath}`;
 
-  console.log(`Starting restore from: ${backupFilePath}`);
+  logger.info(`Starting restore from: ${backupFilePath}`);
   await new Promise<void>((resolve, reject) => {
     childProcess.exec(
       restoreCommand,
       { env: { ...process.env, PGPASSWORD: environment.DATABASE_PASSWORD } },
       (error) => {
         if (error) {
-          console.error('Restore failed:', error);
+          logger.error('Restore failed:', error);
           reject(error);
         } else {
-          console.log('Restore completed successfully.');
+          logger.info('Restore completed successfully.');
           resolve();
         }
       },
@@ -74,7 +78,7 @@ async function main(backupFileName: string): Promise<void> {
   try {
     await restoreBackup(backupFileName);
   } catch (error) {
-    console.error('Fatal error in restore script:', error);
+    logger.error('Fatal error in restore script:', error);
     throw error;
   }
 }
@@ -82,11 +86,11 @@ async function main(backupFileName: string): Promise<void> {
 // Example usage: node restore.js backup_file_name.sql.gz
 const backupFileName = process.argv[2];
 if (!backupFileName) {
-  console.error('Please provide the backup file name as an argument.');
+  logger.error('Please provide the backup file name as an argument.');
   throw new Error('Please provide the backup file name as an argument.');
 }
 
 main(backupFileName).catch((error) => {
-  console.error('Fatal error in restore script:', error);
+  logger.error('Fatal error in restore script:', error);
   throw error;
 });
