@@ -26,12 +26,13 @@ export class LoggerServeController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':filepath(*)')
+  @Get('*filepath')
   async getFile(
-    @Param('filepath') filepath: string,
+    @Param('filepath') _filepath: string,
     @Query('invert') invert: string,
     @Res() response: Response,
   ): Promise<void> {
+    const filepath = path.join(..._filepath);
     // Ensure that the file path is valid
     if (!this.isValidFilePath(filepath)) {
       response.status(HttpStatus.FORBIDDEN).send('Access denied');

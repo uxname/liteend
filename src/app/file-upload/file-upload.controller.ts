@@ -148,7 +148,7 @@ export class FileUploadController {
     );
   }
 
-  @Get('/uploads/:filePath(*)')
+  @Get('/uploads/*filePath')
   @ApiOperation({ summary: 'Get file' })
   @ApiParam({
     name: 'filePath',
@@ -163,7 +163,7 @@ export class FileUploadController {
     @Param('filePath') filePath: string,
     @Res() response: Response,
   ): Promise<void> {
-    const fullFilePath = path.join(UPLOAD_DIR, filePath);
+    const fullFilePath = path.join(UPLOAD_DIR, ...filePath);
 
     if (!fs.existsSync(fullFilePath)) {
       const randomDelay = crypto.randomInt(500, 1500);
