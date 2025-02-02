@@ -110,7 +110,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(new AuthGuard())
+  @UseGuards(AuthGuard)
   async logout(
     @Args('sessionIds', { type: () => [Number] }) sessionIds: number[],
     @RequestContextDecorator() context: RequestContext,
@@ -122,7 +122,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Account)
-  @UseGuards(new AuthGuard())
+  @UseGuards(AuthGuard)
   async changePassword(
     @Args('password') password: string,
     @Args('newPassword') newPassword: string,
@@ -232,7 +232,7 @@ export class AuthResolver {
     }
   }
 
-  @UseGuards(new AuthGuard())
+  @UseGuards(AuthGuard)
   @Query(() => String)
   async generateTotpSecret(
     @RequestContextDecorator() context: RequestContext,
@@ -245,7 +245,7 @@ export class AuthResolver {
     return this.authService.generateTotpSecret(context.profile.id, token);
   }
 
-  @UseGuards(new AuthGuard())
+  @UseGuards(AuthGuard)
   @Mutation(() => Boolean)
   async changeTotpEnabled(
     @Args('token') token: string,
