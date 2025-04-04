@@ -39,9 +39,8 @@ export class AuthService {
 
     if (isPasswordValid) {
       return account;
-    } else {
-      throw new Error(this.i18n.t('errors.invalidPassword'));
     }
+    throw new Error(this.i18n.t('errors.invalidPassword'));
   }
 
   async generateTotpSecret(

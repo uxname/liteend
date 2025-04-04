@@ -57,7 +57,7 @@ async function ensureBackupDirectoryExists(): Promise<void> {
   }
 }
 
-let isBackingUp: boolean = false;
+let isBackingUp = false;
 
 // Function to create a backup
 async function createBackup(): Promise<void> {

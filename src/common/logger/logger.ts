@@ -15,9 +15,11 @@ function getLogger(tag: string): Log4jsLogger {
 }
 
 // Function to handle circular references in JSON
+// biome-ignore lint/suspicious/noExplicitAny: can log anything
 function safeCycles(): (this: any, key: string, value: any) => any {
   const seen: Array<unknown> = [];
-  return (key: unknown, value: unknown): any => {
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
+  return (_key: unknown, value: unknown): any => {
     if (!value || typeof value !== 'object') return value;
     if (seen.includes(value)) return '[Circular]';
     seen.push(value);
@@ -189,22 +191,27 @@ export class Logger implements LoggerService {
     addWarnings();
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
   debug(message: any, ...optionalParameters: any[]): void {
     this.logger.debug(message, ...optionalParameters);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
   error(message: any, ...optionalParameters: any[]): void {
     this.logger.error(message, ...optionalParameters);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
   log(message: any, ...optionalParameters: any[]): void {
     this.logger.info(message, ...optionalParameters);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
   verbose(message: any, ...optionalParameters: any[]): void {
     this.logger.trace(message, ...optionalParameters);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: can log anything
   warn(message: any, ...optionalParameters: any[]): void {
     this.logger.warn(message, ...optionalParameters);
   }

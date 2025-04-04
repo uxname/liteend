@@ -16,8 +16,8 @@ import { Request, Response } from 'express';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 
-import { AccountModule } from '@/app/account/account.module';
 import { AccountSessionModule } from '@/app/account-session/account-session.module';
+import { AccountModule } from '@/app/account/account.module';
 import { AuthModule } from '@/app/auth/auth.module';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RequestContextExtractorMiddleware } from '@/app/auth/request-context-extractor/request-context-extractor.middleware';
@@ -32,12 +32,12 @@ import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { CryptoModule } from '@/common/crypto/crypto.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
+import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
 import { Logger } from '@/common/logger/logger';
 import { LoggerModule } from '@/common/logger/logger.module';
-import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
-import { PrismaModule } from '@/common/prisma/prisma.module';
 import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
+import { PrismaModule } from '@/common/prisma/prisma.module';
 
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { HealthModule } from './health/health.module';

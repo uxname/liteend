@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   InjectQueue,
   OnQueueCompleted,
@@ -5,7 +6,6 @@ import {
   Process,
   Processor,
 } from '@nestjs/bull';
-import { MailerService } from '@nestjs-modules/mailer';
 import { Job, Queue } from 'bull';
 import { SentMessageInfo } from 'nodemailer';
 

@@ -34,7 +34,7 @@ const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
 // eslint-disable-next-line sonarjs/content-length
 const storage = diskStorage({
-  destination: (request, file, callback) => {
+  destination: (_request, _file, callback) => {
     const uploadDate = new Date();
     const year = uploadDate.getFullYear();
     const month = String(uploadDate.getMonth() + 1).padStart(2, '0');
@@ -55,7 +55,7 @@ const storage = diskStorage({
     }
     callback(null, uploadDirectory);
   },
-  filename: (request, file, callback) => {
+  filename: (_request, file, callback) => {
     const extension = path.extname(file.originalname);
     callback(null, `${uuidv4()}${extension}`);
   },
@@ -94,7 +94,7 @@ export class FileUploadController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'files', maxCount: 10 }], {
       storage,
-      fileFilter: (request, file, callback) => {
+      fileFilter: (_request, file, callback) => {
         const allowedMimeTypes = [
           'image/png',
           'image/jpeg',

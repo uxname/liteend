@@ -3,19 +3,19 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { AccountService } from '@/app/account/account.service';
-import { Account } from '@/app/account/types/account.object-type';
-import { AccountStatus } from '@/app/account/types/account-status.enum';
 import { AccountSessionService } from '@/app/account-session/account-session.service';
-import { AuthService } from '@/app/auth/auth.service';
+import { AccountService } from '@/app/account/account.service';
+import { AccountStatus } from '@/app/account/types/account-status.enum';
+import { Account } from '@/app/account/types/account.object-type';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
+import { AuthService } from '@/app/auth/auth.service';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RolesGuard } from '@/app/auth/roles-guard/roles.guard';
 import { ActivateAccountInput } from '@/app/auth/types/activate-account.input';
 import { AuthResponse } from '@/app/auth/types/auth-response.object-type';
 import { EmailPasswordInput } from '@/app/auth/types/email-password.input';
-import { GenerateEmailCodeInput } from '@/app/auth/types/generate-email-code.input';
 import { GenerateEmailCodeResponse } from '@/app/auth/types/generate-email-code-response.object-type';
+import { GenerateEmailCodeInput } from '@/app/auth/types/generate-email-code.input';
 import { ResetPasswordInput } from '@/app/auth/types/reset-password.input';
 import { EmailService } from '@/app/email/email.service';
 import { OneTimeCodeService } from '@/app/one-time-code/one-time-code.service';
@@ -156,9 +156,8 @@ export class AuthResolver {
     );
     if (sendEmailResult) {
       return { result: true, expiresAt: result.expiresAt };
-    } else {
-      throw new Error(i18n.t('errors.emailNotSent'));
     }
+    throw new Error(i18n.t('errors.emailNotSent'));
   }
 
   @Mutation(() => Account)
@@ -174,9 +173,8 @@ export class AuthResolver {
     if (isCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(data.email);
       return this.accountService.changeStatus(data.email, AccountStatus.ACTIVE);
-    } else {
-      throw new Error(i18n.t('errors.invalidCode'));
     }
+    throw new Error(i18n.t('errors.invalidCode'));
   }
 
   @Mutation(() => Account)
@@ -192,9 +190,8 @@ export class AuthResolver {
     if (isOneTimeCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(data.email);
       return this.accountService.changePassword(data.email, data.newPassword);
-    } else {
-      throw new Error(i18n.t('errors.invalidCode'));
     }
+    throw new Error(i18n.t('errors.invalidCode'));
   }
 
   @Mutation(() => Boolean)
@@ -210,9 +207,8 @@ export class AuthResolver {
     );
     if (sendEmailResult) {
       return true;
-    } else {
-      throw new Error(i18n.t('errors.emailNotSent'));
     }
+    throw new Error(i18n.t('errors.emailNotSent'));
   }
 
   @Mutation(() => Account)
@@ -227,9 +223,8 @@ export class AuthResolver {
     if (isOneTimeCodeValid) {
       await this.oneTimeCodeService.deleteOneTimeCode(email);
       return this.accountService.changePassword(email, newPassword);
-    } else {
-      throw new Error(i18n.t('errors.invalidCode'));
     }
+    throw new Error(i18n.t('errors.invalidCode'));
   }
 
   @UseGuards(AuthGuard)

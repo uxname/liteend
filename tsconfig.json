@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ES2021"
-    ],
+    "lib": ["ES2021"],
     "allowJs": true,
     "strict": true,
     "alwaysStrict": true,
@@ -22,9 +20,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "outDir": "dist",
     "noImplicitThis": true,
@@ -45,8 +41,6 @@
     "noStrictGenericChecks": false
   },
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ]
+    "require": ["tsconfig-paths/register"]
   }
 }

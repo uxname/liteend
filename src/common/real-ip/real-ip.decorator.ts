@@ -1,9 +1,9 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 // RealIp decorator to retrieve the real IP address of the client
 export const RealIp = createParamDecorator(
-  (data: unknown, context: ExecutionContext): string | undefined => {
+  (_data: unknown, context: ExecutionContext): string | undefined => {
     let request: {
       headers: Record<string, string | string[]>;
       connection: { remoteAddress: string };

@@ -1,8 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
-import { Account } from '@/app/account/types/account.object-type';
 import { AccountSession } from '@/app/account-session/types/account-session.object-type';
+import { Account } from '@/app/account/types/account.object-type';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { RequestContextDecorator } from '@/app/request-context.decorator';

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AccountModule } from '@/app/account/account.module';
 import { AccountSessionModule } from '@/app/account-session/account-session.module';
+import { AccountModule } from '@/app/account/account.module';
 import { AuthResolver } from '@/app/auth/auth.resolver';
 import { EmailModule } from '@/app/email/email.module';
 import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';

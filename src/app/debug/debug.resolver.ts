@@ -37,7 +37,7 @@ export class DebugResolver {
     try {
       return JSON.parse(readFileSync(LAST_COMMIT_INFO_FILE_PATH, 'utf8'));
     } catch (error) {
-      this.logger.error(
+      DebugResolver.logger.error(
         'Error reading last commit info. Returning empty commit info.',
         error,
       );
