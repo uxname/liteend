@@ -4,6 +4,11 @@
   <a href="https://github.com/uxname/liteend" target="blank"><img src=".github/logo.png" width="400" alt="LiteEnd logo" /></a>
 </p>
 
+[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
+![Stars](https://img.shields.io/github/stars/uxname/liteend)
+
+
 Lightweight template for a backend applications, based on [NestJS](https://nestjs.com).
 [Prisma.io](https://www.prisma.io) and PostgreSQL uses as base for data storage.
 
