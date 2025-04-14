@@ -40,7 +40,6 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 - [Contributing](#contributing)
 - [Show Your Support](#show-your-support)
 - [License](#license)
-- [Telemetry](#telemetry)
 
 ## Features
 
@@ -60,7 +59,6 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 * **Health Checks:** Endpoint for monitoring application status.
 * **Automated DB Backups:** Scheduled database backups via a dedicated Docker service.
 * **Internationalization (i18n):** Support for multiple languages.
-* **Telemetry:** Optional usage data collection.
 
 ## Tech Stack
 
@@ -311,7 +309,6 @@ These are some of the most important variables in `.env.example` to configure:
 * `MAILER_...`: Email sending configuration (SMTP details).
 * `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD`: pgAdmin access details.
 * `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD`: Redis Commander access details.
-* `DISABLE_TELEMETRY`: Set to `true` to disable anonymous telemetry.
 
 *(Refer to `.env.example` for the full list and `src/config/` for validation schemas).*
 
