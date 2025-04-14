@@ -7,7 +7,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/uxname/liteend)](https://github.com/uxname/liteend/stargazers)
 
 Lightweight, fast, and easy-to-use backend app template for Node.js, based on [NestJS](https://nestjs.com/).
-Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storage.
+Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storage, with Redis integration for caching/queues.
 
 # Table of Contents
 
@@ -19,17 +19,24 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 - [Usage](#usage)
   - [Development](#development)
   - [Production](#production)
+  - [API Documentation (Swagger)](#api-documentation-swagger)
   - [System Endpoints](#system-endpoints)
+    - [Health Check](#health-check)
     - [Logs](#logs)
     - [Database Admin Panel](#database-admin-panel)
 - [Docker](#docker)
-  -   [Docker Compose](#docker-compose)
-  -   [Database Backup/Restore](#database-backuprestore)
+  - [Overview](#overview)
+  - [Docker Compose Usage](#docker-compose-usage)
+  - [Accessing Services](#accessing-services)
+  - [Database Backup/Restore](#database-backuprestore)
+  - [Viewing Logs](#viewing-logs)
 - [Database Workflow (Prisma)](#database-workflow-prisma)
 - [Code Quality](#code-quality)
-  -   [Linting & Formatting](#linting--formatting)
-  -   [Testing](#testing)
+  - [Linting & Formatting](#linting--formatting)
+  - [Testing](#testing)
 - [Configuration](#configuration)
+  - [Key Environment Variables](#key-environment-variables)
+- [Internationalization (i18n)](#internationalization-i18n)
 - [Contributing](#contributing)
 - [Show Your Support](#show-your-support)
 - [License](#license)
@@ -39,16 +46,20 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 
 * **NestJS Framework:** Robust and scalable backend structure.
 * **Prisma ORM:** Type-safe database access with PostgreSQL.
-* **Docker Support:** Easy setup and deployment with Docker and Docker Compose.
+* **Redis Integration:** Support for caching and background jobs using Bull queues.
+* **Docker Support:** Easy setup and deployment with Docker and Docker Compose (App, PostgreSQL, Redis, Admin UIs, Backup).
 * **Code Quality Tools:** Integrated Biome (linting/formatting) and Jest (testing).
 * **Database Migrations:** Managed schema changes with Prisma Migrate.
 * **Configuration Management:** Environment-based configuration using `.env` files.
 * **Logging:** Configured logging with Log4js.
-* **API Documentation:** Basic Swagger setup (can be expanded).
+* **API Documentation:** Basic Swagger UI setup.
 * **WebSockets:** Support for real-time communication.
 * **Task Queues:** Bull module integration.
 * **Email:** Mailer module integration.
 * **GraphQL:** Apollo server integration.
+* **Health Checks:** Endpoint for monitoring application status.
+* **Automated DB Backups:** Scheduled database backups via a dedicated Docker service.
+* **Internationalization (i18n):** Support for multiple languages.
 * **Telemetry:** Optional usage data collection.
 
 ## Tech Stack
@@ -57,19 +68,20 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 * **Framework:** NestJS
 * **ORM:** Prisma
 * **Database:** PostgreSQL
-* **Containerization:** Docker
+* **Caching/Queues:** Redis
+* **Containerization:** Docker, Docker Compose
 * **Package Manager:** npm
 * **Linting/Formatting:** BiomeJS
 * **Testing:** Jest
 * **Logging:** Log4js
+* **Admin Tools (via Docker):** pgAdmin 4, Redis Commander
 
 ## Prerequisites
 
-* Node.js (Check `.nvmrc` or `package.json` engines section for specific version if available, otherwise use a recent
-  LTS version)
-* npm (usually comes with Node.js)
-* Docker & Docker Compose (Optional, for containerized setup)
-* Git
+* **Node.js:** Use a recent LTS version (e.g., 18.x, 20.x). Check project specifics if needed.
+* **npm:** Usually comes with Node.js.
+* **Git:** For cloning the repository.
+* **Docker & Docker Compose:** (Recommended) For easy environment setup and running PostgreSQL/Redis.
 
 ## Installation
 
@@ -85,10 +97,11 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
    ```
 
 3. **Set up environment variables:**
-   Copy the example environment file and customize it for your needs.
+   Copy the example environment file and customize it.
    ```bash
    cp .env.example .env
-   # Edit .env file with your specific configuration (database credentials, ports, etc.)
+   # Edit .env file with your specific configuration (database credentials, ports, Redis details, etc.)
+   # See the 'Configuration' section below for key variables.
    ```
 
 4. **Install dependencies:**
@@ -96,15 +109,21 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
    npm install
    ```
 
-5. **Apply database migrations:**
+5. **(If using Docker - Recommended)** **Start external services (Database & Redis):**
+   Ensure Docker Desktop or Docker Engine/Compose is running.
+   ```bash
+   docker-compose up -d db redis
+   # Wait a few seconds for the database and Redis to initialize.
+   ```
+   *Note: If you are **not** using Docker, ensure PostgreSQL and Redis are installed, running, and accessible according to your `.env` configuration.*
+
+6. **Apply database migrations:**
    This command applies existing migrations to set up the database schema.
    ```bash
    npm run db:migrations:apply
    ```
-   *Note: Ensure your PostgreSQL server (either local or Dockerized) is running and accessible according to your `.env`
-   configuration.*
 
-6. **(Optional) Seed the database:**
+7. **(Optional) Seed the database:**
    If seed data is available, populate the database:
    ```bash
    npm run db:seed
@@ -115,7 +134,7 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 ### Development
 
 * **Run in watch mode:**
-  The application will restart automatically on file changes.
+  The application will restart automatically on file changes. Requires database and Redis to be running.
   ```bash
   npm run start:dev
   ```
@@ -135,173 +154,173 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
    ```
 
 2. **Run the production build:**
-   Starts the application from the compiled code in the `dist` folder. Ensure `NODE_ENV` is set to `production`.
+   Starts the application from the compiled code in the `dist` folder. Ensure `NODE_ENV` is set to `production`. Requires database and Redis to be running.
    ```bash
    npm run start:prod
    ```
    *Note: The `prestart:prod` script automatically runs `npm run db:migrations:apply` before starting.*
 
+### API Documentation (Swagger)
+
+Once the application is running (e.g., via `npm run start:dev`), the Swagger UI for API documentation is typically available at:
+
+`http://localhost:<PORT>/api`
+
+Replace `<PORT>` with the application port specified in your `.env` file (default might be 3000 or similar).
+
 ### System Endpoints
 
-The application provides some built-in endpoints for debugging and administration:
+The application provides built-in endpoints for monitoring and administration:
+
+#### Health Check
+
+* `/health`: Returns the application status. Used by Docker healthcheck. Example response: `{"status":"ok",...}`
 
 #### Logs
 
-* `/logs/`: View recent logs.
+* `/logs/`: View recent logs (requires appropriate configuration/permissions).
 * `/logs/all`: View all logs.
 * `/logs/error`: View error logs.
 * *(See `src/common/logger-serve/logger-serve.controller.ts` for more)*
 
 #### Database Admin Panel
 
-* `/studio`: Access Prisma Studio for database browsing and manipulation.
-* *Note: Prisma Studio might need specific configuration or to be run separately in some environments.*
+* `/studio`: Access Prisma Studio for database browsing and manipulation (runs alongside the NestJS app).
 
 ## Docker
 
-### Docker Compose
+### Overview
 
-A `docker-compose.yml` file is provided for easy setup of the application and its database (PostgreSQL).
+The `docker-compose.yml` file defines the following services for a complete development/testing environment:
 
-1. **Ensure `.env` is configured correctly**, especially `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, and
-   potentially ports if they conflict with existing services.
+* `app`: The main NestJS application container.
+* `db`: PostgreSQL database container.
+* `redis`: Redis container (for Bull queues, caching).
+* `db_admin`: pgAdmin 4 container, a web UI for managing PostgreSQL.
+* `redis_admin`: Redis Commander container, a web UI for managing Redis.
+* `db_backup`: A dedicated container that performs scheduled backups of the PostgreSQL database.
 
-2. **Launch services:**
-   Starts the application and database containers in detached mode.
+### Docker Compose Usage
+
+1. **Start all services:**
+   Launches the app, database, Redis, and admin UIs in detached mode.
    ```bash
    docker-compose up -d
    ```
 
-3. **Rebuild and launch:**
-   If you've made changes to the `Dockerfile` or need to rebuild images:
+2. **Start only specific services (e.g., DB and Redis):**
+   Useful during initial setup or if running the app locally.
    ```bash
-   docker-compose up -d --build
+   docker-compose up -d db redis
    ```
 
-4. **Stop services:**
+3. **Stop all services:**
    ```bash
    docker-compose down
    ```
 
+4. **Rebuild and start services:**
+   If you've made changes to `Dockerfile` or need to rebuild images:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+### Accessing Services
+
+* **Application:** `http://localhost:<PORT>` (See `PORT` in `.env`)
+* **pgAdmin (DB Admin):** `http://localhost:<DB_ADMIN_PORT>` (See `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD` in `.env` for login)
+* **Redis Commander (Redis Admin):** `http://localhost:<REDIS_ADMIN_PORT>` (See `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD` in `.env` for login)
+
 ### Database Backup/Restore
 
-Scripts and configurations might be available for database backup and restore using Docker. Refer to
-`Dockerfile.database-backup` and potentially related npm scripts or documentation within the project.
-
-* **Example Restore Command (Adapt as needed):**
+* The `db_backup` service automatically creates compressed PostgreSQL backups.
+* **Configuration:** Schedule (`BACKUP_INTERVAL`), rotation (`BACKUP_ROTATION`), format, etc., are defined in `docker-compose.yml` for the `db_backup` service.
+* **Location:** Backups are stored in the volume mapped to `./data/database_backups` on the host machine.
+* **Manual Restore Example:**
   ```bash
-  # Ensure the backup file exists in the designated backup volume/directory
+  # Ensure the backup file exists in ./data/database_backups/
+  # Replace '...' with the actual backup filename
   docker compose exec db_backup sh -c "npx tsx restore.ts postgres_YYYY-MM-DDTHH-MM-SS-MSZ.sql.gz"
   ```
+  *(Refer to `db-backup-tool/restore.ts` or related scripts for details)*
+
+### Viewing Logs
+
+You can view logs for individual services:
+
+```bash
+docker-compose logs app
+docker-compose logs db
+docker-compose logs redis
+# Use '-f' to follow logs in real-time
+docker-compose logs -f app
+```
 
 ## Database Workflow (Prisma)
 
 Manage your database schema and migrations using Prisma CLI commands wrapped in npm scripts.
 
-1. **Edit Schema:**
-   Modify your data model in `prisma/schema.prisma`.
+1. **Edit Schema:** Modify `prisma/schema.prisma`.
+2. **Format Schema:** `npm run db:schema:format`
+3. **Create Migration:** `npm run db:migrations:create` (Provide a descriptive name when prompted). Review the generated SQL in `prisma/migrations`.
+4. **Apply Migrations:** `npm run db:migrations:apply`
+5. **Generate Prisma Client:** `npm run db:gen` (Often run automatically).
+6. **Reset Database (Caution!):** `npm run db:reset`
+7. **Push Schema (Dev Only!):** `npm run db:push` (Directly syncs schema, bypasses migrations).
 
-2. **Format Schema:**
-   Apply Prisma formatting rules.
-   ```bash
-   npm run db:schema:format
-   ```
-
-3. **Create Migration:**
-   Generate a new SQL migration file based on schema changes. **Provide a descriptive name** when prompted.
-   ```bash
-   npm run db:migrations:create
-   ```
-   *Review the generated migration file in the `prisma/migrations` directory.*
-
-4. **Apply Migrations:**
-   Apply pending migrations to the database.
-   ```bash
-   npm run db:migrations:apply
-   ```
-
-5. **Generate Prisma Client:**
-   Update the Prisma Client library based on the schema (often run automatically after migrations).
-   ```bash
-   npm run db:gen
-   ```
-
-6. **Reset Database:** (Use with caution!)
-   Resets the database, applies all migrations, and seeds data if applicable.
-   ```bash
-   npm run db:reset
-   ```
-
-7. **Push Schema Changes (Development Only):**
-   Directly sync schema changes to the DB without creating a migration file. **Not recommended for production or
-   collaborative environments.**
-   ```bash
-   npm run db:push
-   ```
-
-> For more detailed information, visit the [Prisma Documentation](https://www.prisma.io/docs/).
+> For more details, visit the [Prisma Documentation](https://www.prisma.io/docs/).
 
 ## Code Quality
 
 > **TL;DR:** Run `npm run check` before **every** commit.
 
-A Lefthook pre-commit hook is configured (`lefthook.yml`, `.husky/`) to run checks automatically.
+A Lefthook pre-commit hook is configured (`lefthook.yml`) to run checks automatically.
 
 ### Linting & Formatting
 
-* **Check code:**
-  Uses BiomeJS to check for linting errors and formatting issues.
-  ```bash
-  npm run lint
-  ```
-
-* **Fix code:**
-  Automatically fixes fixable linting and formatting issues.
-  ```bash
-  npm run lint:fix
-  ```
-
-* **Check TypeScript types:**
-  ```bash
-  npm run ts:check
-  ```
-
-* **Run all checks:**
-  ```bash
-  npm run check
-  ```
+* **Check code (BiomeJS):** `npm run lint`
+* **Fix code (BiomeJS):** `npm run lint:fix`
+* **Check TypeScript types:** `npm run ts:check`
+* **Run all checks:** `npm run check`
 
 ### Testing
 
-* **Run unit tests:**
-  ```bash
-  npm run test
-  ```
-
-* **Run unit tests in watch mode:**
-  ```bash
-  npm run test:watch
-  ```
-
-* **Run end-to-end (e2e) tests:**
-  Ensure the application (and potentially database) is running.
-  ```bash
-  npm run test:e2e
-  ```
-
-* **Generate test coverage report:**
-  ```bash
-  npm run test:cov
-  ```
+* **Run unit tests:** `npm run test`
+* **Run unit tests (watch mode):** `npm run test:watch`
+* **Run e2e tests:** `npm run test:e2e` (Requires running app/db)
+* **Generate coverage report:** `npm run test:cov`
 
 ## Configuration
 
-Configuration is managed through environment variables loaded via `@nestjs/config`.
+Configuration is managed via environment variables loaded by `@nestjs/config` from a `.env` file.
 
-* A `.env.example` file provides a template for required variables.
-* Copy `.env.example` to `.env` and fill in your specific values.
-* Variables in `.env` will override system environment variables unless configured otherwise.
-* Refer to `src/config/` or relevant configuration modules for details on available variables.
+* Copy `.env.example` to `.env`.
+* Fill in your specific values in `.env`.
+
+### Key Environment Variables
+
+These are some of the most important variables in `.env.example` to configure:
+
+* `NODE_ENV`: Set to `development` or `production`.
+* `PORT`: The port the NestJS application will listen on.
+* `DATABASE_URL`: The full connection string for PostgreSQL.
+* `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: Individual database connection parameters (used by some tools/scripts and Docker Compose).
+* `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: Redis connection details.
+* `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`: Secret keys for JWT tokens.
+* `API_URL`, `WEB_URL`: Base URLs for API and frontend (used for CORS, emails, etc.).
+* `MAILER_...`: Email sending configuration (SMTP details).
+* `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD`: pgAdmin access details.
+* `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD`: Redis Commander access details.
+* `DISABLE_TELEMETRY`: Set to `true` to disable anonymous telemetry.
+
+*(Refer to `.env.example` for the full list and `src/config/` for validation schemas).*
+
+## Internationalization (i18n)
+
+The project uses `nestjs-i18n` for handling multiple languages.
+
+* Language files (JSON format) are located in `src/i18n/`.
+* Add new language directories (e.g., `src/i18n/de/`) and translation files as needed.
 
 ## Contributing
 
