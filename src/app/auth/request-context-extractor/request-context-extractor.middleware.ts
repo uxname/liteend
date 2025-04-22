@@ -13,7 +13,12 @@ export class RequestContextExtractorMiddleware implements NestMiddleware {
     response: Response,
     next: NextFunction,
   ): Promise<void> {
-    const token = request.headers.authorization;
+    let token = request.headers.authorization;
+
+    // remove "Bearer " prefix (case-insensitive)
+    if (token?.toLowerCase().startsWith('bearer ')) {
+      token = token.slice(7);
+    }
 
     const requestContext: RequestContext = {
       req: request,
