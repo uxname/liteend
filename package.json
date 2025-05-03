@@ -34,7 +34,7 @@
     "db:gen": "npx prisma generate --no-hints",
     "db:studio": "npx prisma studio --browser none",
     "db:studio-local": "npm run db:studio -- -n 127.0.0.1",
-    "db:seed": "ts-node src/seed.ts",
+    "db:seed": "ts-node prisma/seed.ts",
     "________________ OTHER ________________": "",
     "postinstall": "npm run prepare",
     "prepare": "npx lefthook install",
