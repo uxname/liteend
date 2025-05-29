@@ -1,7 +1,0 @@
-.eslintrc.js
-node_modules/
-dist/
-.idea/
-src/@generated/
-data
-src/common/telemetry.ts
