@@ -50,6 +50,7 @@ const logger = new Logger('AppModule');
       driver: ApolloDriver,
       autoSchemaFile: true,
       path: '/graphql',
+      graphiql: true,
       playground: {
         settings: {
           'editor.theme': 'light',
