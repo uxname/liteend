@@ -9,7 +9,7 @@ services:
     volumes:
       - ./data:/app/data:rw
     ports:
-      - ${PORT}:${PORT}
+      - 127.0.0.1:${PORT}:${PORT}
     healthcheck:
       test: [ "CMD-SHELL", "/app/healthcheck.sh" ]
       interval: 2s
@@ -25,7 +25,7 @@ services:
     image: redis:7.4-alpine
     restart: unless-stopped
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - 127.0.0.1:${REDIS_PORT}:${REDIS_PORT}
     command: >
       redis-server --save 20 1 --loglevel warning
       --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
@@ -41,7 +41,7 @@ services:
     image: rediscommander/redis-commander:latest
     restart: unless-stopped
     ports:
-      - ${REDIS_ADMIN_PORT}:8081
+      - 127.0.0.1:${REDIS_ADMIN_PORT}:8081
     environment:
       HTTP_USER: ${REDIS_ADMIN_USER}
       HTTP_PASSWORD: ${REDIS_ADMIN_PASSWORD}
@@ -77,7 +77,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_PASSWORD}
     ports:
-      - ${DB_ADMIN_PORT}:80
+      - 127.0.0.1:${DB_ADMIN_PORT}:80
     logging:
       driver: "json-file"
       options:
