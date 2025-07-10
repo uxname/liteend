@@ -1,31 +1,44 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
+  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", "dist", "src/@generated"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/src/@generated",
+      "!**/data"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "lineEnding": "lf"
   },
-  "organizeImports": {
-    "enabled": true
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
       "correctness": {
+        "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",
-        "noUnusedVariables": "error",
-        "noUnusedFunctionParameters": "error"
+        "noUnusedVariables": "error"
       },
+      "recommended": true,
       "style": {
         "noNonNullAssertion": "off",
         "useImportType": "off"
@@ -35,12 +48,9 @@
       }
     }
   },
-  "javascript": {
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": true
-    },
-    "formatter": {
-      "quoteStyle": "single"
-    }
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true
   }
 }

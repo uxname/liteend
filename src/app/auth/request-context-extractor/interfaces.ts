@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-
-import { AccountSession } from '@/app/account-session/types/account-session.object-type';
 import { Account } from '@/app/account/types/account.object-type';
+import { AccountSession } from '@/app/account-session/types/account-session.object-type';
 import { Profile } from '@/app/profile/types/profile.object-type';
 
 export class RequestContext {

@@ -1,5 +1,4 @@
-import { UseGuards } from '@nestjs/common';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -12,8 +11,8 @@ import { Account } from '@/app/account/types/account.object-type';
 import { AuthGuard } from '@/app/auth/auth-guard/auth.guard';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
 import { ProfileService } from '@/app/profile/profile.service';
-import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
 import { Profile } from '@/app/profile/types/profile.object-type';
+import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
 import { RequestContextDecorator } from '@/app/request-context.decorator';
 
 @Resolver(() => Profile)
