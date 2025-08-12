@@ -339,8 +339,6 @@ The project uses `nestjs-i18n` for handling multiple languages.
 Contributions, issues, and feature requests are welcome!
 Feel free to check the [issues page](https://github.com/uxname/liteend/issues).
 
-*(Consider adding a `CONTRIBUTING.md` file with more detailed guidelines if needed).*
-
 ## Show Your Support
 
 Give a ⭐️ if this project helped you!
