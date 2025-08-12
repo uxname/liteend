@@ -160,11 +160,11 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 
 ### API Documentation (Swagger)
 
-Once the application is running (e.g., via `npm run start:dev`), the Swagger UI for API documentation is typically available at:
+Once the application is running (e.g., via `npm run start:dev`), the Swagger UI for API documentation is available at:
 
-`http://localhost:<PORT>/api`
+`http://localhost:<PORT>/swagger`
 
-Replace `<PORT>` with the application port specified in your `.env` file (default might be 3000 or similar).
+Replace `<PORT>` with the application port specified in your `.env` file (default is 4000).
 
 ### System Endpoints
 
@@ -176,14 +176,22 @@ The application provides built-in endpoints for monitoring and administration:
 
 #### Logs
 
-* `/logs/`: View recent logs (requires appropriate configuration/permissions).
+* `/logs/`: View recent logs (requires credentials from `.env`).
 * `/logs/all`: View all logs.
 * `/logs/error`: View error logs.
 * *(See `src/common/logger-serve/logger-serve.controller.ts` for more)*
 
-#### Database Admin Panel
+#### Database Admin Panel (Prisma Studio)
 
-* `/studio`: Access Prisma Studio for database browsing and manipulation (runs alongside the NestJS app).
+* `/studio`: Access Prisma Studio for database browsing and manipulation (runs alongside the NestJS app). Requires credentials from `.env`.
+
+#### Task Queue Dashboard (Bull Board)
+
+* `/board`: Access the Bull Board UI to monitor background job queues (e.g., email sending). Requires credentials from `.env`.
+
+#### GraphQL Debug Query
+
+* **Query:** `debug`: A GraphQL query available in the main GraphQL endpoint (`/graphql`) that returns system information like application version, uptime, and the last git commit.
 
 ## Docker
 
@@ -228,6 +236,8 @@ The `docker-compose.yml` file defines the following services for a complete deve
 * **Application:** `http://localhost:<PORT>` (See `PORT` in `.env`)
 * **pgAdmin (DB Admin):** `http://localhost:<DB_ADMIN_PORT>` (See `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD` in `.env` for login)
 * **Redis Commander (Redis Admin):** `http://localhost:<REDIS_ADMIN_PORT>` (See `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD` in `.env` for login)
+* **Prisma Studio (DB Admin via App):** `http://localhost:<PORT>/studio` (See `PORT`, `PRISMA_STUDIO_LOGIN`, `PRISMA_STUDIO_PASSWORD` in `.env` for login)
+* **Bull Board (Task Queues):** `http://localhost:<PORT>/board` (See `PORT`, `BULL_BOARD_LOGIN`, `BULL_BOARD_PASSWORD` in `.env` for login)
 
 ### Database Backup/Restore
 
@@ -266,11 +276,13 @@ Manage your database schema and migrations using Prisma CLI commands wrapped in 
 6. **Reset Database (Caution!):** `npm run db:reset`
 7. **Push Schema (Dev Only!):** `npm run db:push` (Directly syncs schema, bypasses migrations).
 
+> **Note:** For a typical development workflow, you will mostly use `npm run db:migrations:create` and `npm run db:migrations:apply`.
+>
 > For more details, visit the [Prisma Documentation](https://www.prisma.io/docs/).
 
 ## Code Quality
 
-> **TL;DR:** Run `npm run check` before **every** commit.
+> **TL;DR:** Run `npm run check` (linter + type-check) before **every** commit.
 
 A Lefthook pre-commit hook is configured (`lefthook.yml`) to run checks automatically.
 
@@ -301,14 +313,17 @@ These are some of the most important variables in `.env.example` to configure:
 
 * `NODE_ENV`: Set to `development` or `production`.
 * `PORT`: The port the NestJS application will listen on.
+* `SALT`: A secret string used for hashing passwords and other data.
 * `DATABASE_URL`: The full connection string for PostgreSQL.
-* `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: Individual database connection parameters (used by some tools/scripts and Docker Compose).
+* `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: Individual database connection parameters.
 * `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: Redis connection details.
 * `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`: Secret keys for JWT tokens.
-* `API_URL`, `WEB_URL`: Base URLs for API and frontend (used for CORS, emails, etc.).
 * `MAILER_...`: Email sending configuration (SMTP details).
 * `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD`: pgAdmin access details.
 * `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD`: Redis Commander access details.
+* `PRISMA_STUDIO_LOGIN`, `PRISMA_STUDIO_PASSWORD`: Credentials for the Prisma Studio web UI (`/studio`).
+* `BULL_BOARD_LOGIN`, `BULL_BOARD_PASSWORD`: Credentials for the Bull Board web UI (`/board`).
+* `LOGS_ADMIN_PANEL_USER`, `LOGS_ADMIN_PANEL_PASSWORD`: Credentials for the protected log viewer (`/logs`).
 
 *(Refer to `.env.example` for the full list and `src/config/` for validation schemas).*
 
