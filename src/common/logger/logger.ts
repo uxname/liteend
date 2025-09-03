@@ -45,7 +45,9 @@ export class Logger implements LoggerService {
       return (logEvent): unknown => JSON.stringify(logEvent, safeCycles());
     });
 
-    const FILE_APPENDER_LAYOUT_TYPE = 'basic'; // Can also be 'json'
+    // Can also be 'json'
+    // Before use json layout install "log4js-json-layout" package: npm i log4js-json-layout
+    const FILE_APPENDER_LAYOUT_TYPE = 'basic';
 
     log4js.configure({
       appenders: {

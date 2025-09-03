@@ -1,12 +1,9 @@
 import { registerEnumType } from '@nestjs/graphql';
-
-export enum AccountStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  DELETED = 'DELETED',
-}
+import { AccountStatus } from '@prisma/client';
 
 registerEnumType(AccountStatus, {
   name: 'AccountStatus',
   description: undefined,
 });
+
+export { AccountStatus };

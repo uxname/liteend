@@ -1,13 +1,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import { NextHandleFunction } from 'connect';
-import { NextFunction, Request, Response } from 'express';
+import { Handler, NextFunction, Request, Response } from 'express';
 
 import { Logger } from '@/common/logger/logger';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
-  private readonly jsonParser: NextHandleFunction = bodyParser.json();
+  private readonly jsonParser: Handler = bodyParser.json();
   private readonly logger: Logger = new Logger(HttpLoggerMiddleware.name);
 
   // Minifies GraphQL query by removing comments and unnecessary whitespace

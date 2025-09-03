@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/main.ts!"],
+  "project": ["src/**/*.ts!", "test/**/*.ts", "!src/db-backup-tool/**"],
+  "ignore": ["src/@generated/**", "src/common/git-commit-saver.ts"],
+  "ignoreDependencies": ["cross-env"],
+  "paths": {
+    "@/*": ["src/*"]
+  }
+}
