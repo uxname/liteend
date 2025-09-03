@@ -52,7 +52,8 @@ export class EmailService {
   }
 
   @Process()
-  private async processEmailSend(
+  // @ts-expect-error Used through the @Process() decorator
+  private async _processEmailSend(
     job: Job<ProcessEmailSendParameters>,
   ): Promise<void> {
     const { data } = job;

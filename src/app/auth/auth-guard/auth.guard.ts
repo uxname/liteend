@@ -14,7 +14,6 @@ import { I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { AccountStatus } from '@/app/account/types/account-status.enum';
 import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { Logger } from '@/common/logger/logger';
 
 /**
  * Decorator to mark a route as optionally authenticated.
@@ -29,8 +28,6 @@ export const OptionalAuth = (): CustomDecorator<string> =>
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private readonly logger = new Logger(AuthGuard.name);
-
   constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

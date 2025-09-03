@@ -5,10 +5,9 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 
 import { AccountSessionService } from '@/app/account-session/account-session.service';
 import { Logger } from '@/common/logger/logger';
@@ -21,9 +20,6 @@ import { Logger } from '@/common/logger/logger';
 export class AccountGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer()
-  private server: Server;
-
   private clients: Map<number, Set<Socket>> = new Map();
   private readonly logger = new Logger(AccountGateway.name);
 

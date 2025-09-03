@@ -22,7 +22,7 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
-import { Express, Response } from 'express';
+import { Response } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
