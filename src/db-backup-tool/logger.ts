@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null,no-magic-numbers,security/detect-object-injection */
 import { inspect } from 'node:util';
 
 enum LogLevel {

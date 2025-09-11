@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename,unicorn/no-null,no-magic-numbers */
 import * as crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';

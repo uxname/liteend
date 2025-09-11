@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/os-command,unicorn/no-await-expression-member,security/detect-non-literal-fs-filename,unicorn/prefer-top-level-await,security/detect-child-process,promise/no-promise-in-callback */
 import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';

@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers,unicorn/prefer-top-level-await,promise/catch-or-return */
 import * as readline from 'node:readline';
 
 import { faker } from '@faker-js/faker';

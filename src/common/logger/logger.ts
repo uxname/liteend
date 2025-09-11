@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any,unicorn/prefer-module */
-
 import path from 'node:path';
 import * as process from 'node:process';
 
