@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AccountStatus } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
-
 import { I18nTranslations } from '@/@generated/i18n-types';
 import { Account } from '@/app/account/types/account.object-type';
 import { TotpService } from '@/app/auth/totp/totp.service';
@@ -24,10 +24,15 @@ export class AuthService {
   ): Promise<Account> {
     const account = await this.prisma.account.findUnique({
       where: { email },
+      include: { profile: true },
     });
 
     if (!account) {
       throw new Error(this.i18n.t('errors.accountNotFound'));
+    }
+
+    if (account.profile?.status !== AccountStatus.ACTIVE) {
+      throw new Error(this.i18n.t('errors.accountSuspended'));
     }
 
     const salt = this.configService.getOrThrow<string>('SALT');
