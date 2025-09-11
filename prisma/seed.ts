@@ -40,7 +40,6 @@ async function main(): Promise<void> {
   const EXPIRES_AT = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const salt = process.env.SALT as string;
-  // eslint-disable-next-line sonarjs/no-hardcoded-passwords
   const password = '123';
 
   const newPasswordHash = await crypto.hash(password, salt);

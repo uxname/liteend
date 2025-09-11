@@ -63,7 +63,6 @@ async function bootstrap(): Promise<void> {
         if (request.headers['x-no-compression']) {
           return false; // Don't compress if the header is set
         }
-        // eslint-disable-next-line unicorn/no-array-callback-reference,unicorn/no-array-method-this-argument
         return compression.filter(request, response);
       },
     }),
@@ -77,7 +76,6 @@ async function bootstrap(): Promise<void> {
   await app.listen(port);
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
 bootstrap().catch((error) => {
   const logger = new Logger('Main');
   logger.error('Application failed to start', error);

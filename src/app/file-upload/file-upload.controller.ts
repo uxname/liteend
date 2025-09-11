@@ -32,7 +32,6 @@ import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 
-// eslint-disable-next-line sonarjs/content-length
 const storage = diskStorage({
   destination: (_request, _file, callback) => {
     const uploadDate = new Date();

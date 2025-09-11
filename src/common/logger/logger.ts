@@ -6,7 +6,6 @@ import * as process from 'node:process';
 import { LoggerService } from '@nestjs/common';
 import log4js, { Logger as Log4jsLogger } from 'log4js';
 
-// eslint-disable-next-line no-magic-numbers
 const MAX_BACKUP_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
 const MAX_BACKUP_COUNT = 100; // Maximum number of log files.
 
@@ -178,9 +177,7 @@ export class Logger implements LoggerService {
       const log = getLogger('console');
 
       for (const method of ['trace', 'debug', 'log', 'info', 'warn', 'error']) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        // eslint-disable-next-line security/detect-object-injection
         console[method] = (...arguments_: unknown[]): void => {
           log.warn(
             `Console deprecated, use Logger. [${method}]:`,

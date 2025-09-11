@@ -30,7 +30,6 @@ export class CryptoService {
 
   public async generateRandomString(
     prefix: RandomStringPrefix,
-    // eslint-disable-next-line no-magic-numbers
     length = 48,
     lengthIncludePrefix = true,
   ): Promise<string> {

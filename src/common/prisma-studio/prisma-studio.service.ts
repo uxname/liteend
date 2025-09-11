@@ -17,7 +17,6 @@ export class PrismaStudioService {
   async startStudio(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       // Run local Prisma Studio command
-      // eslint-disable-next-line sonarjs/no-os-command-from-path
       exec('npm run db:studio-local', (error, stdout, stderr) => {
         if (error) {
           this.logger.error('Command execution error:', error);
@@ -32,7 +31,6 @@ export class PrismaStudioService {
   }
 
   // Processes the incoming request for Prisma Studio
-  // eslint-disable-next-line complexity
   async processRequest(request: Request, response: Response): Promise<void> {
     const login = this.configService.getOrThrow<string>('PRISMA_STUDIO_LOGIN');
     const password = this.configService.getOrThrow<string>(

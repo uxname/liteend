@@ -44,7 +44,6 @@ export class ComplexityPlugin implements ApolloServerPlugin {
         }
 
         // Log a warning if the complexity exceeds half of the max limit
-        // eslint-disable-next-line no-magic-numbers
         if (complexity > MAX_COMPLEXITY / 2) {
           thisLogger.warn(`Query complexity: ${complexity}`);
         }

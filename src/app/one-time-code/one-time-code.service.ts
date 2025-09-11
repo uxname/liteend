@@ -20,10 +20,8 @@ export class OneTimeCodeService {
 
   async createOneTimeCode(email: string): Promise<OneTimeCode> {
     // 30 minutes
-    // eslint-disable-next-line no-magic-numbers
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes expiration time
     // Random 6 digits code
-    // eslint-disable-next-line no-magic-numbers
     const code = crypto.randomInt(100_000, 999_999).toString();
 
     // Check if there's an existing active code

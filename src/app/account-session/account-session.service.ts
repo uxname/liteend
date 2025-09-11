@@ -52,7 +52,6 @@ export class AccountSessionService {
       }
     }
 
-    // eslint-disable-next-line no-magic-numbers
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days from now
 
     const session = await this.prisma.accountSession.create({
