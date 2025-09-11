@@ -25,8 +25,8 @@ import {
 import { Response } from 'express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-
 import { FileUploadService } from '@/app/file-upload/file-upload.service';
+import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
@@ -63,6 +63,8 @@ const storage = diskStorage({
 
 @Controller()
 export class FileUploadController {
+  private readonly logger = new Logger(FileUploadController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileUploadService: FileUploadService,
@@ -164,6 +166,16 @@ export class FileUploadController {
     @Res() response: Response,
   ): Promise<void> {
     const fullFilePath = path.join(UPLOAD_DIR, ...filePath);
+
+    const resolvedPath = path.resolve(fullFilePath);
+
+    if (!resolvedPath.startsWith(path.resolve(UPLOAD_DIR))) {
+      this.logger.warn(
+        `Attempt to access file outside of upload directory: ${fullFilePath}`,
+      );
+      response.status(403).send('Forbidden');
+      return;
+    }
 
     if (!fs.existsSync(fullFilePath)) {
       const randomDelay = crypto.randomInt(500, 1500);
