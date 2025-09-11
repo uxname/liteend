@@ -53,6 +53,7 @@ export class EmailService {
 
   @Process()
   // @ts-expect-error Used through the @Process() decorator
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: Used through the @Process() decorator
   private async _processEmailSend(
     job: Job<ProcessEmailSendParameters>,
   ): Promise<void> {

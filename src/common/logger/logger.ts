@@ -179,7 +179,7 @@ export class Logger implements LoggerService {
 
       for (const method of ['trace', 'debug', 'log', 'info', 'warn', 'error']) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error
         // eslint-disable-next-line security/detect-object-injection
         console[method] = (...arguments_: unknown[]): void => {
           log.warn(
