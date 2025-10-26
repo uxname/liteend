@@ -98,7 +98,7 @@ services:
       BACKUP_INTERVAL: 14400000 # 4 hours
       BACKUP_ROTATION: 20
       BACKUP_FORMAT: plain
-      BACKUP_COMPRESS: true
+      BACKUP_COMPRESS: "true"
     volumes:
       - ./data/database_backups:/app/data/database_backups
     restart: unless-stopped
