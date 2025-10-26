@@ -1,4 +1,4 @@
-import * as crypto from 'node:crypto';
+import { randomInt, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as process from 'node:process';
@@ -23,7 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
 import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
@@ -55,7 +54,7 @@ const storage = diskStorage({
   },
   filename: (_request, file, callback) => {
     const extension = path.extname(file.originalname);
-    callback(null, `${uuidv4()}${extension}`);
+    callback(null, `${randomUUID()}${extension}`);
   },
 });
 
@@ -176,7 +175,7 @@ export class FileUploadController {
     }
 
     if (!fs.existsSync(fullFilePath)) {
-      const randomDelay = crypto.randomInt(500, 1500);
+      const randomDelay = randomInt(500, 1500);
       await new Promise((resolve) => setTimeout(resolve, randomDelay));
       response.status(204).end();
       return;

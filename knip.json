@@ -3,7 +3,7 @@
   "entry": ["src/main.ts!"],
   "project": ["src/**/*.ts!", "test/**/*.ts", "!src/db-backup-tool/**"],
   "ignore": ["src/@generated/**", "src/common/git-commit-saver.ts"],
-  "ignoreDependencies": ["cross-env"],
+  "ignoreDependencies": ["cross-env", "@as-integrations/express5"],
   "paths": {
     "@/*": ["src/*"]
   }
