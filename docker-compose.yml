@@ -1,106 +1,137 @@
+x-common-logging: &common-logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "5"
+
+x-common-restart-policy: &common-restart-policy
+  restart: unless-stopped
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
+    <<: *common-restart-policy
     env_file:
       - .env
-    volumes:
-      - ./data:/app/data:rw
     ports:
-      - 127.0.0.1:${PORT}:${PORT}
+      - "127.0.0.1:${PORT}:${PORT}"
+    volumes:
+      - ./data/uploads:/app/data/uploads
+      - ./data/logs:/app/data/logs
+      - ./data/database_backups:/app/data/database_backups
+    networks:
+      - liteend-net
+    logging: *common-logging
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "/app/healthcheck.sh" ]
-      interval: 2s
+      test: ["CMD-SHELL", "/app/healthcheck.sh"]
+      interval: 5s
       timeout: 10s
       retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
+      start_period: 10s
+
+  db:
+    image: postgres:17-alpine
+    <<: *common-restart-policy
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/pgdata
+    ports:
+      - "127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}"
+    command: -p ${DATABASE_PORT}
+    networks:
+      - liteend-net
+    logging: *common-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_admin:
+    image: dpage/pgadmin4:latest
+    <<: *common-restart-policy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_PASSWORD}
+    ports:
+      - "127.0.0.1:${DB_ADMIN_PORT}:80"
+    networks:
+      - liteend-net
+    logging: *common-logging
+    depends_on:
+      - db
 
   redis:
     image: redis:7.4-alpine
-    restart: unless-stopped
-    ports:
-      - 127.0.0.1:${REDIS_PORT}:${REDIS_PORT}
+    <<: *common-restart-policy
     command: >
       redis-server --save 20 1 --loglevel warning
       --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
     volumes:
       - ./data/redis:/data
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
+    ports:
+      - "127.0.0.1:${REDIS_PORT}:${PORT}"
+    networks:
+      - liteend-net
+    logging: *common-logging
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "${REDIS_PORT}", "--raw", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis_admin:
     image: rediscommander/redis-commander:latest
-    restart: unless-stopped
-    ports:
-      - 127.0.0.1:${REDIS_ADMIN_PORT}:8081
+    <<: *common-restart-policy
     environment:
-      HTTP_USER: ${REDIS_ADMIN_USER}
-      HTTP_PASSWORD: ${REDIS_ADMIN_PASSWORD}
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
-
-  db:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
-      PGDATA: "/data/postgres"
+      - REDIS_HOSTS=local:redis:${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - HTTP_USER=${REDIS_ADMIN_USER}
+      - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
     ports:
-      - 127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}
-    volumes:
-      - ./data/postgres:/data/postgres
-    command: -p ${DATABASE_PORT}
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
-
-  db_admin:
-    image: dpage/pgadmin4:latest
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_PASSWORD}
-    ports:
-      - 127.0.0.1:${DB_ADMIN_PORT}:80
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "5"
+      - "127.0.0.1:${REDIS_ADMIN_PORT}:8081"
+    networks:
+      - liteend-net
+    logging: *common-logging
+    depends_on:
+      - redis
 
   db_backup:
     build:
       context: .
       dockerfile: Dockerfile.database-backup
+    <<: *common-restart-policy
     environment:
-      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_NAME: ${DATABASE_NAME}
       BACKUP_DIR: /app/data/database_backups
-      BACKUP_INTERVAL: 14400000 # 4 hours
+      BACKUP_INTERVAL: 14400000
       BACKUP_ROTATION: 20
       BACKUP_FORMAT: plain
       BACKUP_COMPRESS: "true"
     volumes:
       - ./data/database_backups:/app/data/database_backups
-    restart: unless-stopped
+    networks:
+      - liteend-net
+    logging: *common-logging
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+networks:
+  liteend-net:
+    driver: bridge
