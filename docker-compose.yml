@@ -81,7 +81,7 @@ services:
     volumes:
       - ./data/redis:/data
     ports:
-      - "127.0.0.1:${REDIS_PORT}:${PORT}"
+      - "127.0.0.1:${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - liteend-net
     logging: *common-logging

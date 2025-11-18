@@ -1,18 +1,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { I18n, I18nContext } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/@generated/i18n-types';
-import { AuthGuard, OptionalAuth } from '@/app/auth/auth-guard/auth.guard';
-import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { ProfileRole } from '@/app/profile/types/profile-role.enum';
-import { RequestContextDecorator } from '@/app/request-context.decorator';
 import { Logger } from '@/common/logger/logger';
-import { PrismaService } from '@/common/prisma/prisma.service';
 
 import packageJson from '../../../package.json';
 
@@ -30,8 +24,6 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
 @Resolver(() => Query)
 export class DebugResolver {
   private static readonly logger: Logger = new Logger(DebugResolver.name);
-
-  constructor(private readonly prisma: PrismaService) {}
 
   private static readLastCommitInfo(): CommitInfo | undefined {
     try {
@@ -69,11 +61,7 @@ export class DebugResolver {
   }
 
   @Query(() => GraphQLJSON, { name: 'debug' })
-  @OptionalAuth()
-  @UseGuards(AuthGuard)
-  async debug(
-    @RequestContextDecorator() context: RequestContext,
-  ): Promise<unknown> {
+  async debug(): Promise<unknown> {
     const SECONDS_IN_DAY = 86_400;
     const SECONDS_IN_HOUR = 3600;
     const SECONDS_IN_MINUTE = 60;
@@ -107,9 +95,9 @@ export class DebugResolver {
       totalUsers: -1,
     };
 
-    result.totalUsers = context.profile?.roles.includes(ProfileRole.ADMIN)
-      ? await this.prisma.profile.count()
-      : undefined;
+    // result.totalUsers = context.profile?.roles.includes(ProfileRole.ADMIN)
+    //   ? await this.prisma.profile.count()
+    //   : undefined;
 
     return result;
   }

@@ -12,24 +12,15 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import { Request, Response } from 'express';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
-import { AccountModule } from '@/app/account/account.module';
-import { AccountSessionModule } from '@/app/account-session/account-session.module';
-import { AuthModule } from '@/app/auth/auth.module';
-import { RequestContext } from '@/app/auth/request-context-extractor/interfaces';
-import { RequestContextExtractorMiddleware } from '@/app/auth/request-context-extractor/request-context-extractor.middleware';
 import { DebugModule } from '@/app/debug/debug.module';
-import { EmailModule } from '@/app/email/email.module';
-import { OneTimeCodeModule } from '@/app/one-time-code/one-time-code.module';
 import {
   AllExceptionsFilter,
   createDigestFromError,
 } from '@/common/all-exceptions-filter';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { ComplexityPlugin } from '@/common/complexity.plugin';
-import { CryptoModule } from '@/common/crypto/crypto.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
 import { Logger } from '@/common/logger/logger';
@@ -58,19 +49,6 @@ const logger = new Logger('AppModule');
       introspection: true,
       persistedQueries: false,
       resolvers: { JSON: GraphQLJSON },
-      context: ({
-        req,
-        res,
-      }: {
-        req: Request;
-        res: Response;
-      }): RequestContext => ({
-        req,
-        res,
-        account: undefined,
-        profile: undefined,
-        accountSession: undefined,
-      }),
       formatError: (error) => {
         const digest = createDigestFromError(error);
         const errorWithDigest = { ...error, digest };
@@ -78,14 +56,8 @@ const logger = new Logger('AppModule');
         return errorWithDigest;
       },
     }),
-    AccountModule,
-    AuthModule,
-    AccountSessionModule,
     BullBoardModule,
-    CryptoModule,
     DebugModule,
-    OneTimeCodeModule,
-    EmailModule,
     LoggerModule,
     PrismaModule,
     PrismaStudioModule,
@@ -141,12 +113,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(HttpLoggerMiddleware)
-      .exclude({
-        path: 'health',
-        method: RequestMethod.ALL,
-      })
-      .forRoutes('*')
-      .apply(RequestContextExtractorMiddleware)
       .exclude({
         path: 'health',
         method: RequestMethod.ALL,

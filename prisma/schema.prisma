@@ -10,57 +10,20 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Account {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email        String @unique
-  passwordHash String
-
-  sessions AccountSession[]
-
-  profile   Profile? @relation(fields: [profileId], references: [id])
-  profileId Int?
-}
-
 model Profile {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  roles  ProfileRole[]
-  status AccountStatus
+  oidcSub String @unique
 
-  accounts Account[]
-
+  roles     ProfileRole[]
   avatarUrl String?
-  name      String?
-  bio       String?
-
-  totpEnabled Boolean @default(false)
-  totpSecret  String?
-}
-
-enum AccountStatus {
-  ACTIVE
-  INACTIVE
-  DELETED
 }
 
 enum ProfileRole {
   ADMIN
   USER
-}
-
-model OneTimeCode {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email     String   @unique
-  code      String
-  expiresAt DateTime
 }
 
 model Upload {
@@ -75,19 +38,4 @@ model Upload {
   mimetype         String
 
   uploaderIp String
-}
-
-model AccountSession {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId Int
-
-  token String @unique
-
-  ipAddr    String
-  userAgent String?
-  expiresAt DateTime
 }

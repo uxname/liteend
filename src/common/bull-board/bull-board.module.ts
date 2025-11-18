@@ -1,6 +1,5 @@
 import process from 'node:process';
 
-import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule as BullBoard } from '@bull-board/nestjs';
 import { HttpStatus, Module } from '@nestjs/common';
@@ -104,18 +103,10 @@ function sendUnauthorizedResponse(response: Response): void {
       middleware: createAuthenticationMiddleware(),
     }),
     // Registering queues with Bull Board
-    BullBoard.forFeature({
-      name: 'email',
-      adapter: BullAdapter,
-    }),
-    BullBoard.forFeature({
-      name: 'account-session',
-      adapter: BullAdapter,
-    }),
-    BullBoard.forFeature({
-      name: 'one-time-code',
-      adapter: BullAdapter,
-    }),
+    // BullBoard.forFeature({
+    //   name: 'email',
+    //   adapter: BullAdapter,
+    // }),
   ],
 })
 export class BullBoardModule {}
