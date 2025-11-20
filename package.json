@@ -68,7 +68,6 @@
     "class-validator": "^0.14.2",
     "compression": "^1.8.1",
     "cross-env": "^10.1.0",
-    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "graphql": "^16.12.0",
     "graphql-query-complexity": "^1.1.0",
