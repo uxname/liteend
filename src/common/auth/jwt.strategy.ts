@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Profile } from '@/app/profile/types/profile.object-type';
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 interface JwtPayload {
   sub: string;
@@ -16,7 +18,10 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {
     const issuer = configService.getOrThrow<string>('OIDC_ISSUER');
     const audience = configService.getOrThrow<string>('OIDC_AUDIENCE');
     const jwksUri = configService.getOrThrow<string>('OIDC_JWKS_URI');
@@ -36,15 +41,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<Profile> {
     if (!payload.sub) {
       throw new UnauthorizedException('Token has no subject (sub)');
     }
 
-    return {
-      id: payload.sub,
-      roles: payload.roles || [],
-      email: payload.email,
-    };
+    const oidcSub = payload.sub;
+
+    return this.prisma.profile.upsert({
+      where: { oidcSub },
+      create: {
+        oidcSub,
+      },
+      update: {},
+    });
   }
 }

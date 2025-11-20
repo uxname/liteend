@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ProfileRole } from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
 import { I18n, I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '@/@generated/i18n-types';
@@ -10,6 +11,8 @@ import {
   CurrentUserType,
 } from '@/common/auth/current-user.decorator';
 import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
+import { Roles } from '@/common/auth/roles.decorator';
+import { RolesGuard } from '@/common/auth/roles.guard';
 import { Logger } from '@/common/logger/logger';
 import packageJson from '../../../package.json';
 
@@ -63,7 +66,8 @@ export class DebugResolver {
     return text;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(ProfileRole.ADMIN, ProfileRole.USER)
   @Query(() => GraphQLJSON, { name: 'debug' })
   async debug(@CurrentUser() user: CurrentUserType): Promise<unknown> {
     const SECONDS_IN_DAY = 86_400;

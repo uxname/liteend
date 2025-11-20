@@ -7,7 +7,7 @@ CREATE TABLE "Profile" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "oidcSub" TEXT NOT NULL,
-    "roles" "ProfileRole"[],
+    "roles" "ProfileRole"[] DEFAULT ARRAY['USER']::"ProfileRole"[],
     "avatarUrl" TEXT,
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")

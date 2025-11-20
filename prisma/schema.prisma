@@ -17,7 +17,7 @@ model Profile {
 
   oidcSub String @unique
 
-  roles     ProfileRole[]
+  roles     ProfileRole[] @default([USER])
   avatarUrl String?
 }
 
