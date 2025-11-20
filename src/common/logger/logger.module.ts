@@ -1,10 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-
-import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
+import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
+import { pinoConfig } from '@/common/logger/pino-config';
 
 @Global()
 @Module({
-  providers: [HttpLoggerMiddleware],
-  exports: [HttpLoggerMiddleware],
+  imports: [PinoLoggerModule.forRoot(pinoConfig)],
 })
 export class LoggerModule {}

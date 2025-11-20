@@ -22,3 +22,6 @@
 - [ ] fix warning: [log]: [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
 - [ ] remove ts-node,jest,supertest,faker
 - [ ] move logger to Pino
+- [ ] log graphql requests & subscriptions
+- [ ] query for returning redirect url
+- [ ] update readme.md (all from OIDC migration)

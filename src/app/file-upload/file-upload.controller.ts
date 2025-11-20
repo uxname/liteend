@@ -2,11 +2,11 @@ import { randomInt, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as process from 'node:process';
-
 import {
   BadRequestException,
   Controller,
   Get,
+  Logger,
   Param,
   Post,
   Res,
@@ -24,7 +24,6 @@ import {
 import { Response } from 'express';
 import { diskStorage } from 'multer';
 import { FileUploadService } from '@/app/file-upload/file-upload.service';
-import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 

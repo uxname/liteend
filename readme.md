@@ -7,7 +7,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/uxname/liteend)](https://github.com/uxname/liteend/stargazers)
 
 Lightweight, fast, and easy-to-use backend app template for Node.js, based on [NestJS](https://nestjs.com/).
-Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storage, with Redis integration for caching/queues.
+Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storage, Redis for caching/queues, and OIDC for authentication.
 
 # Table of Contents
 
@@ -47,10 +47,11 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 * **Prisma ORM:** Type-safe database access with PostgreSQL.
 * **Redis Integration:** Support for caching and background jobs using Bull queues.
 * **Docker Support:** Easy setup and deployment with Docker and Docker Compose (App, PostgreSQL, Redis, Admin UIs, Backup).
-* **Code Quality Tools:** Integrated Biome (linting/formatting) and Jest (testing).
+* **Code Quality Tools:** Integrated Biome (linting/formatting) and Vitest (testing).
+* **Authentication:** Secure OIDC (OpenID Connect) integration (Logto, Auth0, etc.) with lazy user registration.
 * **Database Migrations:** Managed schema changes with Prisma Migrate.
 * **Configuration Management:** Environment-based configuration using `.env` files.
-* **Logging:** Configured logging with Log4js.
+* **Logging:** High-performance structured logging with Pino (file rotation included).
 * **API Documentation:** Basic Swagger UI setup.
 * **WebSockets:** Support for real-time communication.
 * **Task Queues:** Bull module integration.
@@ -70,8 +71,8 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 * **Containerization:** Docker, Docker Compose
 * **Package Manager:** npm
 * **Linting/Formatting:** BiomeJS
-* **Testing:** Jest
-* **Logging:** Log4js
+* **Testing:** Vitest, Pactum
+* **Logging:** Pino
 * **Admin Tools (via Docker):** pgAdmin 4, Redis Commander
 
 ## Prerequisites
@@ -313,11 +314,12 @@ These are some of the most important variables in `.env.example` to configure:
 
 * `NODE_ENV`: Set to `development` or `production`.
 * `PORT`: The port the NestJS application will listen on.
-* `SALT`: A secret string used for hashing passwords and other data.
+* `OIDC_ISSUER`: The URL of the OIDC provider (e.g., Logto).
+* `OIDC_AUDIENCE`: The API identifier defined in the OIDC provider.
+* `OIDC_JWKS_URI`: The URL to the JSON Web Key Set (JWKS) of the provider.
 * `DATABASE_URL`: The full connection string for PostgreSQL.
 * `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: Individual database connection parameters.
 * `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: Redis connection details.
-* `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`: Secret keys for JWT tokens.
 * `MAILER_...`: Email sending configuration (SMTP details).
 * `DB_ADMIN_PORT`, `DB_ADMIN_EMAIL`, `DB_ADMIN_PASSWORD`: pgAdmin access details.
 * `REDIS_ADMIN_PORT`, `REDIS_ADMIN_USER`, `REDIS_ADMIN_PASSWORD`: Redis Commander access details.

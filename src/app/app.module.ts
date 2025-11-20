@@ -3,12 +3,7 @@ import * as process from 'node:process';
 
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BullModule } from '@nestjs/bull';
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -23,8 +18,6 @@ import { AuthModule } from '@/common/auth/auth.module';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
-import { HttpLoggerMiddleware } from '@/common/logger/http-logger-middleware';
-import { Logger } from '@/common/logger/logger';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
@@ -148,14 +141,4 @@ interface GraphQLExecutionContext {
     },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(HttpLoggerMiddleware)
-      .exclude({
-        path: 'health',
-        method: RequestMethod.ALL,
-      })
-      .forRoutes('*');
-  }
-}
+export class AppModule {}

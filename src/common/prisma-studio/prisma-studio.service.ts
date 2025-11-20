@@ -1,11 +1,8 @@
 import { exec } from 'node:child_process';
-
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Request, Response } from 'express';
-
-import { Logger } from '@/common/logger/logger';
 
 @Injectable()
 export class PrismaStudioService {

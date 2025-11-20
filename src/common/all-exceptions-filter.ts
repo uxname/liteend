@@ -1,16 +1,14 @@
 import crypto from 'node:crypto';
-
 import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Response } from 'express';
-
-import { Logger } from '@/common/logger/logger';
 
 // Constants
 const DIGEST_LENGTH = 16;

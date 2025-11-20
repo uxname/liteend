@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProfileRole } from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
@@ -12,7 +12,6 @@ import {
 } from '@/common/auth/current-user.decorator';
 import { JwtOptionalAuthGuard } from '@/common/auth/jwt-optional-auth.guard';
 import { Roles } from '@/common/auth/roles.decorator';
-import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import packageJson from '../../../package.json';
 
@@ -29,7 +28,7 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
 
 @Resolver(() => Query)
 export class DebugResolver {
-  private static readonly logger: Logger = new Logger(DebugResolver.name);
+  private static readonly logger = new Logger(DebugResolver.name);
 
   constructor(private readonly prisma: PrismaService) {}
 

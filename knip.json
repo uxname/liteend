@@ -6,7 +6,9 @@
   "ignoreDependencies": [
     "cross-env",
     "@as-integrations/express5",
-    "graphql-ws"
+    "graphql-ws",
+    "pino-pretty",
+    "pino-roll"
   ],
   "paths": {
     "@/*": ["src/*"]

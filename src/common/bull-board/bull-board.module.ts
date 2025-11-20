@@ -2,10 +2,8 @@ import process from 'node:process';
 
 import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule as BullBoard } from '@bull-board/nestjs';
-import { HttpStatus, Module } from '@nestjs/common';
+import { HttpStatus, Logger, Module } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-
-import { Logger } from '../logger/logger';
 
 // Instantiate logger with a descriptive name for this module
 const logger = new Logger('BullBoardModule');

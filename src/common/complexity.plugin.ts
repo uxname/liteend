@@ -1,6 +1,7 @@
 import { ApolloServerPlugin, GraphQLRequestListener } from '@apollo/server';
 import type { BaseContext } from '@apollo/server/src/externalTypes/context';
 import { Plugin } from '@nestjs/apollo';
+import { Logger } from '@nestjs/common';
 import { GraphQLSchemaHost } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
 import {
@@ -8,7 +9,6 @@ import {
   getComplexity,
   simpleEstimator,
 } from 'graphql-query-complexity';
-import { Logger } from '@/common/logger/logger';
 
 @Plugin()
 export class ComplexityPlugin implements ApolloServerPlugin {

@@ -1,9 +1,7 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Logger, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import Redis from 'ioredis';
-
-import { Logger } from '@/common/logger/logger';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Controller('health')

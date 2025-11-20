@@ -5,14 +5,16 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 import helmet from 'helmet';
-
-import { Logger } from '@/common/logger/logger';
-
+import { Logger } from 'nestjs-pino';
 import packageJson from '../package.json';
 import { AppModule } from './app/app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
+
+  app.useLogger(app.get(Logger));
 
   // Global pipe setup for validation
   app.useGlobalPipes(new ValidationPipe());
@@ -46,9 +48,6 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const logger = new Logger('Main');
-  app.useLogger(logger);
-
   // Compression middleware setup
   app.use(
     compression({
@@ -65,6 +64,7 @@ async function bootstrap(): Promise<void> {
 
   const port = configService.getOrThrow<number>('PORT');
 
+  const logger = app.get(Logger);
   logger.log(`App started at http://localhost:${port}`);
 
   // Start server
@@ -72,6 +72,5 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error) => {
-  const logger = new Logger('Main');
-  logger.error('Application failed to start', error);
+  console.error('Application failed to start', error);
 });

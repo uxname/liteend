@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Logger,
   Post,
   RawBodyRequest,
   Req,
@@ -10,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-
-import { Logger } from '@/common/logger/logger';
 import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
 
 const ROUTES_GET = [

@@ -1,7 +1,5 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
-import { Logger } from '@/common/logger/logger';
 import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
 
 import { PrismaStudioController } from './prisma-studio.controller';
