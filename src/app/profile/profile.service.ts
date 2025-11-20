@@ -1,21 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Profile } from '@/app/profile/types/profile.object-type';
-import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
+import { Profile } from '@prisma/client';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { ProfileUpdateInput } from './types/profile-update.input';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async updateProfile(
-    oidcSub: string,
-    input: ProfileUpdateInput,
-  ): Promise<Profile> {
-    return this.prismaService.profile.update({
-      where: {
-        oidcSub,
+  async updateProfile(id: number, input: ProfileUpdateInput): Promise<Profile> {
+    return this.prisma.profile.update({
+      where: { id },
+      data: {
+        ...input,
       },
-      data: input,
     });
   }
 }
