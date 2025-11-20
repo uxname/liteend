@@ -93,8 +93,7 @@ export class DebugResolver {
       totalUsers: -1,
       authInfo: {
         message: 'You are authenticated!',
-        userId: user.id,
-        roles: user.roles,
+        user,
       },
     };
   }
