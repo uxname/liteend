@@ -10,10 +10,10 @@ import {
   CurrentUser,
   CurrentUserType,
 } from '@/common/auth/current-user.decorator';
-import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
+import { JwtOptionalAuthGuard } from '@/common/auth/jwt-optional-auth.guard';
 import { Roles } from '@/common/auth/roles.decorator';
-import { RolesGuard } from '@/common/auth/roles.guard';
 import { Logger } from '@/common/logger/logger';
+import { PrismaService } from '@/common/prisma/prisma.service';
 import packageJson from '../../../package.json';
 
 interface CommitInfo {
@@ -30,6 +30,8 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
 @Resolver(() => Query)
 export class DebugResolver {
   private static readonly logger: Logger = new Logger(DebugResolver.name);
+
+  constructor(private readonly prisma: PrismaService) {}
 
   private static readLastCommitInfo(): CommitInfo | undefined {
     try {
@@ -66,7 +68,7 @@ export class DebugResolver {
     return text;
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtOptionalAuthGuard)
   @Roles(ProfileRole.ADMIN, ProfileRole.USER)
   @Query(() => GraphQLJSON, { name: 'debug' })
   async debug(@CurrentUser() user: CurrentUserType): Promise<unknown> {
@@ -84,6 +86,14 @@ export class DebugResolver {
     );
     const uptimePretty = `${uptimeDays}d ${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s`;
 
+    // Logic for sensitive data
+    let totalUsers: number | undefined;
+
+    // Check if user exists AND has ADMIN role
+    if (user?.roles.includes(ProfileRole.ADMIN)) {
+      totalUsers = await this.prisma.profile.count();
+    }
+
     return {
       serverTime: new Date().toISOString(),
       uptime: uptimePretty,
@@ -94,11 +104,10 @@ export class DebugResolver {
       },
       lastCommit:
         DebugResolver.readLastCommitInfo() || 'No commit info available',
-      totalUsers: -1,
-      authInfo: {
-        message: 'You are authenticated!',
-        user,
-      },
+      totalUsers,
+      requester: user
+        ? `User ID: ${user.id} (${user.roles.join(', ')})`
+        : 'Anonymous',
     };
   }
 }
