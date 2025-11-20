@@ -1,5 +1,3 @@
-import 'source-map-support/register';
-
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';

@@ -42,8 +42,5 @@
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
     "noStrictGenericChecks": false
-  },
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
   }
 }

@@ -1,26 +1,35 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import request from 'supertest';
-
+import * as pactum from 'pactum';
+import { afterAll, beforeAll, describe, it } from 'vitest';
 import { AppModule } from '@/app/app.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  const port = 4001; // Порт для тестов
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    await app.init();
+
+    // Запускаем приложение на реальном порту
+    await app.listen(port);
+
+    // Говорим Pactum-у, куда стучаться
+    pactum.request.setBaseUrl(`http://localhost:${port}`);
   });
 
-  test('/ (GET)', () => {
-    expect(app).toBeDefined();
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(HttpStatus.OK)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('/health (GET)', () => {
+    // Pactum style: читается как предложение
+    return pactum.spec().get('/health').expectStatus(200).expectJsonLike({
+      status: 'ok',
+    });
   });
 });
