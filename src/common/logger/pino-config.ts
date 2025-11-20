@@ -26,6 +26,8 @@ export const pinoConfig: Params = {
       ignore: (req) => {
         if (req.url?.includes('/health')) return true;
         if (req.url?.includes('/favicon.ico')) return true;
+        if (req.url?.startsWith('/logs')) return true;
+
         return false;
       },
     },
