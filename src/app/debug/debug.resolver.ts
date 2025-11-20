@@ -1,13 +1,16 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { I18n, I18nContext } from 'nestjs-i18n';
-
 import { I18nTranslations } from '@/@generated/i18n-types';
+import {
+  CurrentUser,
+  CurrentUserType,
+} from '@/common/auth/current-user.decorator';
+import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
 import { Logger } from '@/common/logger/logger';
-
 import packageJson from '../../../package.json';
 
 interface CommitInfo {
@@ -60,8 +63,9 @@ export class DebugResolver {
     return text;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Query(() => GraphQLJSON, { name: 'debug' })
-  async debug(): Promise<unknown> {
+  async debug(@CurrentUser() user: CurrentUserType): Promise<unknown> {
     const SECONDS_IN_DAY = 86_400;
     const SECONDS_IN_HOUR = 3600;
     const SECONDS_IN_MINUTE = 60;
@@ -76,13 +80,7 @@ export class DebugResolver {
     );
     const uptimePretty = `${uptimeDays}d ${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s`;
 
-    const result: {
-      serverTime: string;
-      uptime: string;
-      appInfo: { name: string; version: string; description: string };
-      lastCommit: CommitInfo | string;
-      totalUsers: number | undefined;
-    } = {
+    return {
       serverTime: new Date().toISOString(),
       uptime: uptimePretty,
       appInfo: {
@@ -93,12 +91,11 @@ export class DebugResolver {
       lastCommit:
         DebugResolver.readLastCommitInfo() || 'No commit info available',
       totalUsers: -1,
+      authInfo: {
+        message: 'You are authenticated!',
+        userId: user.id,
+        roles: user.roles,
+      },
     };
-
-    // result.totalUsers = context.profile?.roles.includes(ProfileRole.ADMIN)
-    //   ? await this.prisma.profile.count()
-    //   : undefined;
-
-    return result;
   }
 }

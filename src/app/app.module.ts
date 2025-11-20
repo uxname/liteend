@@ -19,6 +19,7 @@ import {
   AllExceptionsFilter,
   createDigestFromError,
 } from '@/common/all-exceptions-filter';
+import { AuthModule } from '@/common/auth/auth.module';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
@@ -28,7 +29,6 @@ import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
-
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { HealthModule } from './health/health.module';
 import { ProfileModule } from './profile/profile.module';
@@ -36,6 +36,7 @@ import { ProfileModule } from './profile/profile.module';
 const logger = new Logger('AppModule');
 @Module({
   imports: [
+    AuthModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
