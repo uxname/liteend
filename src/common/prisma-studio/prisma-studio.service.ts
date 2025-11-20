@@ -1,8 +1,8 @@
 import { exec } from 'node:child_process';
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
 import { Request, Response } from 'express';
+import { ofetch } from 'ofetch';
 
 @Injectable()
 export class PrismaStudioService {
@@ -70,19 +70,29 @@ export class PrismaStudioService {
         : `http://localhost:5555${request.url}`;
 
     try {
-      const { data, status, headers } = await axios({
+      const proxyResponse = await ofetch.raw(url, {
         method: request.method,
-        url,
-        headers: request.headers,
-        data: request.method === 'POST' ? request.body : undefined,
+        headers: request.headers as Record<string, string>,
+        body: request.method === 'POST' ? request.body : undefined,
+        ignoreResponseError: true,
+        responseType: 'arrayBuffer',
       });
 
-      response.status(status);
-      for (const [header, value] of Object.entries(headers)) {
-        response.setHeader(header, value);
-      }
+      response.status(proxyResponse.status);
 
-      response.send(data);
+      proxyResponse.headers.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        if (lowerKey === 'content-length' || lowerKey === 'content-encoding') {
+          return;
+        }
+        response.setHeader(key, value);
+      });
+
+      if (proxyResponse._data) {
+        response.send(Buffer.from(proxyResponse._data));
+      } else {
+        response.end();
+      }
     } catch (error) {
       this.logger.error('Error while processing the request:', error);
       response
