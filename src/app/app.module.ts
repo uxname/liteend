@@ -34,11 +34,49 @@ import { HealthModule } from './health/health.module';
 import { ProfileModule } from './profile/profile.module';
 
 const logger = new Logger('AppModule');
+
+interface ContextArgs {
+  req?: Request;
+  extra?: {
+    connectionParams?: Record<string, unknown>;
+  };
+}
+
+interface OnConnectArgs {
+  connectionParams?: Record<string, unknown>;
+  extra: unknown;
+}
+
+interface GraphQLExecutionContext {
+  req?: Request;
+  connectionParams?: Record<string, unknown>;
+}
+
 @Module({
   imports: [
     AuthModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      subscriptions: {
+        'graphql-ws': {
+          path: '/graphql',
+          onConnect: (context: OnConnectArgs) => {
+            const { connectionParams, extra } = context;
+            const enhancedExtra = extra as {
+              connectionParams?: Record<string, unknown>;
+            };
+            enhancedExtra.connectionParams = connectionParams;
+            return { extra: enhancedExtra };
+          },
+        },
+      },
+      context: ({ req, extra }: ContextArgs) => {
+        const context: GraphQLExecutionContext = {};
+        if (req) context.req = req;
+        if (extra?.connectionParams)
+          context.connectionParams = extra.connectionParams;
+        return context;
+      },
       autoSchemaFile: true,
       path: '/graphql',
       graphiql: true,
