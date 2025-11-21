@@ -48,7 +48,7 @@ export class DotenvValidatorService {
       .filter((line) => line.length > 0 && !line.startsWith('#'))
       .map((line) => {
         const separatorIndex = line.indexOf('=');
-        if (separatorIndex === -1) return line; // На случай странных строк
+        if (separatorIndex === -1) return line;
         return line.substring(0, separatorIndex).trim();
       });
   }

@@ -6,7 +6,7 @@ import { AppModule } from '@/app/app.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  const port = 4001; // Порт для тестов
+  const port = 4001;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,10 +15,8 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    // Запускаем приложение на реальном порту
     await app.listen(port);
 
-    // Говорим Pactum-у, куда стучаться
     pactum.request.setBaseUrl(`http://localhost:${port}`);
   });
 
@@ -27,7 +25,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('/health (GET)', () => {
-    // Pactum style: читается как предложение
     return pactum.spec().get('/health').expectStatus(200).expectJsonLike({
       status: 'ok',
     });
