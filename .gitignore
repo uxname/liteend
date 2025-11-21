@@ -38,4 +38,3 @@ lerna-debug.log*
 tsconfig.tsbuildinfo
 .husky
 
-.cspellcache

@@ -9,6 +9,7 @@ files:
 ignorePaths:
   - "src/app/file-upload/file-upload.service.ts"
   - "src/@generated/**"
+  -
 dictionaries:
   - typescript
   - en
