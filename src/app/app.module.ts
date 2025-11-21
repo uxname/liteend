@@ -2,7 +2,7 @@ import path from 'node:path';
 import * as process from 'node:process';
 
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { BullModule } from '@nestjs/bull';
+import { BullModule } from '@nestjs/bullmq';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
@@ -26,6 +26,7 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { HealthModule } from './health/health.module';
 import { ProfileModule } from './profile/profile.module';
+import { TestQueueModule } from './test-queue/test-queue.module';
 
 const logger = new Logger('AppModule');
 
@@ -50,6 +51,7 @@ interface GraphQLExecutionContext {
   imports: [
     AuthModule,
     AuthConfigModule,
+    TestQueueModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       subscriptions: {
@@ -102,7 +104,7 @@ interface GraphQLExecutionContext {
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        redis: {
+        connection: {
           host: configService.getOrThrow<string>('REDIS_HOST'),
           port: Number.parseInt(
             configService.getOrThrow<string>('REDIS_PORT'),
