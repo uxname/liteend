@@ -6,7 +6,7 @@ import { Job } from 'bullmq';
 export class TestQueueProcessor extends WorkerHost {
   private readonly logger = new Logger(TestQueueProcessor.name);
 
-  async process(job: Job<any, any, string>): Promise<any> {
+  async process(job: Job): Promise<unknown> {
     this.logger.log(
       `Start processing job ${job.id} (${job.name}). Data: ${JSON.stringify(job.data)}`,
     );

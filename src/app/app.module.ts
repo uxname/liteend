@@ -9,7 +9,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
-import { AuthConfigModule } from '@/app/auth-config/auth-config.module';
 import { DebugModule } from '@/app/debug/debug.module';
 import {
   AllExceptionsFilter,
@@ -50,7 +49,6 @@ interface GraphQLExecutionContext {
 @Module({
   imports: [
     AuthModule,
-    AuthConfigModule,
     TestQueueModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
