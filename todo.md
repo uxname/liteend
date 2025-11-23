@@ -1,4 +1,6 @@
-# Todo
+# TODO
+
+## General
 
 - [ ] (db_backup) Throw error when pg_dump not found database but no error message in logs
 - [ ] Change log levels to: verbose, debug, info, warn, error
@@ -13,7 +15,7 @@
 - [ ] Add log rotation into docker-compose.yml
 - [ ] DELETE THIS FILE
 
-# OIDC Migration todo
+## OIDC Migration todo
 
 - [ ] Update profile mutation
 - [ ] Websocket + auth
