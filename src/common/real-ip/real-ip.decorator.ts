@@ -1,33 +1,36 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { FastifyRequest } from 'fastify';
 
-// RealIp decorator to retrieve the real IP address of the client
 export const RealIp = createParamDecorator(
-  (_data: unknown, context: ExecutionContext): string | undefined => {
-    let request: {
-      headers: Record<string, string | string[]>;
-      connection: { remoteAddress: string };
-    };
+  (_data: unknown, context: ExecutionContext): string => {
+    let request: FastifyRequest;
 
-    // Handle HTTP requests
     if (context.getType() === 'http') {
-      request = context.switchToHttp().getRequest();
+      request = context.switchToHttp().getRequest<FastifyRequest>();
     } else {
-      // Handle GraphQL requests
       const gqlContext = GqlExecutionContext.create(context);
       request = gqlContext.getContext().req;
     }
 
-    // Get IP address from headers or fallback to connection.remoteAddress
-    const xRealIp = request.headers['x-real-ip'] as string | undefined;
-    const xForwardedFor = request.headers['x-forwarded-for'];
+    // 1. Fastify native way (работает для HTTP контроллеров)
+    // Учитывает настройки 'trustProxy' в main.ts
+    if (request.ip) {
+      return request.ip;
+    }
 
-    // If x-forwarded-for is an array, use the first IP in the list
-    const forwardedIp = Array.isArray(xForwardedFor)
-      ? xForwardedFor[0]
-      : xForwardedFor;
+    // 2. Обработка заголовков вручную (полезно для наших кастомных контекстов в GraphQL/WS)
+    // Мы создавали объект { req: { headers: ... } } в AppModule
+    const headers = request.headers || {};
+    const xForwardedFor = headers['x-forwarded-for'];
 
-    // Return the first valid IP address found, using nullish coalescing for better safety
-    return xRealIp ?? forwardedIp ?? request.connection.remoteAddress;
+    if (xForwardedFor) {
+      return Array.isArray(xForwardedFor)
+        ? xForwardedFor[0]!
+        : xForwardedFor.split(',')[0]!;
+    }
+
+    // 3. Fallback, если IP определить не удалось
+    return '127.0.0.1';
   },
 );

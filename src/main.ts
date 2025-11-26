@@ -1,6 +1,7 @@
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import multiPart from '@fastify/multipart';
+import rateLimit from '@fastify/rate-limit';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -48,8 +49,14 @@ async function bootstrap(): Promise<void> {
     crossOriginResourcePolicy: false,
   });
 
+  await app.register(rateLimit, {
+    max: 100, // 100 запросов
+    timeWindow: '1 minute', // в минуту с одного IP
+  });
+
   await app.register(compression, {
     encodings: ['gzip', 'deflate'],
+    threshold: 1024,
   });
 
   const configService = app.get(ConfigService);
@@ -73,7 +80,8 @@ async function bootstrap(): Promise<void> {
 
   const logger = app.get(Logger);
   logger.log(`App started at http://localhost:${port}`);
-  logger.log(`GraphQL Playground at http://localhost:${port}/graphiql`);
+  logger.log(`GraphiQL at http://localhost:${port}/graphiql`);
+  logger.log(`Altair at http://localhost:${port}/altair`);
 }
 
 bootstrap().catch((error) => {

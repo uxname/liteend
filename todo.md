@@ -18,3 +18,11 @@
 ## OIDC Migration todo
 
 - [x] Migrate to Fastify
+- [ ] Protect upload endpoint
+- [ ] Migrate: pnpm, SWC, hot reload,
+- [ ] ```
+      throw new mercurius.ErrorWithProps('User not found', {
+        code: 'USER_NOT_FOUND',
+        timestamp: new Date().toISOString()
+      });
+      ```

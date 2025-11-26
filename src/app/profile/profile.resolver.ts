@@ -1,6 +1,13 @@
-import { Inject, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { UseGuards } from '@nestjs/common';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
+import { PubSub } from 'mercurius'; // <--- Важный импорт
 import { ProfileService } from '@/app/profile/profile.service';
 import { Profile } from '@/app/profile/types/profile.object-type';
 import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
@@ -10,7 +17,6 @@ import {
 } from '@/common/auth/current-user.decorator';
 import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
 import { RolesGuard } from '@/common/auth/roles.guard';
-import { PUB_SUB } from '@/common/pubsub/pubsub.module';
 
 const EVENTS = {
   PROFILE_UPDATED: 'profileUpdated',
@@ -19,10 +25,7 @@ const EVENTS = {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Resolver(() => Profile)
 export class ProfileResolver {
-  constructor(
-    private readonly profileService: ProfileService,
-    @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
-  ) {}
+  constructor(private readonly profileService: ProfileService) {}
 
   @Query(() => Profile, { name: 'me' })
   async me(@CurrentUser() user: CurrentUserType): Promise<Profile> {
@@ -33,14 +36,19 @@ export class ProfileResolver {
   async updateProfile(
     @CurrentUser() user: CurrentUserType,
     @Args('input') input: ProfileUpdateInput,
+    @Context('pubsub') pubSub: PubSub, // <--- Получаем PubSub из контекста
   ): Promise<Profile> {
     const updatedProfile = await this.profileService.updateProfile(
       user.id,
       input,
     );
 
-    await this.pubSub.publish(EVENTS.PROFILE_UPDATED, {
-      profileUpdated: updatedProfile,
+    // Метод publish в Mercurius принимает объект { topic, payload }
+    await pubSub.publish({
+      topic: EVENTS.PROFILE_UPDATED,
+      payload: {
+        profileUpdated: updatedProfile,
+      },
     });
 
     return updatedProfile;
@@ -48,13 +56,16 @@ export class ProfileResolver {
 
   @Subscription(() => Profile, {
     name: EVENTS.PROFILE_UPDATED,
+    // В Mercurius filter работает немного иначе, но концепция та же
     filter: (payload, _variables, context) => {
       const updatedProfileId = payload.profileUpdated.id;
+      // context.req.user появится благодаря JwtAuthGuard
       const currentUserId = context.req?.user?.id;
       return currentUserId === updatedProfileId;
     },
   })
-  profileUpdated() {
-    return this.pubSub.asyncIterator(EVENTS.PROFILE_UPDATED);
+  profileUpdated(@Context('pubsub') pubSub: PubSub) {
+    // Используем subscribe вместо asyncIterator
+    return pubSub.subscribe(EVENTS.PROFILE_UPDATED);
   }
 }

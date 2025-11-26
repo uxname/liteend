@@ -8,7 +8,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 
 // Constants
 const DIGEST_LENGTH = 16;
@@ -61,7 +61,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         break;
       }
       case 'ws': {
-        this.handleWsException(exception, host);
+        this.logUnhandledContextType(contextType);
         break;
       }
       default: {
@@ -75,27 +75,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
    */
   private handleHttpException(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
-    const response = context.getResponse<Response>();
+    const response = context.getResponse<FastifyReply>();
+
+    // Fastify check: if headers sent, stop
+    if (response.sent) return;
 
     const { errorResponse, statusCode } = this.prepareErrorResponse(exception);
 
     this.logError(errorResponse);
 
-    response.status(statusCode).json(errorResponse);
-  }
-
-  /**
-   * Handles WebSocket context exceptions
-   */
-  private handleWsException(exception: unknown, host: ArgumentsHost): void {
-    const context = host.switchToWs();
-    const client = context.getClient();
-
-    const { errorResponse } = this.prepareErrorResponse(exception);
-
-    this.logError(errorResponse);
-
-    client.emit('error', errorResponse);
+    // !!! FASTIFY SYNTAX !!!
+    // Express: response.status(statusCode).json(errorResponse);
+    // Fastify:
+    response.code(statusCode).send(errorResponse);
   }
 
   /**
@@ -174,7 +166,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
    * Logs unhandled context types
    */
   private logUnhandledContextType(contextType: string): void {
-    this.logger.warn(`Unhandled context type: ${contextType}`);
+    if (contextType !== 'graphql') {
+      this.logger.warn(`Unhandled context type: ${contextType}`);
+    }
   }
 }
 

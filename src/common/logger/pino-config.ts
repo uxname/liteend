@@ -62,7 +62,7 @@ export const pinoConfig: Params = {
         id: req.id,
         method: req.method,
         url: req.url,
-        ip: req.remoteAddress,
+        ip: req.remoteAddress || req.socket?.remoteAddress,
       }),
     },
   },
