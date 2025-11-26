@@ -5,15 +5,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<Request>();
-    const response = context.switchToHttp().getResponse<Response>();
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
+    const response = context.switchToHttp().getResponse<FastifyReply>();
 
     const authHeader = request.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Basic ')) {
@@ -42,8 +42,8 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private requestCredentials(response: Response): void {
-    response.setHeader(
+  private requestCredentials(response: FastifyReply): void {
+    response.header(
       'WWW-Authenticate',
       'Basic realm="Access to the protected resource"',
     );

@@ -1,110 +1,83 @@
-import process from 'node:process';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { ExpressAdapter } from '@bull-board/express';
+import { FastifyAdapter } from '@bull-board/fastify';
 import { BullBoardModule as BullBoard } from '@bull-board/nestjs';
-import { HttpStatus, Logger, Module } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
-
-// Instantiate logger with a descriptive name for this module
-const logger = new Logger('BullBoardModule');
-
-function createAuthenticationMiddleware(): (
-  request: Request,
-  response: Response,
-  next: NextFunction,
-) => void {
-  return (request: Request, response: Response, next: NextFunction): void => {
-    try {
-      const { login, password } = getCredentialsFromEnvironment();
-
-      if (!login || !password) {
-        handleAuthError(
-          response,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          'Authentication credentials are missing in environment variables.',
-        );
-        return;
-      }
-
-      const credentials = extractCredentials(request);
-      if (!credentials || !validateCredentials(credentials, login, password)) {
-        sendUnauthorizedResponse(response);
-        return;
-      }
-
-      next(); // Authentication successful
-    } catch (error) {
-      logger.error('Error in authentication middleware:', error);
-      response
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send('Internal Server Error');
-    }
-  };
-}
-
-function getCredentialsFromEnvironment(): {
-  login: string | undefined;
-  password: string | undefined;
-} {
-  return {
-    login: process.env.BULL_BOARD_LOGIN,
-    password: process.env.BULL_BOARD_PASSWORD,
-  };
-}
-
-function extractCredentials(
-  request: Request,
-): { login: string; password: string } | undefined {
-  const authorizationHeader = request.headers.authorization ?? '';
-  const [authType, credentials] = authorizationHeader.split(' ');
-
-  if (authType !== 'Basic' || !credentials) {
-    return undefined;
-  }
-
-  const [login, password] = Buffer.from(credentials, 'base64')
-    .toString()
-    .split(':');
-
-  return login && password ? { login, password } : undefined;
-}
-
-function validateCredentials(
-  provided: { login: string; password: string },
-  expectedLogin: string,
-  expectedPassword: string,
-): boolean {
-  return (
-    provided.login === expectedLogin && provided.password === expectedPassword
-  );
-}
-
-function handleAuthError(
-  response: Response,
-  status: HttpStatus,
-  message: string,
-): void {
-  logger.error(message);
-  response.status(status).send(message);
-}
-
-function sendUnauthorizedResponse(response: Response): void {
-  response.set('WWW-Authenticate', 'Basic realm="401"');
-  response.status(HttpStatus.UNAUTHORIZED).send('Authentication required.');
-}
+import { Module, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { HttpAdapterHost } from '@nestjs/core';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 @Module({
   imports: [
     BullBoard.forRoot({
       route: '/board',
-      adapter: ExpressAdapter, // Using ExpressAdapter; switch to FastifyAdapter if needed
-      middleware: createAuthenticationMiddleware(),
+      adapter: FastifyAdapter,
     }),
-    // Registering queues with Bull Board
     BullBoard.forFeature({
       name: 'test',
       adapter: BullMQAdapter,
     }),
   ],
 })
-export class BullBoardModule {}
+export class BullBoardModule implements OnModuleInit {
+  constructor(
+    private readonly adapterHost: HttpAdapterHost,
+    private readonly configService: ConfigService,
+  ) {}
+
+  onModuleInit() {
+    const httpAdapter = this.adapterHost.httpAdapter;
+    // Получаем прямой доступ к инстансу Fastify
+    const fastify = httpAdapter.getInstance<FastifyInstance>();
+
+    const login = this.configService.get<string>('BULL_BOARD_LOGIN');
+    const password = this.configService.get<string>('BULL_BOARD_PASSWORD');
+
+    // Регистрируем глобальный хук
+    fastify.addHook(
+      'onRequest',
+      async (req: FastifyRequest, reply: FastifyReply) => {
+        // Фильтруем только запросы к админке
+        if (!req.url.startsWith('/board')) {
+          return;
+        }
+
+        // Функция для отправки запроса авторизации
+        const unauthorized = () => {
+          reply
+            .code(401)
+            .header('WWW-Authenticate', 'Basic realm="BullBoard"')
+            .send('Unauthorized');
+          // Важно вернуть reply, чтобы Fastify понял, что ответ отправлен и прервал цепочку
+          return reply;
+        };
+
+        if (!login || !password) {
+          return unauthorized();
+        }
+
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+          return unauthorized();
+        }
+
+        const [scheme, credentials] = authHeader.split(' ');
+
+        if (scheme !== 'Basic' || !credentials) {
+          return unauthorized();
+        }
+
+        const [user, pass] = Buffer.from(credentials, 'base64')
+          .toString()
+          .split(':');
+
+        if (user !== login || pass !== password) {
+          reply.code(403).send('Forbidden');
+          return reply;
+        }
+
+        // Если все ок, просто выходим из функции, запрос идет дальше
+      },
+    );
+  }
+}

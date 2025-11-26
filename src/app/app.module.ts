@@ -1,93 +1,59 @@
 import path from 'node:path';
 import * as process from 'node:process';
-
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BullModule } from '@nestjs/bullmq';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { DebugModule } from '@/app/debug/debug.module';
+import { FileUploadModule } from '@/app/file-upload/file-upload.module';
+import { HealthModule } from '@/app/health/health.module';
+import { ProfileModule } from '@/app/profile/profile.module';
+import { TestQueueModule } from '@/app/test-queue/test-queue.module';
 import {
   AllExceptionsFilter,
   createDigestFromError,
 } from '@/common/all-exceptions-filter';
 import { AuthModule } from '@/common/auth/auth.module';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
-import { ComplexityPlugin } from '@/common/complexity.plugin';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
-import { FileUploadModule } from './file-upload/file-upload.module';
-import { HealthModule } from './health/health.module';
-import { ProfileModule } from './profile/profile.module';
-import { TestQueueModule } from './test-queue/test-queue.module';
 
 const logger = new Logger('AppModule');
-
-interface ContextArgs {
-  req?: Request;
-  extra?: {
-    connectionParams?: Record<string, unknown>;
-  };
-}
-
-interface OnConnectArgs {
-  connectionParams?: Record<string, unknown>;
-  extra: unknown;
-}
-
-interface GraphQLExecutionContext {
-  req?: Request;
-  connectionParams?: Record<string, unknown>;
-}
 
 @Module({
   imports: [
     AuthModule,
     TestQueueModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      subscriptions: {
-        'graphql-ws': {
-          path: '/graphql',
-          onConnect: (context: OnConnectArgs) => {
-            const { connectionParams, extra } = context;
-            const enhancedExtra = extra as {
-              connectionParams?: Record<string, unknown>;
-            };
-            enhancedExtra.connectionParams = connectionParams;
-            return { extra: enhancedExtra };
-          },
-        },
-      },
-      context: ({ req, extra }: ContextArgs) => {
-        const context: GraphQLExecutionContext = {};
-        if (req) context.req = req;
-        if (extra?.connectionParams)
-          context.connectionParams = extra.connectionParams;
-        return context;
-      },
+    GraphQLModule.forRoot<MercuriusDriverConfig>({
+      driver: MercuriusDriver,
       autoSchemaFile: true,
-      path: '/graphql',
-      graphiql: true,
-      playground: {
-        settings: {
-          'editor.theme': 'light',
-        },
-      },
-      introspection: true,
-      persistedQueries: false,
+      graphiql: false,
+      subscription: true,
       resolvers: { JSON: GraphQLJSON },
-      formatError: (error) => {
-        const digest = createDigestFromError(error);
-        const errorWithDigest = { ...error, digest };
-        logger.error(errorWithDigest);
-        return errorWithDigest;
+      errorFormatter: (execution) => {
+        const [error] = execution.errors;
+        const originalError = error?.originalError || error;
+        const digest = createDigestFromError(originalError);
+
+        logger.error({ ...originalError, digest });
+
+        return {
+          statusCode: 500,
+          response: {
+            errors: execution.errors.map((e) => ({
+              message: e.message,
+              extensions: { digest, ...e.extensions },
+            })),
+            data: execution.data,
+          },
+        };
       },
     }),
     BullBoardModule,
@@ -136,7 +102,6 @@ interface GraphQLExecutionContext {
     ProfileModule,
   ],
   providers: [
-    ComplexityPlugin,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

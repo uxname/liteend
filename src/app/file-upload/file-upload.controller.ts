@@ -1,7 +1,8 @@
-import { randomInt, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as process from 'node:process';
+import { pipeline } from 'node:stream/promises';
 import {
   BadRequestException,
   Controller,
@@ -9,53 +10,21 @@ import {
   Logger,
   Param,
   Post,
+  Req,
   Res,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
-import { Response } from 'express';
-import { diskStorage } from 'multer';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
-
-const storage = diskStorage({
-  destination: (_request, _file, callback) => {
-    const uploadDate = new Date();
-    const year = uploadDate.getFullYear();
-    const month = String(uploadDate.getMonth() + 1).padStart(2, '0');
-    const day = String(uploadDate.getDate()).padStart(2, '0');
-    const hours = String(uploadDate.getHours()).padStart(2, '0');
-    const minutes = String(uploadDate.getMinutes()).padStart(2, '0');
-
-    const uploadDirectory = path.join(
-      UPLOAD_DIR,
-      year.toString(),
-      month,
-      day,
-      `${hours}-${minutes}`,
-    );
-
-    if (!fs.existsSync(uploadDirectory)) {
-      fs.mkdirSync(uploadDirectory, { recursive: true });
-    }
-    callback(null, uploadDirectory);
-  },
-  filename: (_request, file, callback) => {
-    const extension = path.extname(file.originalname);
-    callback(null, `${randomUUID()}${extension}`);
-  },
-});
 
 @Controller()
 export class FileUploadController {
@@ -69,56 +38,13 @@ export class FileUploadController {
   @Post('upload')
   @ApiOperation({ summary: 'Upload files' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'The file to upload',
-    schema: {
-      type: 'object',
-      properties: {
-        files: {
-          type: 'array',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-      },
-    },
-  })
   @ApiResponse({
     status: 200,
     description: 'The file has been successfully uploaded.',
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'files', maxCount: 10 }], {
-      storage,
-      fileFilter: (_request, file, callback) => {
-        const allowedMimeTypes = [
-          'image/png',
-          'image/jpeg',
-          'image/gif',
-          'image/svg+xml',
-          'image/webp',
-        ];
-        if (allowedMimeTypes.includes(file.mimetype)) {
-          callback(null, true);
-        } else {
-          callback(
-            new BadRequestException('Only image files are allowed!'),
-            false,
-          );
-        }
-      },
-      limits: {
-        fileSize: 1024 * 1024 * 10, // 10 MB file size limit
-      },
-    }),
-  )
   async uploadFile(
-    @UploadedFiles()
-    files: {
-      files?: Express.Multer.File[];
-    },
+    @Req() req: FastifyRequest,
     @RealIp() ip: string,
   ): Promise<
     Array<{
@@ -126,30 +52,107 @@ export class FileUploadController {
       path: string;
     }>
   > {
+    if (!req.isMultipart()) {
+      throw new BadRequestException('Request is not multipart');
+    }
+
+    const savedFiles: Array<{
+      filename: string;
+      path: string;
+      filepath: string;
+      originalFilename: string;
+      extension: string;
+      size: number;
+      mimetype: string;
+    }> = [];
+
+    const parts = req.parts();
+
+    for await (const part of parts) {
+      if (part.type === 'file') {
+        const allowedMimeTypes = [
+          'image/png',
+          'image/jpeg',
+          'image/gif',
+          'image/svg+xml',
+          'image/webp',
+        ];
+
+        if (!allowedMimeTypes.includes(part.mimetype)) {
+          // Важно: в Fastify Multipart нужно вычитывать поток до конца, даже если ошибка,
+          // иначе зависнет весь запрос.
+          await part.toBuffer();
+          continue;
+          // Или throw new BadRequestException, но тогда нужно убедиться, что стрим закрыт
+        }
+
+        const uploadDate = new Date();
+        const year = uploadDate.getFullYear();
+        const month = String(uploadDate.getMonth() + 1).padStart(2, '0');
+        const day = String(uploadDate.getDate()).padStart(2, '0');
+        const hours = String(uploadDate.getHours()).padStart(2, '0');
+        const minutes = String(uploadDate.getMinutes()).padStart(2, '0');
+
+        const uploadDirectory = path.join(
+          UPLOAD_DIR,
+          year.toString(),
+          month,
+          day,
+          `${hours}-${minutes}`,
+        );
+
+        if (!fs.existsSync(uploadDirectory)) {
+          fs.mkdirSync(uploadDirectory, { recursive: true });
+        }
+
+        const extension = path.extname(part.filename);
+        const filename = `${randomUUID()}${extension}`;
+        const fullPath = path.join(uploadDirectory, filename);
+
+        // Сохраняем файл
+        await pipeline(part.file, fs.createWriteStream(fullPath));
+
+        // Получаем размер файла
+        const stats = fs.statSync(fullPath);
+
+        savedFiles.push({
+          filename: filename,
+          path: fullPath.replace(UPLOAD_DIR, '/uploads'), // URL path
+          filepath: fullPath.replace(UPLOAD_DIR, ''), // DB path relative to UPLOAD_DIR
+          originalFilename: part.filename,
+          extension: extension,
+          size: stats.size,
+          mimetype: part.mimetype,
+        });
+      }
+    }
+
+    if (savedFiles.length === 0) {
+      throw new BadRequestException('No valid files uploaded');
+    }
+
     await this.prisma.upload.createMany({
-      data:
-        files.files?.map((file) => ({
-          filepath: file.path.replace(UPLOAD_DIR, ''),
-          originalFilename: file.originalname,
-          extension: path.extname(file.originalname),
-          size: file.size,
-          mimetype: file.mimetype,
-          uploaderIp: ip,
-        })) ?? [],
+      data: savedFiles.map((f) => ({
+        filepath: f.filepath,
+        originalFilename: f.originalFilename,
+        extension: f.extension,
+        size: f.size,
+        mimetype: f.mimetype,
+        uploaderIp: ip ?? 'unknown',
+      })),
     });
 
-    return (
-      files.files?.map((file) => ({
-        filename: file.filename,
-        path: file.path.replace(UPLOAD_DIR, '/uploads'),
-      })) ?? []
-    );
+    return savedFiles.map((f) => ({
+      filename: f.filename,
+      path: f.path,
+    }));
   }
 
-  @Get('/uploads/*filePath')
+  // Было: @Get('/uploads/*filepath')
+  @Get('/uploads/*')
   @ApiOperation({ summary: 'Get file' })
   @ApiParam({
-    name: 'filePath',
+    name: '*', // Для Swagger, хотя он может ругаться, но для Fastify важно имя параметра
     required: true,
     description: 'The file path.',
   })
@@ -158,25 +161,27 @@ export class FileUploadController {
     description: 'The file has been successfully retrieved.',
   })
   async getFile(
-    @Param('filePath') filePath: string,
-    @Res() response: Response,
+    // Было: @Param('filepath')
+    @Param('*') filePathParam: string,
+    @Res() response: FastifyReply,
   ): Promise<void> {
-    const fullFilePath = path.join(UPLOAD_DIR, ...filePath);
+    const fullFilePath = path.join(UPLOAD_DIR, filePathParam);
 
+    // Остальной код без изменений...
     const resolvedPath = path.resolve(fullFilePath);
 
     if (!resolvedPath.startsWith(path.resolve(UPLOAD_DIR))) {
       this.logger.warn(
         `Attempt to access file outside of upload directory: ${fullFilePath}`,
       );
-      response.status(403).send('Forbidden');
+      response.code(403).send('Forbidden');
       return;
     }
 
     if (!fs.existsSync(fullFilePath)) {
-      const randomDelay = randomInt(500, 1500);
+      const randomDelay = Math.floor(Math.random() * 1000) + 500;
       await new Promise((resolve) => setTimeout(resolve, randomDelay));
-      response.status(204).end();
+      response.code(404).send();
       return;
     }
 
@@ -184,6 +189,6 @@ export class FileUploadController {
     response.type(mimeType);
 
     const stream = fs.createReadStream(fullFilePath);
-    stream.pipe(response);
+    response.send(stream);
   }
 }

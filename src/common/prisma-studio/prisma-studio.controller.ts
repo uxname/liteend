@@ -5,12 +5,11 @@ import {
   HttpStatus,
   Logger,
   Post,
-  RawBodyRequest,
   Req,
   Res,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
 
 const ROUTES_GET = [
@@ -32,16 +31,15 @@ export class PrismaStudioController {
   @ApiExcludeEndpoint()
   @Get(ROUTES_GET)
   async proxyGet(
-    @Req() request: Request,
-    @Res() response: Response,
+    @Req() request: FastifyRequest,
+    @Res() response: FastifyReply,
   ): Promise<void> {
     try {
       await this.prismaStudioService.processRequest(request, response);
     } catch (error) {
       response
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .code(HttpStatus.INTERNAL_SERVER_ERROR)
         .send('An error occurred while processing your request');
-      // Log error (optional for debugging)
       this.logger.error('Error processing GET request:', error);
     }
   }
@@ -49,18 +47,17 @@ export class PrismaStudioController {
   @ApiExcludeEndpoint()
   @Post(ROUTES_POST)
   async proxyPost(
-    @Req() request: RawBodyRequest<Request>,
-    @Res() response: Response,
+    @Req() request: FastifyRequest,
+    @Res() response: FastifyReply,
     @Body() body: unknown,
   ): Promise<void> {
-    request.body = body;
+    // В Fastify body уже распарсен в request.body, но для сервиса мы передадим его явно или через request
     try {
-      await this.prismaStudioService.processRequest(request, response);
+      await this.prismaStudioService.processRequest(request, response, body);
     } catch (error) {
       response
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .code(HttpStatus.INTERNAL_SERVER_ERROR)
         .send('An error occurred while processing your request');
-      // Log error (optional for debugging)
       this.logger.error('Error processing POST request:', error);
     }
   }

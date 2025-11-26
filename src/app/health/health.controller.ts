@@ -1,6 +1,6 @@
 import { Controller, Get, HttpStatus, Logger, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import express from 'express';
+import { FastifyReply } from 'fastify';
 import Redis from 'ioredis';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -21,7 +21,7 @@ export class HealthController {
   }
 
   @Get()
-  async getHealth(@Res() response: express.Response): Promise<void> {
+  async getHealth(@Res() response: FastifyReply): Promise<void> {
     const [databaseOnline, redisOnline] = await Promise.all([
       this.checkDatabase(),
       this.checkRedis(),
@@ -32,7 +32,7 @@ export class HealthController {
         ? HttpStatus.OK
         : HttpStatus.SERVICE_UNAVAILABLE;
 
-    response.status(status).json({
+    response.code(status).send({
       status: status === HttpStatus.OK ? 'ok' : 'error',
       info: {
         serverTime: new Date().toISOString(),

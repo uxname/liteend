@@ -17,4 +17,4 @@
 
 ## OIDC Migration todo
 
-- [ ] Migrate to Fastify
+- [x] Migrate to Fastify

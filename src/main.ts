@@ -1,26 +1,56 @@
+import compression from '@fastify/compress';
+import helmet from '@fastify/helmet';
+import multiPart from '@fastify/multipart';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import compression from 'compression';
-import helmet from 'helmet';
+import { AltairFastify } from 'altair-fastify-plugin';
 import { Logger } from 'nestjs-pino';
 import packageJson from '../package.json';
 import { AppModule } from './app/app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
+  const adapter = new FastifyAdapter({
+    logger: false,
+    bodyLimit: 10485760,
+    trustProxy: true,
   });
+
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    adapter,
+    {
+      bufferLogs: true,
+    },
+  );
 
   app.useLogger(app.get(Logger));
 
-  // Global pipe setup for validation
   app.useGlobalPipes(new ValidationPipe());
 
-  // Use custom body parser for text
-  app.useBodyParser('text');
+  await app.register(multiPart);
+
+  await app.register(AltairFastify, {
+    path: '/altair',
+    baseURL: '/altair/',
+    endpointURL: '/graphql',
+  });
+
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+  });
+
+  await app.register(compression, {
+    encodings: ['gzip', 'deflate'],
+  });
 
   const configService = app.get(ConfigService);
   app.enableShutdownHooks();
@@ -38,37 +68,12 @@ async function bootstrap(): Promise<void> {
   // Enable CORS
   app.enableCors();
 
-  // Helmet for security headers
-  app.use(
-    helmet({
-      crossOriginEmbedderPolicy: false,
-      crossOriginOpenerPolicy: false,
-      crossOriginResourcePolicy: false,
-      contentSecurityPolicy: false,
-    }),
-  );
-
-  // Compression middleware setup
-  app.use(
-    compression({
-      level: -1, // Use default compression level
-      threshold: 1024, // Compress responses larger than 1 KB
-      filter: (request, response) => {
-        if (request.headers['x-no-compression']) {
-          return false; // Don't compress if the header is set
-        }
-        return compression.filter(request, response);
-      },
-    }),
-  );
-
   const port = configService.getOrThrow<number>('PORT');
+  await app.listen(port, '0.0.0.0');
 
   const logger = app.get(Logger);
   logger.log(`App started at http://localhost:${port}`);
-
-  // Start server
-  await app.listen(port);
+  logger.log(`GraphQL Playground at http://localhost:${port}/graphiql`);
 }
 
 bootstrap().catch((error) => {

@@ -11,7 +11,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 
 import { AuthGuard } from '@/common/logger-serve/auth/auth.guard';
 import { LOGGER_UI_HTML } from './logger-ui.html';
@@ -22,11 +22,9 @@ export class LoggerServeController {
   private readonly logger = new Logger(LoggerServeController.name);
   private readonly logsDirectory = path.join(process.cwd(), 'data', 'logs');
 
-  // 1. Serve UI (No Cache)
   @Get()
-  async getDashboard(@Res() response: Response): Promise<void> {
+  async getDashboard(@Res() response: FastifyReply): Promise<void> {
     response.header('Content-Type', 'text/html');
-    // Prevent browser caching to ensure JS updates are applied immediately
     response.header('Cache-Control', 'no-cache, no-store, must-revalidate');
     response.header('Pragma', 'no-cache');
     response.header('Expires', '0');
@@ -34,10 +32,8 @@ export class LoggerServeController {
     response.send(LOGGER_UI_HTML);
   }
 
-  // 2. List Files
   @Get('api/list')
-  async getFilesList(@Res() response: Response): Promise<void> {
-    // Disable cache for API too
+  async getFilesList(@Res() response: FastifyReply): Promise<void> {
     response.header('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     try {
@@ -55,30 +51,25 @@ export class LoggerServeController {
 
       relativeFiles.sort();
 
-      response.json(relativeFiles);
+      response.send(relativeFiles);
     } catch (error) {
       this.logger.error('Error listing files:', error);
       response
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Unable to list files' });
+        .code(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send({ error: 'Unable to list files' });
     }
   }
 
-  // 3. Get Content
-  @Get('file/*filepath')
+  @Get('file/*')
   async getFileContent(
-    @Param('filepath') _filepath: string | string[],
+    // Было: @Param('filepath')
+    @Param('*') _filepath: string,
     @Query('start') startQuery: string,
-    @Res() response: Response,
+    @Res() response: FastifyReply,
   ): Promise<void> {
-    const requestPath = Array.isArray(_filepath)
-      ? _filepath.join('/')
-      : _filepath;
-
-    await this.serveFile(requestPath, startQuery, response);
+    // Остальной код без изменений...
+    await this.serveFile(_filepath, startQuery, response);
   }
-
-  // --- Helpers ---
 
   private isValidFilePath(filePath: string): boolean {
     const absolutePath = path.resolve(this.logsDirectory, filePath);
@@ -88,10 +79,10 @@ export class LoggerServeController {
   private async serveFile(
     filepath: string,
     startQuery: string,
-    response: Response,
+    response: FastifyReply,
   ): Promise<void> {
     if (!this.isValidFilePath(filepath)) {
-      response.status(HttpStatus.FORBIDDEN).send('Access denied');
+      response.code(HttpStatus.FORBIDDEN).send('Access denied');
       return;
     }
 
@@ -101,7 +92,7 @@ export class LoggerServeController {
       const stats = await fs.promises.stat(absolutePath);
 
       if (stats.isDirectory()) {
-        response.status(HttpStatus.BAD_REQUEST).send('Is a directory');
+        response.code(HttpStatus.BAD_REQUEST).send('Is a directory');
         return;
       }
 
@@ -112,9 +103,9 @@ export class LoggerServeController {
 
       if (start > totalSize) start = 0;
 
-      response.setHeader('X-File-Size', totalSize.toString());
-      response.setHeader('Content-Type', 'text/plain');
-      response.setHeader('Cache-Control', 'no-cache');
+      response.header('X-File-Size', totalSize.toString());
+      response.header('Content-Type', 'text/plain');
+      response.header('Cache-Control', 'no-cache');
 
       if (start === totalSize) {
         response.send('');
@@ -128,12 +119,12 @@ export class LoggerServeController {
 
       stream.on('error', (err) => {
         this.logger.error(`Stream error: ${err.message}`);
-        if (!response.headersSent) response.end();
+        if (!response.sent) response.send();
       });
 
-      stream.pipe(response);
+      response.send(stream);
     } catch {
-      response.status(HttpStatus.NOT_FOUND).send('File not found');
+      response.code(HttpStatus.NOT_FOUND).send('File not found');
     }
   }
 
@@ -152,7 +143,6 @@ export class LoggerServeController {
         }
       }
     } catch {
-      // It is normal if the directory doesn't exist yet
       return [];
     }
     return results;
