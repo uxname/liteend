@@ -19,6 +19,7 @@
 
 - [ ] Check for unsafe logs
 - [ ] Add mock JWT for debug
+- [ ] Fix logs (log error stacktrace to stdout)
 - [ ] Fix prisma studio proxy
 - [ ] ```
   throw new mercurius.ErrorWithProps('User not found', {
