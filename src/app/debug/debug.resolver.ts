@@ -93,6 +93,8 @@ export class DebugResolver {
       totalUsers = await this.prisma.profile.count();
     }
 
+    const memoryUsage = process.memoryUsage();
+
     return {
       serverTime: new Date().toISOString(),
       uptime: uptimePretty,
@@ -100,6 +102,11 @@ export class DebugResolver {
         name: packageJson.name,
         version: packageJson.version,
         description: packageJson.description,
+      },
+      memory: {
+        rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
+        heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
+        heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
       },
       lastCommit:
         DebugResolver.readLastCommitInfo() || 'No commit info available',
