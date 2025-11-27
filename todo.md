@@ -17,7 +17,7 @@
 
 ## OIDC Migration todo
 
-- [ ] Clear project: remove any, remove russian comments
+- [ ] Check for unsafe logs
 - [ ] Fix prisma studio proxy
 - [ ] ```
   throw new mercurius.ErrorWithProps('User not found', {

@@ -3,5 +3,4 @@ node_modules/
 docker-compose.yml
 Dockerfile
 /dist
-.env
 /data

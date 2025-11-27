@@ -77,8 +77,6 @@ const mqEmitterRedis = require('mqemitter-redis');
             const payload = data.payload || data || {};
             const headers = payload.headers || payload || {};
 
-            console.log('WS Connected with headers:', headers);
-
             return {
               req: {
                 headers: {

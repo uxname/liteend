@@ -6,6 +6,6 @@ COPY package*.json ./
 COPY .git .git
 RUN npm i
 COPY . .
-RUN npm run db:gen && npm run build && chmod +x ./healthcheck.sh && rm -rf .git
+RUN npm run db:gen && npm run build && chmod +x ./healthcheck.sh && rm -rf .git .env
 ENV NODE_ENV=production
 CMD ["npm", "run", "start:prod"]
