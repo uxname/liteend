@@ -80,7 +80,6 @@ async function bootstrap(): Promise<void> {
 
   const logger = app.get(Logger);
   logger.log(`App started at http://localhost:${port}`);
-  logger.log(`GraphiQL at http://localhost:${port}/graphiql`);
   logger.log(`Altair at http://localhost:${port}/altair`);
 }
 

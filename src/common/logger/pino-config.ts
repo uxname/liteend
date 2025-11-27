@@ -1,3 +1,4 @@
+// File: src/common/logger/pino-config.ts
 import path from 'node:path';
 import * as process from 'node:process';
 import { Params } from 'nestjs-pino';
@@ -22,6 +23,9 @@ const fileTransport = (filename: string): TransportTargetOptions => ({
 export const pinoConfig: Params = {
   pinoHttp: {
     level: IS_DEV ? 'trace' : 'info',
+    customSuccessMessage: (_req, _res, responseTime) => {
+      return `Request completed in ${Math.round(responseTime)}ms`;
+    },
     autoLogging: {
       ignore: (req) => {
         if (req.url?.includes('/health')) return true;

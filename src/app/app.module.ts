@@ -42,7 +42,7 @@ const logger = new Logger('AppModule');
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         autoSchemaFile: true,
-        graphiql: true,
+        graphiql: false,
         jit: 1,
         cache: true,
 
