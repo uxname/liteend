@@ -68,7 +68,6 @@ export class PrismaStudioService {
     this.logger.log('Authorized');
 
     const urlStr = request.url;
-    // Fastify: request.url содержит полный путь, например /studio или /api
     const url =
       urlStr === '/studio'
         ? 'http://localhost:5555'

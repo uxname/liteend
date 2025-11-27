@@ -51,7 +51,6 @@ export class PrismaStudioController {
     @Res() response: FastifyReply,
     @Body() body: unknown,
   ): Promise<void> {
-    // В Fastify body уже распарсен в request.body, но для сервиса мы передадим его явно или через request
     try {
       await this.prismaStudioService.processRequest(request, response, body);
     } catch (error) {

@@ -62,12 +62,10 @@ export class LoggerServeController {
 
   @Get('file/*')
   async getFileContent(
-    // Было: @Param('filepath')
     @Param('*') _filepath: string,
     @Query('start') startQuery: string,
     @Res() response: FastifyReply,
   ): Promise<void> {
-    // Остальной код без изменений...
     await this.serveFile(_filepath, startQuery, response);
   }
 

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
-import { ZodError } from 'zod'; // <--- Импортируем ZodError
+import { ZodError } from 'zod';
 
 // Constants
 const DIGEST_LENGTH = 16;
@@ -103,7 +103,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // --- ZOD VALIDATION HANDLER ---
     if (exception instanceof ZodValidationException) {
       const zodException = exception as ZodValidationException;
-      // Явное приведение результата getZodError() к ZodError
       const zodError = zodException.getZodError() as unknown as ZodError;
 
       return {

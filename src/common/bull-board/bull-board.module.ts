@@ -26,28 +26,23 @@ export class BullBoardModule implements OnModuleInit {
 
   onModuleInit() {
     const httpAdapter = this.adapterHost.httpAdapter;
-    // Получаем прямой доступ к инстансу Fastify
     const fastify = httpAdapter.getInstance<FastifyInstance>();
 
     const login = this.configService.get<string>('BULL_BOARD_LOGIN');
     const password = this.configService.get<string>('BULL_BOARD_PASSWORD');
 
-    // Регистрируем глобальный хук
     fastify.addHook(
       'onRequest',
       async (req: FastifyRequest, reply: FastifyReply) => {
-        // Фильтруем только запросы к админке
         if (!req.url.startsWith('/board')) {
           return;
         }
 
-        // Функция для отправки запроса авторизации
         const unauthorized = () => {
           reply
             .code(401)
             .header('WWW-Authenticate', 'Basic realm="BullBoard"')
             .send('Unauthorized');
-          // Важно вернуть reply, чтобы Fastify понял, что ответ отправлен и прервал цепочку
           return reply;
         };
 
@@ -75,8 +70,6 @@ export class BullBoardModule implements OnModuleInit {
           reply.code(403).send('Forbidden');
           return reply;
         }
-
-        // Если все ок, просто выходим из функции, запрос идет дальше
       },
     );
   }

@@ -11,7 +11,6 @@ export class TestQueueProcessor extends WorkerHost {
       `Start processing job ${job.id} (${job.name}). Data: ${JSON.stringify(job.data)}`,
     );
 
-    // Эмулируем бурную деятельность (1 секунда)
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     this.logger.log(`Finished processing job ${job.id}`);

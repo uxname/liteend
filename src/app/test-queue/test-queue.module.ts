@@ -8,12 +8,9 @@ import { TestQueueResolver } from './test-queue.resolver';
 
 @Module({
   imports: [
-    // Регистрируем очередь в BullMQ
     BullModule.registerQueue({
       name: 'test',
     }),
-    // Регистрируем эту очередь в админке Bull Board
-    // Это позволяет не править общий модуль админки каждый раз
     BullBoardModule.forFeature({
       name: 'test',
       adapter: BullMQAdapter,

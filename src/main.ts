@@ -50,8 +50,8 @@ async function bootstrap(): Promise<void> {
   });
 
   await app.register(rateLimit, {
-    max: 100, // 100 запросов
-    timeWindow: '1 minute', // в минуту с одного IP
+    max: 100,
+    timeWindow: '1 minute',
   });
 
   await app.register(compression, {

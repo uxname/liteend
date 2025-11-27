@@ -85,11 +85,8 @@ export class FileUploadController {
         ];
 
         if (!allowedMimeTypes.includes(part.mimetype)) {
-          // Важно: в Fastify Multipart нужно вычитывать поток до конца, даже если ошибка,
-          // иначе зависнет весь запрос.
           await part.toBuffer();
           continue;
-          // Или throw new BadRequestException, но тогда нужно убедиться, что стрим закрыт
         }
 
         const uploadDate = new Date();
@@ -115,10 +112,8 @@ export class FileUploadController {
         const filename = `${randomUUID()}${extension}`;
         const fullPath = path.join(uploadDirectory, filename);
 
-        // Сохраняем файл
         await pipeline(part.file, fs.createWriteStream(fullPath));
 
-        // Получаем размер файла
         const stats = fs.statSync(fullPath);
 
         savedFiles.push({
@@ -154,11 +149,10 @@ export class FileUploadController {
     }));
   }
 
-  // Было: @Get('/uploads/*filepath')
   @Get('/uploads/*')
   @ApiOperation({ summary: 'Get file' })
   @ApiParam({
-    name: '*', // Для Swagger, хотя он может ругаться, но для Fastify важно имя параметра
+    name: '*',
     required: true,
     description: 'The file path.',
   })
@@ -167,13 +161,11 @@ export class FileUploadController {
     description: 'The file has been successfully retrieved.',
   })
   async getFile(
-    // Было: @Param('filepath')
     @Param('*') filePathParam: string,
     @Res() response: FastifyReply,
   ): Promise<void> {
     const fullFilePath = path.join(UPLOAD_DIR, filePathParam);
 
-    // Остальной код без изменений...
     const resolvedPath = path.resolve(fullFilePath);
 
     if (!resolvedPath.startsWith(path.resolve(UPLOAD_DIR))) {

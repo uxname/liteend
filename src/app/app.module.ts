@@ -50,14 +50,13 @@ const mqEmitterRedis = require('mqemitter-redis');
                 schema,
                 operationName: node.name?.value,
                 query: context.getDocument(),
-                variables: undefined, // На этапе валидации переменные могут быть недоступны, используем дефолтные оценки
+                variables: undefined,
                 estimators: [simpleEstimator({ defaultComplexity: 1 })],
               });
 
-              const MAX_COMPLEXITY = 200; // Настрой под себя
+              const MAX_COMPLEXITY = 200;
 
               if (complexity > MAX_COMPLEXITY) {
-                // Бросаем ошибку валидации
                 context.reportError(
                   new GraphQLError(
                     `Query is too complex: ${complexity}. Maximum allowed complexity: ${MAX_COMPLEXITY}`,
@@ -68,35 +67,18 @@ const mqEmitterRedis = require('mqemitter-redis');
           }),
         ],
 
-        // Настройка Subscriptions (Mercurius Style)
         subscription: {
-          // 1. Подключаем Redis Emitter (вместо локального PubSub)
           emitter: mqEmitterRedis({
             host: configService.getOrThrow<string>('REDIS_HOST'),
             port: configService.getOrThrow<number>('REDIS_PORT'),
             password: configService.getOrThrow<string>('REDIS_PASSWORD'),
           }),
-
-          // 2. Валидация при подключении (возвращает true/false)
-          // Это не создает user, но проверяет наличие заголовка
-          // verifyClient: (info, next) => {
-          //   const headers = info.req.headers || {};
-          //   const auth = headers.authorization || headers.Authorization;
-          //   if (!auth) {
-          //     return next(false); // Отклоняем соединение
-          //   }
-          //   next(true); // Разрешаем
-          // },
-
-          // 3. Передаем заголовки в контекст
           onConnect: (data) => {
             const payload = data.payload || data || {};
             const headers = payload.headers || payload || {};
 
             console.log('WS Connected with headers:', headers);
 
-            // ВАЖНО: Мы сразу возвращаем структуру, которую ожидает Guard.
-            // Guard ищет context.req.headers
             return {
               req: {
                 headers: {
@@ -107,35 +89,22 @@ const mqEmitterRedis = require('mqemitter-redis');
           },
         },
 
-        // Формирование контекста для Guard'ов
         // biome-ignore lint/suspicious/noExplicitAny: todo
         context: (request: any, reply: any) => {
-          // 1. HTTP Запрос (Fastify)
           if (request.raw) {
             return { req: request, res: reply };
           }
 
-          // 2. WebSocket (Mercurius)
-          // ДЕБАГ: Смотрим, что же нам пришло
-          console.log('DEBUG: WS Context Keys:', Object.keys(request));
-          // if (request.context) console.log('DEBUG: request.context:', request.context);
-
           let headers = {};
 
-          // Вариант А: Данные лежат в request.context (стандарт)
           if (request.context?.headers) {
             headers = request.context.headers;
-          }
-          // Вариант Б: Данные смержились в сам request
-          else if (request.headers) {
+          } else if (request.headers) {
             headers = request.headers;
-          }
-          // Вариант В: Данные в payload (иногда бывает)
-          else if (request.payload?.headers) {
+          } else if (request.payload?.headers) {
             headers = request.payload.headers;
           }
 
-          // ГАРАНТИРУЕМ структуру, чтобы Passport не падал
           return {
             req: {
               headers: headers || {},

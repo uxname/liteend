@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { ExecutionResult } from 'graphql';
 import { GraphQLError } from 'graphql/error';
 import { ZodValidationException } from 'nestjs-zod';
-import { core, ZodError } from 'zod'; // <--- Импортируем ZodError
+import { core, ZodError } from 'zod';
 import { createDigestFromError } from '@/common/all-exceptions-filter';
 
 const logger = new Logger('GraphQLErrorFormatter');
@@ -17,10 +17,8 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
   const originalError = error.originalError || error;
   const digest = createDigestFromError(originalError);
 
-  // 1. Обработка ошибок валидации Zod
   if (originalError instanceof ZodValidationException) {
     const zodException = originalError as ZodValidationException;
-    // Явное приведение к ZodError
     const zodError = zodException.getZodError() as unknown as ZodError;
     const issues = zodError.issues;
 
@@ -47,7 +45,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     };
   }
 
-  // 2. Обработка стандартных HTTP исключений NestJS
   if (originalError instanceof HttpException) {
     const status = originalError.getStatus();
     const response = originalError.getResponse() as any;
@@ -77,7 +74,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     };
   }
 
-  // 3. Обработка GraphQLError
   if (originalError instanceof GraphQLError && !error.originalError) {
     return {
       statusCode: 400,
@@ -95,7 +91,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     };
   }
 
-  // 4. Все остальное — это 500 (Internal Server Error)
   logger.error({
     message: 'Internal GraphQL Error',
     originalError,
