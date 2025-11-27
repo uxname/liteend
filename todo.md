@@ -17,13 +17,15 @@
 
 ## OIDC Migration todo
 
+- [x] Update dependencies
 - [x] Migrate to Fastify
-- [ ] Protect upload endpoint
+- [x] Protect upload endpoint
+- [ ] Fix prisma studio proxy
 - [ ] Swagger -> Scalar
 - [ ] Class-validator -> Zod
 - [ ] Migrate: pnpm, SWC, hot reload,
 - [ ] ```
-      throw new mercurius.ErrorWithProps('User not found', {
+  throw new mercurius.ErrorWithProps('User not found', {
         code: 'USER_NOT_FOUND',
         timestamp: new Date().toISOString()
       });

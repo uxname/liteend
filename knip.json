@@ -5,10 +5,10 @@
   "ignore": ["src/@generated/**", "src/common/git-commit-saver.ts"],
   "ignoreDependencies": [
     "cross-env",
-    "@as-integrations/express5",
-    "graphql-ws",
     "pino-pretty",
-    "pino-roll"
+    "pino-roll",
+    "graphql-ws",
+    "@dotenvx/dotenvx"
   ],
   "paths": {
     "@/*": ["src/*"]
