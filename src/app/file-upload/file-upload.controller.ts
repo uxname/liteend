@@ -12,8 +12,10 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiConsumes,
   ApiOperation,
   ApiParam,
@@ -21,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { FileUploadService } from '@/app/file-upload/file-upload.service';
+import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
 
@@ -36,6 +39,8 @@ export class FileUploadController {
   ) {}
 
   @Post('upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Upload files' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({
@@ -43,6 +48,7 @@ export class FileUploadController {
     description: 'The file has been successfully uploaded.',
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async uploadFile(
     @Req() req: FastifyRequest,
     @RealIp() ip: string,
