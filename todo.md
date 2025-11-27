@@ -19,7 +19,6 @@
 
 - [ ] Clear project: remove any, remove russian comments
 - [ ] Fix prisma studio proxy
-- [ ] Delete cspell config file
 - [ ] ```
   throw new mercurius.ErrorWithProps('User not found', {
         code: 'USER_NOT_FOUND',
