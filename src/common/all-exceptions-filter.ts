@@ -9,6 +9,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
+import { ZodValidationException } from 'nestjs-zod';
+import { ZodError } from 'zod'; // <--- Импортируем ZodError
 
 // Constants
 const DIGEST_LENGTH = 16;
@@ -29,6 +31,7 @@ interface ErrorResponse {
   stack?: string;
   path?: string;
   method?: string;
+  details?: unknown;
 }
 
 // Structured error data for digest creation
@@ -84,9 +87,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     this.logError(errorResponse);
 
-    // !!! FASTIFY SYNTAX !!!
-    // Express: response.status(statusCode).json(errorResponse);
-    // Fastify:
     response.code(statusCode).send(errorResponse);
   }
 
@@ -99,6 +99,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
   } {
     const digest = createDigestFromError(exception);
     const statusCode = this.determineHttpStatus(exception);
+
+    // --- ZOD VALIDATION HANDLER ---
+    if (exception instanceof ZodValidationException) {
+      const zodException = exception as ZodValidationException;
+      // Явное приведение результата getZodError() к ZodError
+      const zodError = zodException.getZodError() as unknown as ZodError;
+
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        errorResponse: {
+          message: 'Validation failed',
+          error: 'Bad Request',
+          statusCode: HttpStatus.BAD_REQUEST,
+          timestamp: new Date().toISOString(),
+          digest,
+          details: zodError.issues,
+        },
+      };
+    }
+    // -----------------------------
 
     // Handle specific 404 errors
     if (exception instanceof NotFoundException) {

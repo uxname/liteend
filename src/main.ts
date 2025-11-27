@@ -2,7 +2,6 @@ import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import multiPart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
@@ -12,6 +11,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AltairFastify } from 'altair-fastify-plugin';
 import { Logger } from 'nestjs-pino';
+import { cleanupOpenApiDoc, ZodValidationPipe } from 'nestjs-zod';
 import packageJson from '../package.json';
 import { AppModule } from './app/app.module';
 
@@ -32,7 +32,7 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(app.get(Logger));
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ZodValidationPipe());
 
   await app.register(multiPart);
 
@@ -70,7 +70,7 @@ async function bootstrap(): Promise<void> {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('swagger', app, document);
+  SwaggerModule.setup('swagger', app, cleanupOpenApiDoc(document));
 
   // Enable CORS
   app.enableCors();

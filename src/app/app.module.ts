@@ -1,7 +1,7 @@
 import path from 'node:path';
 import * as process from 'node:process';
 import { BullModule } from '@nestjs/bullmq';
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -15,13 +15,11 @@ import { FileUploadModule } from '@/app/file-upload/file-upload.module';
 import { HealthModule } from '@/app/health/health.module';
 import { ProfileModule } from '@/app/profile/profile.module';
 import { TestQueueModule } from '@/app/test-queue/test-queue.module';
-import {
-  AllExceptionsFilter,
-  createDigestFromError,
-} from '@/common/all-exceptions-filter';
+import { AllExceptionsFilter } from '@/common/all-exceptions-filter';
 import { AuthModule } from '@/common/auth/auth.module';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
+import { gqlErrorFormatter } from '@/common/graphql/error-formatter';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
@@ -29,8 +27,6 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mqEmitterRedis = require('mqemitter-redis');
-
-const logger = new Logger('AppModule');
 
 @Module({
   imports: [
@@ -148,22 +144,7 @@ const logger = new Logger('AppModule');
         },
 
         resolvers: { JSON: GraphQLJSON },
-        errorFormatter: (execution) => {
-          const [error] = execution.errors;
-          const originalError = error?.originalError || error;
-          const digest = createDigestFromError(originalError);
-          logger.error({ ...originalError, digest });
-          return {
-            statusCode: 500,
-            response: {
-              errors: execution.errors.map((e) => ({
-                message: e.message,
-                extensions: { digest, ...e.extensions },
-              })),
-              data: execution.data,
-            },
-          };
-        },
+        errorFormatter: gqlErrorFormatter,
       }),
     }),
     BullBoardModule,

@@ -80,6 +80,7 @@
     "mqemitter-redis": "^7.2.0",
     "nestjs-i18n": "^10.5.1",
     "nestjs-pino": "^4.5.0",
+    "nestjs-zod": "^5.0.1",
     "ofetch": "^1.5.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -89,7 +90,8 @@
     "pino-pretty": "^13.1.2",
     "pino-roll": "^4.0.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
