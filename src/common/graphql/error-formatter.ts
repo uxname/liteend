@@ -25,7 +25,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     return {
       statusCode: 200,
       response: {
-        // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         errors: execution.errors?.map((e) => ({
           message: 'Validation Failed',
           locations: e.locations,
@@ -39,6 +38,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
             })),
             digest,
           },
+          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         })) as any,
         data: execution.data,
       },
@@ -47,6 +47,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
 
   if (originalError instanceof HttpException) {
     const status = originalError.getStatus();
+    // biome-ignore lint/suspicious/noExplicitAny: HttpException types are too strict
     const response = originalError.getResponse() as any;
 
     let code = 'INTERNAL_SERVER_ERROR';
@@ -58,7 +59,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     return {
       statusCode: 200,
       response: {
-        // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         errors: execution.errors?.map((e) => ({
           message: response.message || e.message,
           locations: e.locations,
@@ -68,6 +68,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
             digest,
             details: typeof response === 'object' ? response : null,
           },
+          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         })) as any,
         data: execution.data,
       },
@@ -78,13 +79,13 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
     return {
       statusCode: 400,
       response: {
-        // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         errors: execution.errors?.map((e) => ({
           message: e.message,
           extensions: {
             code: 'GRAPHQL_VALIDATION_FAILED',
             digest,
           },
+          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
         })) as any,
         data: null,
       },
@@ -101,7 +102,6 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
   return {
     statusCode: 200,
     response: {
-      // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
       errors: execution.errors?.map((e) => ({
         message: 'Internal Server Error',
         locations: e.locations,
@@ -110,6 +110,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
           code: 'INTERNAL_SERVER_ERROR',
           digest,
         },
+        // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
       })) as any,
       data: execution.data,
     },
