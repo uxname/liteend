@@ -18,6 +18,7 @@
 ## OIDC Migration todo
 
 - [ ] Check for unsafe logs
+- [ ] Add mock JWT for debug
 - [ ] Fix prisma studio proxy
 - [ ] ```
   throw new mercurius.ErrorWithProps('User not found', {
