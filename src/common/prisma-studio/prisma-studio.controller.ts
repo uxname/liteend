@@ -1,10 +1,9 @@
 import {
+  All,
   Body,
   Controller,
-  Get,
   HttpStatus,
   Logger,
-  Post,
   Req,
   Res,
 } from '@nestjs/common';
@@ -12,15 +11,23 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
 
-const ROUTES_GET = [
+const STUDIO_ROUTES = [
   'studio',
-  'index.css',
-  'http/databrowser.js',
-  'assets/index.js',
-  'assets/vendor.js',
+  'studio/*',
+  'bff',
+  'bff/*',
+  'telemetry',
+  'api',
+  'api/*',
+  'ui',
+  'ui/*',
+  'data',
+  'data/*',
+  'assets',
+  'assets/*',
+  'favicon.ico',
+  ':file(.*\\.(?:js|css|png|svg|ico|map|woff2))',
 ];
-
-const ROUTES_POST = ['api'];
 
 @Controller()
 export class PrismaStudioController {
@@ -29,24 +36,8 @@ export class PrismaStudioController {
   constructor(private readonly prismaStudioService: PrismaStudioService) {}
 
   @ApiExcludeEndpoint()
-  @Get(ROUTES_GET)
-  async proxyGet(
-    @Req() request: FastifyRequest,
-    @Res() response: FastifyReply,
-  ): Promise<void> {
-    try {
-      await this.prismaStudioService.processRequest(request, response);
-    } catch (error) {
-      response
-        .code(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send('An error occurred while processing your request');
-      this.logger.error('Error processing GET request:', error);
-    }
-  }
-
-  @ApiExcludeEndpoint()
-  @Post(ROUTES_POST)
-  async proxyPost(
+  @All(STUDIO_ROUTES)
+  async proxy(
     @Req() request: FastifyRequest,
     @Res() response: FastifyReply,
     @Body() body: unknown,
@@ -54,10 +45,12 @@ export class PrismaStudioController {
     try {
       await this.prismaStudioService.processRequest(request, response, body);
     } catch (error) {
-      response
-        .code(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send('An error occurred while processing your request');
-      this.logger.error('Error processing POST request:', error);
+      if (!response.sent) {
+        response
+          .code(HttpStatus.INTERNAL_SERVER_ERROR)
+          .send('An error occurred while processing your request');
+      }
+      this.logger.error('Error processing Studio request:', error);
     }
   }
 }

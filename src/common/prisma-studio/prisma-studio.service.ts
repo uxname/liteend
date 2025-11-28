@@ -11,10 +11,6 @@ export class PrismaStudioService {
   constructor(private readonly configService: ConfigService) {}
 
   async startStudio(): Promise<void> {
-    this.logger.error('Hack: does not started prisma studio. TODO: FIX IT');
-    if (Math.random() > -1) {
-      return;
-    }
     return new Promise<void>((resolve, reject) => {
       exec('npm run db:studio', (error, stdout, stderr) => {
         if (error) {
