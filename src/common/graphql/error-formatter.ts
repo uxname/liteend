@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 import { ExecutionResult } from 'graphql';
-import { GraphQLError } from 'graphql/error/GraphQLError';
+import { GraphQLError } from 'graphql/error';
+import { MercuriusContext } from 'mercurius';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 
@@ -8,7 +10,7 @@ const logger = new Logger('GraphQLErrorFormatter');
 
 export function gqlErrorFormatter(
   execution: ExecutionResult,
-  context: any,
+  context: MercuriusContext,
 ): { statusCode: number; response: ExecutionResult } {
   const errors = execution.errors;
 
@@ -16,7 +18,8 @@ export function gqlErrorFormatter(
     return { statusCode: 200, response: execution };
   }
 
-  const requestId = context?.req?.id || 'unknown';
+  const req = (context as MercuriusContext & { req?: FastifyRequest }).req;
+  const requestId = req?.id || 'unknown';
 
   const formattedErrors = errors.map((error) => {
     const originalError = error.originalError;
