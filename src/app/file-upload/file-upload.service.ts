@@ -75,6 +75,7 @@ export class FileUploadService {
     };
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: Because of Prisma
   async saveMetadata(files: Array<any>, ip: string) {
     if (files.length === 0) return;
 
