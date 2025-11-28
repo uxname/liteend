@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
-import { ExecutionResult } from 'graphql';
+import { ExecutionResult, GraphQLFormattedError } from 'graphql';
 import { GraphQLError } from 'graphql/error';
 import { ZodValidationException } from 'nestjs-zod';
 import { core, ZodError } from 'zod';
@@ -9,7 +9,9 @@ const logger = new Logger('GraphQLErrorFormatter');
 
 export function gqlErrorFormatter(execution: ExecutionResult): {
   statusCode: number;
-  response: ExecutionResult;
+  response: Omit<ExecutionResult, 'errors'> & {
+    errors?: GraphQLFormattedError[] | readonly GraphQLFormattedError[];
+  };
 } {
   const [error] = execution.errors || [];
   if (!error) return { statusCode: 200, response: execution };
@@ -38,8 +40,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
             })),
             digest,
           },
-          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
-        })) as any,
+        })) as GraphQLFormattedError[],
         data: execution.data,
       },
     };
@@ -68,8 +69,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
             digest,
             details: typeof response === 'object' ? response : null,
           },
-          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
-        })) as any,
+        })) as GraphQLFormattedError[],
         data: execution.data,
       },
     };
@@ -85,8 +85,7 @@ export function gqlErrorFormatter(execution: ExecutionResult): {
             code: 'GRAPHQL_VALIDATION_FAILED',
             digest,
           },
-          // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
-        })) as any,
+        })) as GraphQLFormattedError[],
         data: null,
       },
     };

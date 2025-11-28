@@ -17,7 +17,6 @@
 
 ## OIDC Migration todo
 
-- [ ] Check for unsafe logs
 - [ ] Fix logs (log error stacktrace to stdout)
 - [ ] Fix prisma studio proxy
 - [ ] ```

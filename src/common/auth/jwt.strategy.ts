@@ -12,8 +12,7 @@ interface JwtPayload {
   aud: string;
   scope?: string;
   roles?: string[];
-  // biome-ignore lint/suspicious/noExplicitAny: any other fields
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 @Injectable()

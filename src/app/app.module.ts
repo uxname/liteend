@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { GraphQLError } from 'graphql/error';
 import { getComplexity, simpleEstimator } from 'graphql-query-complexity';
 import GraphQLJSON from 'graphql-type-json';
@@ -27,6 +28,16 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mqEmitterRedis = require('mqemitter-redis');
+
+interface GqlSubscriptionRequest {
+  headers?: Record<string, string>;
+  context?: {
+    headers?: Record<string, string>;
+  };
+  payload?: {
+    headers?: Record<string, string>;
+  };
+}
 
 @Module({
   imports: [
@@ -87,19 +98,21 @@ const mqEmitterRedis = require('mqemitter-redis');
           },
         },
 
-        // biome-ignore lint/suspicious/noExplicitAny: todo
-        context: (request: any, reply: any) => {
-          if (request.raw) {
+        context: (
+          request: FastifyRequest | GqlSubscriptionRequest,
+          reply: FastifyReply,
+        ) => {
+          if ('raw' in request) {
             return { req: request, res: reply };
           }
 
-          let headers = {};
+          let headers: Record<string, string> = {};
 
-          if (request.context?.headers) {
+          if ('context' in request && request.context?.headers) {
             headers = request.context.headers;
-          } else if (request.headers) {
+          } else if ('headers' in request && request.headers) {
             headers = request.headers;
-          } else if (request.payload?.headers) {
+          } else if ('payload' in request && request.payload?.headers) {
             headers = request.payload.headers;
           }
 
