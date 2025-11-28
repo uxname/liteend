@@ -3,17 +3,54 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+import { ProfileRole } from '@prisma/client';
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isMockEnabled =
+      this.configService.get<string>('OIDC_MOCK_ENABLED') === 'true';
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    if (isMockEnabled && !isProduction) {
+      const request = this.getRequest(context);
+
+      request.user = await this.prisma.profile.upsert({
+        where: { oidcSub: 'mock-oidc-sub' },
+        create: {
+          oidcSub: 'mock-oidc-sub',
+          roles: [ProfileRole.USER, ProfileRole.ADMIN],
+          avatarUrl: 'https://mock.jpg',
+        },
+        update: {
+          roles: [ProfileRole.USER, ProfileRole.ADMIN],
+          avatarUrl: 'https://mock.jpg',
+        },
+      });
+      return true;
+    }
+
+    return super.canActivate(context) as Promise<boolean>;
+  }
+
   getRequest(context: ExecutionContext) {
     // 1. HTTP REST
     if (context.getType() === 'http') {
       return context.switchToHttp().getRequest();
     }
-
+    // 2. GraphQL
     const ctx = GqlExecutionContext.create(context);
     const gqlContext = ctx.getContext();
 

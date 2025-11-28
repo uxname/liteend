@@ -18,7 +18,6 @@
 ## OIDC Migration todo
 
 - [ ] Check for unsafe logs
-- [ ] Add mock JWT for debug
 - [ ] Fix logs (log error stacktrace to stdout)
 - [ ] Fix prisma studio proxy
 - [ ] ```
