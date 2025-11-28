@@ -18,7 +18,6 @@
 ## OIDC Migration todo
 
 - [ ] Fix logs (log error stacktrace to stdout)
-- [ ] Fix prisma studio proxy
 - [ ] ```
   throw new mercurius.ErrorWithProps('User not found', {
         code: 'USER_NOT_FOUND',
