@@ -1,117 +1,89 @@
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
-import { ExecutionResult, GraphQLFormattedError } from 'graphql';
-import { GraphQLError } from 'graphql/error';
+import { ExecutionResult } from 'graphql';
+import { GraphQLError } from 'graphql/error/GraphQLError';
 import { ZodValidationException } from 'nestjs-zod';
-import { core, ZodError } from 'zod';
-import { createDigestFromError } from '@/common/all-exceptions-filter';
+import { ZodError } from 'zod';
 
 const logger = new Logger('GraphQLErrorFormatter');
 
-export function gqlErrorFormatter(execution: ExecutionResult): {
-  statusCode: number;
-  response: Omit<ExecutionResult, 'errors'> & {
-    errors?: GraphQLFormattedError[] | readonly GraphQLFormattedError[];
-  };
-} {
-  const [error] = execution.errors || [];
-  if (!error) return { statusCode: 200, response: execution };
+export function gqlErrorFormatter(
+  execution: ExecutionResult,
+  context: any,
+): { statusCode: number; response: ExecutionResult } {
+  const errors = execution.errors;
 
-  const originalError = error.originalError || error;
-  const digest = createDigestFromError(originalError);
-
-  if (originalError instanceof ZodValidationException) {
-    const zodException = originalError as ZodValidationException;
-    const zodError = zodException.getZodError() as unknown as ZodError;
-    const issues = zodError.issues;
-
-    return {
-      statusCode: 200,
-      response: {
-        errors: execution.errors?.map((e) => ({
-          message: 'Validation Failed',
-          locations: e.locations,
-          path: e.path,
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            validationErrors: issues.map((issue: core.$ZodIssue) => ({
-              field: issue.path.join('.'),
-              message: issue.message,
-              code: issue.code,
-            })),
-            digest,
-          },
-        })) as GraphQLFormattedError[],
-        data: execution.data,
-      },
-    };
+  if (!errors || errors.length === 0) {
+    return { statusCode: 200, response: execution };
   }
 
-  if (originalError instanceof HttpException) {
-    const status = originalError.getStatus();
-    // biome-ignore lint/suspicious/noExplicitAny: HttpException types are too strict
-    const response = originalError.getResponse() as any;
+  const requestId = context?.req?.id || 'unknown';
 
-    let code = 'INTERNAL_SERVER_ERROR';
-    if (status === HttpStatus.BAD_REQUEST) code = 'BAD_USER_INPUT';
-    if (status === HttpStatus.UNAUTHORIZED) code = 'UNAUTHENTICATED';
-    if (status === HttpStatus.FORBIDDEN) code = 'FORBIDDEN';
-    if (status === HttpStatus.NOT_FOUND) code = 'NOT_FOUND';
+  const formattedErrors = errors.map((error) => {
+    const originalError = error.originalError;
+
+    if (originalError instanceof ZodValidationException) {
+      const issues = (originalError.getZodError() as ZodError).issues;
+      return {
+        message: 'Validation Failed',
+        locations: error.locations,
+        path: error.path,
+        extensions: {
+          code: 'BAD_USER_INPUT',
+          requestId,
+          details: issues.map((i) => ({
+            field: i.path.join('.'),
+            message: i.message,
+          })),
+        },
+      };
+    }
+
+    if (originalError instanceof HttpException) {
+      const status = originalError.getStatus();
+      let code = 'INTERNAL_SERVER_ERROR';
+
+      if (status === HttpStatus.BAD_REQUEST) code = 'BAD_USER_INPUT';
+      if (status === HttpStatus.UNAUTHORIZED) code = 'UNAUTHENTICATED';
+      if (status === HttpStatus.FORBIDDEN) code = 'FORBIDDEN';
+      if (status === HttpStatus.NOT_FOUND) code = 'NOT_FOUND';
+
+      const response = originalError.getResponse();
+      const details = typeof response === 'object' ? response : null;
+
+      return {
+        message: originalError.message,
+        locations: error.locations,
+        path: error.path,
+        extensions: {
+          code,
+          requestId,
+          details,
+        },
+      };
+    }
+
+    logger.error({
+      msg: 'GraphQL Internal Error',
+      err: originalError || error,
+      requestId,
+    });
 
     return {
-      statusCode: 200,
-      response: {
-        errors: execution.errors?.map((e) => ({
-          message: response.message || e.message,
-          locations: e.locations,
-          path: e.path,
-          extensions: {
-            code,
-            digest,
-            details: typeof response === 'object' ? response : null,
-          },
-        })) as GraphQLFormattedError[],
-        data: execution.data,
+      message: 'Internal Server Error',
+      locations: error.locations,
+      path: error.path,
+      extensions: {
+        code: 'INTERNAL_SERVER_ERROR',
+        requestId,
       },
     };
-  }
-
-  if (originalError instanceof GraphQLError && !error.originalError) {
-    return {
-      statusCode: 400,
-      response: {
-        errors: execution.errors?.map((e) => ({
-          message: e.message,
-          extensions: {
-            code: 'GRAPHQL_VALIDATION_FAILED',
-            digest,
-          },
-        })) as GraphQLFormattedError[],
-        data: null,
-      },
-    };
-  }
-
-  logger.error({
-    message: 'Internal GraphQL Error',
-    originalError,
-    digest,
-    stack: originalError instanceof Error ? originalError.stack : null,
   });
 
   return {
     statusCode: 200,
     response: {
-      errors: execution.errors?.map((e) => ({
-        message: 'Internal Server Error',
-        locations: e.locations,
-        path: e.path,
-        extensions: {
-          code: 'INTERNAL_SERVER_ERROR',
-          digest,
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: GraphQL types are too strict
-      })) as any,
       data: execution.data,
+      errors: formattedErrors as unknown as GraphQLError[],
     },
   };
 }

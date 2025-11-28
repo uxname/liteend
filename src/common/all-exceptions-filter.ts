@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import {
   ArgumentsHost,
   Catch,
@@ -6,224 +5,98 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 
-// Constants
-const DIGEST_LENGTH = 16;
-
-// Extended interface for NotFoundException with additional properties
-interface ExtendedNotFoundException extends NotFoundException {
-  path?: string;
-  method?: string;
-}
-
-// Detailed error response interface
-interface ErrorResponse {
-  message: string;
-  error: string;
-  statusCode: number;
-  timestamp: string;
-  digest: string;
-  stack?: string;
-  path?: string;
-  method?: string;
-  details?: unknown;
-}
-
-// Structured error data for digest creation
-interface ErrorData {
-  message: string;
-  name: string;
-  timestamp: string;
-  locations?: unknown;
-  path?: unknown;
-  stack?: string;
-}
-
-/**
- * Global exception filter to handle HTTP and WebSocket exceptions
- */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger: Logger;
-
-  constructor() {
-    this.logger = new Logger(AllExceptionsFilter.name);
-  }
+  private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    const contextType = host.getType();
-
-    switch (contextType) {
-      case 'http': {
-        this.handleHttpException(exception, host);
-        break;
-      }
-      case 'ws': {
-        this.logUnhandledContextType(contextType);
-        break;
-      }
-      default: {
-        this.logUnhandledContextType(contextType);
-      }
+    if (host.getType() !== 'http') {
+      return;
     }
-  }
 
-  /**
-   * Handles HTTP context exceptions
-   */
-  private handleHttpException(exception: unknown, host: ArgumentsHost): void {
-    const context = host.switchToHttp();
-    const response = context.getResponse<FastifyReply>();
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest<FastifyRequest>();
 
-    // Fastify check: if headers sent, stop
     if (response.sent) return;
 
-    const { errorResponse, statusCode } = this.prepareErrorResponse(exception);
+    const status = this.getHttpStatus(exception);
+    const errorBody = this.buildErrorBody(exception, status, request.id);
 
-    this.logError(errorResponse);
+    if (status >= 500) {
+      this.logger.error({
+        msg: 'HTTP Error',
+        err: exception,
+        requestId: request.id,
+      });
+    } else {
+      // Для отладки 4xx ошибок можно включить warn
+      this.logger.warn({
+        msg: 'Client Error',
+        statusCode: status,
+        requestId: request.id,
+        error: errorBody.message,
+      });
+    }
 
-    response.code(statusCode).send(errorResponse);
+    response.status(status).send(errorBody);
   }
 
-  /**
-   * Prepares a standardized error response
-   */
-  private prepareErrorResponse(exception: unknown): {
-    statusCode: number;
-    errorResponse: ErrorResponse;
-  } {
-    const digest = createDigestFromError(exception);
-    const statusCode = this.determineHttpStatus(exception);
+  private getHttpStatus(exception: unknown): number {
+    if (exception instanceof ZodValidationException)
+      return HttpStatus.BAD_REQUEST;
+    if (exception instanceof HttpException) return exception.getStatus();
+    return HttpStatus.INTERNAL_SERVER_ERROR;
+  }
 
-    // --- ZOD VALIDATION HANDLER ---
-    if (exception instanceof ZodValidationException) {
-      const zodException = exception as ZodValidationException;
-      const zodError = zodException.getZodError() as unknown as ZodError;
-
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        errorResponse: {
-          message: 'Validation failed',
-          error: 'Bad Request',
-          statusCode: HttpStatus.BAD_REQUEST,
-          timestamp: new Date().toISOString(),
-          digest,
-          details: zodError.issues,
-        },
-      };
-    }
-    // -----------------------------
-
-    // Handle specific 404 errors
-    if (exception instanceof NotFoundException) {
-      const notFoundException = exception as ExtendedNotFoundException;
-      return {
-        statusCode: HttpStatus.NOT_FOUND,
-        errorResponse: {
-          message: 'Resource not found',
-          error: 'Not Found',
-          statusCode: HttpStatus.NOT_FOUND,
-          timestamp: new Date().toISOString(),
-          path: notFoundException.path ?? undefined,
-          method: notFoundException.method ?? undefined,
-          digest,
-        },
-      };
-    }
-
-    // Generic error response
-    const errorResponse: ErrorResponse = {
-      message: this.extractErrorMessage(exception),
-      error: this.extractErrorName(exception),
-      statusCode,
+  private buildErrorBody(
+    exception: unknown,
+    status: number,
+    requestId: string,
+  ) {
+    const base = {
+      statusCode: status,
       timestamp: new Date().toISOString(),
-      digest,
-      stack: exception instanceof Error ? exception.stack : undefined,
+      requestId,
     };
 
-    return { statusCode, errorResponse };
-  }
-
-  /**
-   * Determines HTTP status code for the exception
-   */
-  private determineHttpStatus(exception: unknown): number {
-    return exception instanceof HttpException
-      ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
-  }
-
-  /**
-   * Extracts error message with fallback
-   */
-  private extractErrorMessage(error: unknown): string {
-    return error instanceof Error
-      ? error.message
-      : 'An unexpected error occurred';
-  }
-
-  /**
-   * Extracts error name with fallback
-   */
-  private extractErrorName(error: unknown): string {
-    return error instanceof Error ? error.name : 'UnknownError';
-  }
-
-  /**
-   * Logs errors with additional context
-   */
-  private logError(exception: unknown): void {
-    this.logger.error(exception);
-  }
-
-  /**
-   * Logs unhandled context types
-   */
-  private logUnhandledContextType(contextType: string): void {
-    if (contextType !== 'graphql') {
-      this.logger.warn(`Unhandled context type: ${contextType}`);
+    if (exception instanceof ZodValidationException) {
+      const zodError = exception.getZodError() as unknown as ZodError;
+      return {
+        ...base,
+        error: 'Validation Failed',
+        message: 'Input validation error',
+        details: zodError.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+          code: issue.code,
+        })),
+      };
     }
+
+    if (exception instanceof HttpException) {
+      const res = exception.getResponse();
+      const message =
+        typeof res === 'object' && res !== null && 'message' in res
+          ? (res as HttpException).message
+          : exception.message;
+
+      return {
+        ...base,
+        error: exception.name,
+        message,
+      };
+    }
+
+    return {
+      ...base,
+      error: 'Internal Server Error',
+      message: 'An unexpected error occurred',
+    };
   }
-}
-
-/**
- * Generates a deterministic hash digest for error logging
- */
-export function createDigestFromError(error: unknown): string {
-  const currentDate = new Date().toISOString();
-
-  // Prepare error data for digest creation
-  const errorData: ErrorData = {
-    message: error instanceof Error ? error.message : 'Unknown error',
-    name: error instanceof Error ? error.name : 'UnknownError',
-    timestamp: currentDate,
-  };
-
-  // Conditionally add additional error properties
-  if (error instanceof Error) {
-    if ('locations' in error) errorData.locations = error.locations;
-    if ('path' in error) errorData.path = error.path;
-    if ('stack' in error) errorData.stack = error.stack;
-  }
-
-  // Trim large properties (to mitigate potential DoS)
-  const MAX_ERROR_SIZE = 1024; // Limit the size of error details to 1KB
-
-  const trimmedErrorData = JSON.stringify(errorData, (_, value) =>
-    value && typeof value === 'string' && value.length > MAX_ERROR_SIZE
-      ? value.slice(0, MAX_ERROR_SIZE) // Truncate strings to limit size
-      : value,
-  );
-
-  // Generate the digest
-  return crypto
-    .createHash('sha256')
-    .update(trimmedErrorData)
-    .digest('hex')
-    .slice(0, DIGEST_LENGTH);
 }

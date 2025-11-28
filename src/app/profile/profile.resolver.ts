@@ -43,7 +43,7 @@ export class ProfileResolver {
       input,
     );
 
-    await pubSub.publish({
+    pubSub.publish({
       topic: EVENTS.PROFILE_UPDATED,
       payload: {
         profileUpdated: updatedProfile,

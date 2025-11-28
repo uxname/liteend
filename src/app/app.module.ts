@@ -29,16 +29,6 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mqEmitterRedis = require('mqemitter-redis');
 
-interface GqlSubscriptionRequest {
-  headers?: Record<string, string>;
-  context?: {
-    headers?: Record<string, string>;
-  };
-  payload?: {
-    headers?: Record<string, string>;
-  };
-}
-
 @Module({
   imports: [
     AuthModule,
@@ -98,29 +88,8 @@ interface GqlSubscriptionRequest {
           },
         },
 
-        context: (
-          request: FastifyRequest | GqlSubscriptionRequest,
-          reply: FastifyReply,
-        ) => {
-          if ('raw' in request) {
-            return { req: request, res: reply };
-          }
-
-          let headers: Record<string, string> = {};
-
-          if ('context' in request && request.context?.headers) {
-            headers = request.context.headers;
-          } else if ('headers' in request && request.headers) {
-            headers = request.headers;
-          } else if ('payload' in request && request.payload?.headers) {
-            headers = request.payload.headers;
-          }
-
-          return {
-            req: {
-              headers: headers || {},
-            },
-          };
+        context: (request: FastifyRequest, reply: FastifyReply) => {
+          return { req: request, res: reply };
         },
 
         resolvers: { JSON: GraphQLJSON },
