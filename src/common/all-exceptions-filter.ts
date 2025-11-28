@@ -35,7 +35,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         requestId: request.id,
       });
     } else {
-      // Для отладки 4xx ошибок можно включить warn
       this.logger.warn({
         msg: 'Client Error',
         statusCode: status,
