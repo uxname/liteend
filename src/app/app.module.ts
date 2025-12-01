@@ -11,6 +11,7 @@ import { GraphQLError } from 'graphql/error';
 import { getComplexity, simpleEstimator } from 'graphql-query-complexity';
 import GraphQLJSON from 'graphql-type-json';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
+import { AppController } from '@/app/app.controller';
 import { DebugModule } from '@/app/debug/debug.module';
 import { FileUploadModule } from '@/app/file-upload/file-upload.module';
 import { HealthModule } from '@/app/health/health.module';
@@ -141,6 +142,7 @@ const mqEmitterRedis = require('mqemitter-redis');
     }),
     ProfileModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,
