@@ -11,7 +11,7 @@ Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storag
 
 Start a new project based on LiteEnd in seconds. This command downloads the template (without git history), sets up the environment file, and installs dependencies.
 
-### One-line initialization:
+### One-line initialization
 
 Replace `my-app` with your project name:
 
