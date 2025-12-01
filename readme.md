@@ -1,4 +1,4 @@
-# [![LiteEnd logo](.github/logo.png)](https://github.com/uxname/liteend)
+# [![LiteEnd logo](assets/logo.png)](https://github.com/uxname/liteend)
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
