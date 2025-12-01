@@ -16,7 +16,7 @@ Start a new project based on LiteEnd in seconds. This command downloads the temp
 Replace `my-app` with your project name:
 
 ```bash
-npx degit uxname/liteend my-app && cd my-app && cp .env.example .env && npm install && git init
+npx degit uxname/liteend my-app && cd my-app && git init && cp .env.example .env && npm install
 ```
 
 ### What's next?
