@@ -7,6 +7,24 @@
 Lightweight, fast, and easy-to-use backend app template for Node.js, based on [NestJS](https://nestjs.com/).
 Uses [Prisma.io](https://www.prisma.io) and PostgreSQL as a base for data storage, Redis for caching/queues, and OIDC for authentication.
 
+## ⚡️ TL;DR — Quick Start
+
+Start a new project based on LiteEnd in seconds. This command downloads the template (without git history), sets up the environment file, and installs dependencies.
+
+### One-line initialization:
+
+Replace `my-app` with your project name:
+
+```bash
+npx degit uxname/liteend my-app && cd my-app && cp .env.example .env && npm install && git init
+```
+
+### What's next?
+
+1. **Database:** Update `.env` with your credentials and run `docker-compose up -d`.
+2. **Migrations:** Run `npm run db:migrations:apply`.
+3. **Run:** `npm run start:dev`.
+
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
