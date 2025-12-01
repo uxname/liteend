@@ -53,7 +53,7 @@ services:
       - liteend-net
     logging: *common-logging
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME} -p ${DATABASE_PORT}"]
       interval: 5s
       timeout: 5s
       retries: 5
