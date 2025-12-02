@@ -21,10 +21,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isMockEnabled =
       this.configService.get<string>('OIDC_MOCK_ENABLED') === 'true';
-    const isProduction =
-      this.configService.get<string>('NODE_ENV') === 'production';
 
-    if (isMockEnabled && !isProduction) {
+    if (isMockEnabled) {
       const request = this.getRequest(context);
 
       request.user = await this.prisma.profile.upsert({

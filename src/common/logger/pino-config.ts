@@ -1,4 +1,6 @@
 // File: src/common/logger/pino-config.ts
+
+import { IncomingMessage } from 'node:http';
 import path from 'node:path';
 import * as process from 'node:process';
 import { Params } from 'nestjs-pino';
@@ -27,10 +29,15 @@ export const pinoConfig: Params = {
       return `Request completed in ${Math.round(responseTime)}ms`;
     },
     autoLogging: {
-      ignore: (req) => {
-        if (req.url?.includes('/health')) return true;
-        if (req.url?.includes('/favicon.ico')) return true;
-        if (req.url?.startsWith('/logs')) return true;
+      ignore: (_req) => {
+        const req = _req as IncomingMessage & { originalUrl?: string };
+        const url = req.originalUrl || req.url || '';
+
+        if (url?.includes('/health')) return true;
+
+        if (url?.includes('/favicon.ico')) return true;
+
+        if (url?.startsWith('/logs')) return true;
 
         return false;
       },
