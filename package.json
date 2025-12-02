@@ -39,7 +39,7 @@
     "________________ OTHER ________________": "",
     "postinstall": "npm run prepare",
     "prepare": "lefthook install",
-    "update": "npm-check-updates -u && rimraf node_modules package-lock.json && npm i --legacy-peer-deps",
+    "update": "npm-check-updates -u && rimraf node_modules package-lock.json && npm i",
     "postupdate": "npm run lint:fix && npm run check"
   },
   "dependencies": {
