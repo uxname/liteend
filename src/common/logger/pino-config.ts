@@ -1,5 +1,3 @@
-// File: src/common/logger/pino-config.ts
-
 import { IncomingMessage } from 'node:http';
 import path from 'node:path';
 import * as process from 'node:process';
