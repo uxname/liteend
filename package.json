@@ -43,9 +43,9 @@
     "postupdate": "npm run lint:fix && npm run check"
   },
   "dependencies": {
-    "@bull-board/api": "^6.14.2",
-    "@bull-board/fastify": "^6.14.2",
-    "@bull-board/nestjs": "^6.14.2",
+    "@bull-board/api": "^6.15.0",
+    "@bull-board/fastify": "^6.15.0",
+    "@bull-board/nestjs": "^6.15.0",
     "@dotenvx/dotenvx": "^1.51.1",
     "@fastify/compress": "^8.3.0",
     "@fastify/helmet": "^13.0.2",
@@ -106,7 +106,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.15.6",
     "knip": "^5.71.0",
-    "lefthook": "^2.0.7",
+    "lefthook": "^2.0.8",
     "markdownlint-cli": "^0.46.0",
     "npm-check-updates": "^19.1.2",
     "npm-run-all": "^4.1.5",
