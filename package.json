@@ -29,7 +29,7 @@
     "test:e2e": "vitest run --config ./vitest.config.ts --dir test",
     "________________ DATABASE ________________": "",
     "db:push": "prisma db push && npm run db:gen",
-    "db:reset": "prisma migrate reset --force && npm run db:push && npm run db:gen",
+    "db:reset": "prisma migrate reset --force",
     "db:migrations:apply": "prisma migrate deploy && npm run db:gen",
     "db:migrations:create": "prisma migrate dev --create-only",
     "db:schema:format": "prisma format",
