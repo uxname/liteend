@@ -6,7 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { ProfileRole } from '@prisma/client';
+import { ProfileRole } from '@/@generated/prisma/enums';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()

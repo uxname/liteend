@@ -8,7 +8,8 @@
     "pino-pretty",
     "pino-roll",
     "graphql-ws",
-    "@dotenvx/dotenvx"
+    "@dotenvx/dotenvx",
+    "@prisma/client"
   ],
   "paths": {
     "@/*": ["src/*"]

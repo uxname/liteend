@@ -38,3 +38,4 @@ lerna-debug.log*
 tsconfig.tsbuildinfo
 .husky
 
+src/@generated/prisma/

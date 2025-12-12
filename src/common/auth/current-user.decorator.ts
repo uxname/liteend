@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Profile } from '@prisma/client';
+import { Profile } from '@/@generated/prisma/client';
 
 export type CurrentUserType = Profile;
 

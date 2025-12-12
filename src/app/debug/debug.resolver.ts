@@ -2,10 +2,10 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { ProfileRole } from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
 import { I18n, I18nContext } from 'nestjs-i18n';
 import { I18nTranslations } from '@/@generated/i18n-types';
+import { ProfileRole } from '@/@generated/prisma/enums';
 import {
   CurrentUser,
   CurrentUserType,
