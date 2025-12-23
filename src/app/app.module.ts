@@ -42,9 +42,9 @@ const mqEmitterRedis = require('mqemitter-redis');
         autoSchemaFile: true,
         graphiql: false,
         jit: 1,
-        cache: true,
+        cache: false,
 
-        validationRules: [
+        validationRules: ({ variables }) => [
           (context) => ({
             OperationDefinition(node) {
               const schema = context.getSchema();
@@ -52,7 +52,7 @@ const mqEmitterRedis = require('mqemitter-redis');
                 schema,
                 operationName: node.name?.value,
                 query: context.getDocument(),
-                variables: undefined,
+                variables: variables,
                 estimators: [simpleEstimator({ defaultComplexity: 1 })],
               });
 
