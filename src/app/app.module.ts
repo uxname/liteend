@@ -56,7 +56,7 @@ const mqEmitterRedis = require('mqemitter-redis');
                 estimators: [simpleEstimator({ defaultComplexity: 1 })],
               });
 
-              const MAX_COMPLEXITY = 200;
+              const MAX_COMPLEXITY = 1000;
 
               if (complexity > MAX_COMPLEXITY) {
                 context.reportError(
