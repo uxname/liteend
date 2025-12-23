@@ -30,11 +30,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         create: {
           oidcSub: 'mock-oidc-sub',
           roles: [ProfileRole.USER, ProfileRole.ADMIN],
-          avatarUrl: 'https://mock.jpg',
+          avatarUrl: 'https://i.pravatar.cc/300',
         },
         update: {
           roles: [ProfileRole.USER, ProfileRole.ADMIN],
-          avatarUrl: 'https://mock.jpg',
+          avatarUrl: 'https://i.pravatar.cc/300',
         },
       });
       return true;
