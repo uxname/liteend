@@ -59,7 +59,7 @@
     "@nestjs/graphql": "^13.2.0",
     "@nestjs/mercurius": "^13.2.0",
     "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-fastify": "^11.1.9",
+    "@nestjs/platform-fastify": "^11.1.10",
     "@nestjs/swagger": "^11.2.3",
     "@nestjs/websockets": "^11.1.9",
     "@prisma/adapter-pg": "^7.1.0",
