@@ -7,18 +7,41 @@ import { TransportTargetOptions } from 'pino';
 const LOG_DIR = path.join(process.cwd(), 'data', 'logs');
 const IS_DEV = process.env.NODE_ENV !== 'production';
 
-const fileTransport = (filename: string): TransportTargetOptions => ({
+const LOG_ROTATION_SIZE = '20m';
+const LOG_RETENTION_COUNT = 10;
+
+const IGNORED_PATH_SEGMENTS = ['/health', '/altair', '/favicon.ico', '/logs'];
+
+interface RequestWithUrl extends IncomingMessage {
+  originalUrl?: string;
+}
+
+const createFileTransport = (
+  filename: string,
+  level: string,
+): TransportTargetOptions => ({
   target: 'pino-roll',
+  level,
   options: {
     file: path.join(LOG_DIR, filename),
     frequency: 'daily',
     mkdir: true,
-    size: '20m',
+    size: LOG_ROTATION_SIZE,
     limit: {
-      count: 10,
+      count: LOG_RETENTION_COUNT,
     },
   },
 });
+
+const shouldIgnoreRequest = (req: IncomingMessage): boolean => {
+  const url = (req as RequestWithUrl).originalUrl || req.url || '';
+  const isIgnoredPath = IGNORED_PATH_SEGMENTS.some((segment) =>
+    url.includes(segment),
+  );
+  const isStaticMap = url.endsWith('.map');
+
+  return isIgnoredPath || isStaticMap;
+};
 
 export const pinoConfig: Params = {
   pinoHttp: {
@@ -27,18 +50,7 @@ export const pinoConfig: Params = {
       return `Request completed in ${Math.round(responseTime)}ms`;
     },
     autoLogging: {
-      ignore: (_req) => {
-        const req = _req as IncomingMessage & { originalUrl?: string };
-        const url = req.originalUrl || req.url || '';
-
-        if (url?.includes('/health')) return true;
-
-        if (url?.includes('/favicon.ico')) return true;
-
-        if (url?.startsWith('/logs')) return true;
-
-        return false;
-      },
+      ignore: shouldIgnoreRequest,
     },
     redact: {
       paths: ['req.headers.authorization', 'req.body.password'],
@@ -48,22 +60,16 @@ export const pinoConfig: Params = {
       targets: [
         {
           target: 'pino-pretty',
+          level: 'trace',
           options: {
             colorize: true,
             singleLine: true,
             translateTime: 'yyyy-mm-dd HH:MM:ss',
             ignore: 'pid,hostname',
           },
-          level: 'trace',
         },
-        {
-          ...fileTransport('all/log'),
-          level: 'trace',
-        },
-        {
-          ...fileTransport('error/log'),
-          level: 'error',
-        },
+        createFileTransport('all/log', 'trace'),
+        createFileTransport('error/log', 'error'),
       ],
     },
     serializers: {

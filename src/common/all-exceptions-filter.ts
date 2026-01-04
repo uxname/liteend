@@ -10,14 +10,20 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 
+const SILENT_404_EXTENSIONS = ['.map', '.ico', '.js', '.css'];
+
+interface HttpExceptionResponse {
+  message?: string | string[];
+  error?: string;
+  statusCode?: number;
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    if (host.getType() !== 'http') {
-      return;
-    }
+    if (host.getType() !== 'http') return;
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
@@ -26,21 +32,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (response.sent) return;
 
     const status = this.getHttpStatus(exception);
+    const isNoisy404 =
+      status === HttpStatus.NOT_FOUND &&
+      SILENT_404_EXTENSIONS.some((ext) => request.url.endsWith(ext));
+
     const errorBody = this.buildErrorBody(exception, status, request.id);
 
-    if (status >= 500) {
-      this.logger.error({
-        msg: 'HTTP Error',
-        err: exception,
-        requestId: request.id,
-      });
-    } else {
-      this.logger.warn({
-        msg: 'Client Error',
-        statusCode: status,
-        requestId: request.id,
-        error: errorBody.message,
-      });
+    if (!isNoisy404) {
+      this.logException(
+        exception,
+        status,
+        request.id,
+        request.url,
+        errorBody.message,
+      );
     }
 
     response.status(status).send(errorBody);
@@ -51,6 +56,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return HttpStatus.BAD_REQUEST;
     if (exception instanceof HttpException) return exception.getStatus();
     return HttpStatus.INTERNAL_SERVER_ERROR;
+  }
+
+  private logException(
+    exc: unknown,
+    status: number,
+    requestId: string,
+    url: string,
+    message: string | unknown,
+  ): void {
+    const logData = { requestId, url, statusCode: status };
+
+    if (status >= 500) {
+      this.logger.error({ ...logData, msg: 'Internal Server Error', err: exc });
+      return;
+    }
+
+    this.logger.warn({ ...logData, msg: 'Client Error', message });
   }
 
   private buildErrorBody(
@@ -65,7 +87,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     if (exception instanceof ZodValidationException) {
-      const zodError = exception.getZodError() as unknown as ZodError;
+      const zodError = exception.getZodError() as ZodError;
       return {
         ...base,
         error: 'Validation Failed',
@@ -73,16 +95,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
         details: zodError.issues.map((issue) => ({
           field: issue.path.join('.'),
           message: issue.message,
-          code: issue.code,
         })),
       };
     }
 
     if (exception instanceof HttpException) {
-      const res = exception.getResponse();
+      const res = exception.getResponse() as HttpExceptionResponse;
       const message =
-        typeof res === 'object' && res !== null && 'message' in res
-          ? (res as HttpException).message
+        typeof res === 'object' && res !== null
+          ? res.message || exception.message
           : exception.message;
 
       return {

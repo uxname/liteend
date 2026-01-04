@@ -3,7 +3,7 @@ import * as process from 'node:process';
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -22,6 +22,7 @@ import { AuthModule } from '@/common/auth/auth.module';
 import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { gqlErrorFormatter } from '@/common/graphql/error-formatter';
+import { GqlLoggingInterceptor } from '@/common/logger/gql-logging.interceptor';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
@@ -147,6 +148,10 @@ const mqEmitterRedis = require('mqemitter-redis');
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: GqlLoggingInterceptor,
     },
   ],
 })
