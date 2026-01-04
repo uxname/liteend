@@ -37,6 +37,15 @@ const createFileTransport = (
   },
 });
 
+interface PinoCustomProps {
+  user?: { id: number | string };
+  graphql?: { type: string; operation: string };
+  raw?: {
+    user?: { id: number | string };
+    graphql?: { type: string; operation: string };
+  };
+}
+
 export const pinoConfig: Params = {
   pinoHttp: {
     level: IS_DEV ? 'trace' : 'info',
@@ -56,9 +65,10 @@ export const pinoConfig: Params = {
       }),
     },
 
-    customProps: (req: any) => {
-      const user = req.user || req.raw?.user;
-      const graphql = req.graphql || req.raw?.graphql;
+    customProps: (req: IncomingMessage) => {
+      const customReq = req as unknown as PinoCustomProps;
+      const user = customReq.user || customReq.raw?.user;
+      const graphql = customReq.graphql || customReq.raw?.graphql;
       return {
         userId: user?.id,
         graphql,
@@ -82,11 +92,12 @@ export const pinoConfig: Params = {
     },
 
     customSuccessMessage: (
-      req: any,
+      req: IncomingMessage,
       _res: ServerResponse,
       responseTime: number,
     ) => {
-      const gql = req.graphql || req.raw?.graphql;
+      const customReq = req as unknown as PinoCustomProps;
+      const gql = customReq.graphql || customReq.raw?.graphql;
       if (gql) {
         return `GraphQL ${gql.type} ${gql.operation} completed in ${Math.round(responseTime)}ms`;
       }

@@ -32,7 +32,11 @@ export class GqlLoggingInterceptor implements NestInterceptor {
     const gqlContext = GqlExecutionContext.create(context);
     const info = gqlContext.getInfo();
     const args = gqlContext.getArgs();
-    const req = gqlContext.getContext().req;
+
+    const req = gqlContext.getContext().req as {
+      graphql?: unknown;
+      raw?: { graphql?: unknown };
+    };
 
     if (!req) return next.handle();
 
@@ -42,10 +46,9 @@ export class GqlLoggingInterceptor implements NestInterceptor {
       args: this.redact(args),
     };
 
-    // Привязываем данные к запросу для использования в pino-config
     req.graphql = graphqlData;
     if (req.raw) {
-      (req.raw as any).graphql = graphqlData;
+      (req.raw as typeof req.raw & { graphql?: unknown }).graphql = graphqlData;
     }
 
     return next.handle();
@@ -56,8 +59,10 @@ export class GqlLoggingInterceptor implements NestInterceptor {
     if (Array.isArray(args)) return args.map((v) => this.redact(v));
 
     const redactedObj: Record<string, unknown> = {};
-    for (const key of Object.keys(args as object)) {
-      const value = (args as any)[key];
+    const argsObj = args as Record<string, unknown>;
+
+    for (const key of Object.keys(argsObj)) {
+      const value = argsObj[key];
       const isSensitive = SENSITIVE_KEYS.some((s) =>
         key.toLowerCase().includes(s),
       );

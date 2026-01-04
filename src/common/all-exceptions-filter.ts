@@ -46,7 +46,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       SILENT_404_EXTENSIONS.some((ext) => url.endsWith(ext));
 
     const errorBody = this.buildErrorBody(exception, status, request.id);
-    const user = (request as any).user;
+
+    const user = (
+      request as FastifyRequest & { user?: { id: number | string } }
+    ).user;
     const userId = user?.id;
 
     if (!isNoisy404) {

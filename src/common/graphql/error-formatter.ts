@@ -92,7 +92,8 @@ export function gqlErrorFormatter(
     }
 
     const isMercuriusPersistedError =
-      (originalError as any)?.code === 'MER_ERR_GQL_PERSISTED_QUERY_NOT_FOUND';
+      (originalError as { code?: string })?.code ===
+      'MER_ERR_GQL_PERSISTED_QUERY_NOT_FOUND';
 
     if (isMercuriusPersistedError) {
       logger.warn({
