@@ -10,7 +10,15 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 
-const SILENT_404_EXTENSIONS = ['.map', '.ico', '.js', '.css'];
+const SILENT_404_EXTENSIONS = [
+  '.map',
+  '.ico',
+  '.js',
+  '.css',
+  '.png',
+  '.jpg',
+  '.jpeg',
+];
 
 interface HttpExceptionResponse {
   message?: string | string[];
@@ -32,19 +40,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (response.sent) return;
 
     const status = this.getHttpStatus(exception);
+    const url = request.url;
     const isNoisy404 =
       status === HttpStatus.NOT_FOUND &&
-      SILENT_404_EXTENSIONS.some((ext) => request.url.endsWith(ext));
+      SILENT_404_EXTENSIONS.some((ext) => url.endsWith(ext));
 
     const errorBody = this.buildErrorBody(exception, status, request.id);
+    const user = (request as any).user;
+    const userId = user?.id;
 
     if (!isNoisy404) {
       this.logException(
         exception,
         status,
         request.id,
-        request.url,
+        url,
         errorBody.message,
+        userId,
       );
     }
 
@@ -64,15 +76,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
     requestId: string,
     url: string,
     message: string | unknown,
+    userId?: number | string,
   ): void {
-    const logData = { requestId, url, statusCode: status };
+    const logData = {
+      requestId,
+      url,
+      statusCode: status,
+      userId,
+      message,
+    };
 
     if (status >= 500) {
-      this.logger.error({ ...logData, msg: 'Internal Server Error', err: exc });
+      this.logger.error({
+        ...logData,
+        msg: 'Internal Server Error',
+        err:
+          exc instanceof Error
+            ? { message: exc.message, stack: exc.stack }
+            : exc,
+      });
       return;
     }
 
-    this.logger.warn({ ...logData, msg: 'Client Error', message });
+    this.logger.warn({ ...logData, msg: 'HTTP Client Error' });
   }
 
   private buildErrorBody(

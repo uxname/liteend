@@ -26,6 +26,16 @@ export function gqlErrorFormatter(
 
     if (originalError instanceof ZodValidationException) {
       const issues = (originalError.getZodError() as ZodError).issues;
+      logger.warn({
+        msg: 'GraphQL Validation Failed',
+        requestId,
+        path: error.path,
+        details: issues.map((i) => ({
+          field: i.path.join('.'),
+          message: i.message,
+        })),
+      });
+
       return {
         message: 'Validation Failed',
         locations: error.locations,
@@ -43,12 +53,28 @@ export function gqlErrorFormatter(
 
     if (originalError instanceof HttpException) {
       const status = originalError.getStatus();
+      const isClientError = status < 500;
       let code = 'INTERNAL_SERVER_ERROR';
 
       if (status === HttpStatus.BAD_REQUEST) code = 'BAD_USER_INPUT';
       if (status === HttpStatus.UNAUTHORIZED) code = 'UNAUTHENTICATED';
       if (status === HttpStatus.FORBIDDEN) code = 'FORBIDDEN';
       if (status === HttpStatus.NOT_FOUND) code = 'NOT_FOUND';
+
+      const logData = {
+        msg: isClientError ? 'GraphQL Client Error' : 'GraphQL Server Error',
+        status,
+        code,
+        requestId,
+        path: error.path,
+        message: originalError.message,
+      };
+
+      if (isClientError) {
+        logger.warn(logData);
+      } else {
+        logger.error({ ...logData, err: originalError });
+      }
 
       const response = originalError.getResponse();
       const details = typeof response === 'object' ? response : null;
@@ -65,10 +91,26 @@ export function gqlErrorFormatter(
       };
     }
 
+    const isMercuriusPersistedError =
+      (originalError as any)?.code === 'MER_ERR_GQL_PERSISTED_QUERY_NOT_FOUND';
+
+    if (isMercuriusPersistedError) {
+      logger.warn({
+        msg: 'GraphQL Persisted Query Not Found',
+        requestId,
+        path: error.path,
+      });
+      return {
+        message: 'Unknown query',
+        extensions: { code: 'BAD_USER_INPUT', requestId },
+      };
+    }
+
     logger.error({
-      msg: 'GraphQL Internal Error',
+      msg: 'GraphQL Internal Unhandled Error',
       err: originalError || error,
       requestId,
+      path: error.path,
     });
 
     return {

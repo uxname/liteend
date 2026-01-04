@@ -4,7 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
+import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { PinoLogger } from 'nestjs-pino';
 import { Observable } from 'rxjs';
 
@@ -15,51 +15,49 @@ const SENSITIVE_KEYS = [
   'authorization',
   'credentials',
   'cookie',
+  'sig',
 ];
 
 @Injectable()
 export class GqlLoggingInterceptor implements NestInterceptor {
-  constructor(private readonly logger: PinoLogger) {}
+  constructor(private readonly logger: PinoLogger) {
+    this.logger.setContext(GqlLoggingInterceptor.name);
+  }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    if (context.getType<string>() !== 'graphql') {
+    if (context.getType<GqlContextType>() !== 'graphql') {
       return next.handle();
     }
 
     const gqlContext = GqlExecutionContext.create(context);
     const info = gqlContext.getInfo();
     const args = gqlContext.getArgs();
+    const req = gqlContext.getContext().req;
 
-    const parentType = info.parentType?.name || 'Unknown';
-    const fieldName = info.fieldName;
+    if (!req) return next.handle();
 
-    this.logger.assign({
-      graphql: {
-        type: parentType,
-        operation: fieldName,
-        args: this.redact(args),
-      },
-    });
+    const graphqlData = {
+      type: info.parentType?.name || 'Unknown',
+      operation: info.fieldName,
+      args: this.redact(args),
+    };
 
-    this.logger.info(`GraphQL ${parentType}: ${fieldName}`);
+    // Привязываем данные к запросу для использования в pino-config
+    req.graphql = graphqlData;
+    if (req.raw) {
+      (req.raw as any).graphql = graphqlData;
+    }
 
     return next.handle();
   }
 
   private redact(args: unknown): unknown {
-    if (!args || typeof args !== 'object') {
-      return args;
-    }
-
-    if (Array.isArray(args)) {
-      return args.map((item) => this.redact(item));
-    }
+    if (!args || typeof args !== 'object') return args;
+    if (Array.isArray(args)) return args.map((v) => this.redact(v));
 
     const redactedObj: Record<string, unknown> = {};
-    const source = args as Record<string, unknown>;
-
-    for (const key of Object.keys(source)) {
-      const value = source[key];
+    for (const key of Object.keys(args as object)) {
+      const value = (args as any)[key];
       const isSensitive = SENSITIVE_KEYS.some((s) =>
         key.toLowerCase().includes(s),
       );
@@ -72,7 +70,6 @@ export class GqlLoggingInterceptor implements NestInterceptor {
         redactedObj[key] = value;
       }
     }
-
     return redactedObj;
   }
 }
