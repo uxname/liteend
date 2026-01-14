@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 RUN apk add openssl postgresql && rm -rf /var/cache/apk/*
 WORKDIR /app
-RUN npm i --legacy-peer-deps tsx
+RUN npm i --legacy-peer-deps tsx pino pino-pretty
 COPY ./src/db-backup-tool .
 RUN ls -R /app
 ENTRYPOINT ["npx", "tsx", "/app/backup.ts"]
