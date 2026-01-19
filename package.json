@@ -95,6 +95,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
+    "@fission-ai/openspec": "^0.21.0",
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.11",
