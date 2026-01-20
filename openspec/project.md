@@ -20,8 +20,9 @@ This project is a high-performance, modular Node.js backend system designed for 
   - *Reference:* Rules are defined in `biome.json`.
 - **Validation:** **Zod** is the standard for DTOs and input validation.
   - *Reference:* See usage in `src/app/profile/types/profile-update.input.ts`.
-- **Mandatory Checks:** Developers must run `npm run check` locally to detect and fix TypeScript, Linting, and Dead Code errors before finalizing tasks.
-  - *Reference:* The `check` script in `package.json` runs `ts:check`, `lint:fix`, and `knip`.
+- **Mandatory Verification:** All code changes must pass the strict verification script: `npm run check`.
+  - This script aggregates **TypeScript compilation checks**, **Linter fixes**, and **Dead code analysis** (Knip).
+  - Developers must fix all errors reported by this command before finalizing tasks.
 
 ### Database Workflow
 To modify the database structure, follow this strict sequence to ensure the schema is applied and the client is regenerated:
@@ -32,23 +33,23 @@ To modify the database structure, follow this strict sequence to ensure the sche
   *   *Note:* The Prisma Client is only updated/regenerated after the migration is applied.
 
 ### Architecture Patterns
+- **Folder Structure (Modular Monolith):**
+  - `src/app/`: Contains **Business Feature Modules** (e.g., Profile, FileUpload, Queue). All new domain logic must be placed here.
+  - `src/common/`: Contains **Infrastructure & Shared Utilities** (e.g., Prisma, Auth, Logger). Code here must remain business-agnostic.
+- **Security & Authorization:** API endpoints must be secured using declarative decorators.
+  - Use `@UseGuards(JwtAuthGuard)` for basic authentication.
+  - Use `@Roles(ProfileRole.ADMIN, ...)` combined with `RolesGuard` for RBAC.
+  - Access the authenticated user instance via the `@CurrentUser()` decorator.
+  - *Reference:* `src/common/auth/current-user.decorator.ts`.
 - **GraphQL First:** All core domain logic and client-facing APIs must be implemented via GraphQL Resolvers. REST Controllers are reserved solely for functionality that cannot be handled by GraphQL (e.g., binary file streams).
 - **Global Error Handling:** A centralized filter normalizes both HTTP and Zod validation errors.
   - *Reference:* `src/common/all-exceptions-filter.ts`.
 - **Structured Logging:** JSON-based logging via `nestjs-pino` with custom serializers.
   - *Reference:* Configuration in `src/common/logger/pino-config.ts`.
-- **Modular Monolith:** Logic is separated into Feature Modules (`src/app/*`) and Shared Infrastructure (`src/common/*`).
-
-### Testing Strategy
-- **Unit & Integration:** Powered by **Vitest**.
-  - *Reference:* Configuration in `vitest.config.ts`.
-- **E2E Testing:** Uses **PactumJS** for HTTP request assertions.
-  - *Reference:* See `test/app.e2e.spec.ts`.
-- **Code Coverage:** Enforced via `npm run test:cov`.
 
 ### Git Workflow
-- **Pre-commit Hooks:** **Lefthook** manages pre-commit checks (linting, type checking).
-  - *Reference:* `package.json` scripts (`prepare`, `check`).
+- **Pre-commit Hooks:** **Lefthook** manages pre-commit checks to ensure `npm run check` standards are met.
+  - *Reference:* `package.json` scripts (`prepare`).
 
 ## Domain Context
 - **Authentication:** The default OIDC provider is **Logto**. The system validates tokens via JWKS. A local mock mode is available for development (`OIDC_MOCK_ENABLED`).
