@@ -16,9 +16,14 @@ This project is a high-performance, modular Node.js backend system designed for 
 ## Project Conventions
 
 ### Code Style & Quality Assurance
+- **Naming Conventions:**
+  - **Files & Directories:** Kebab-case (e.g., `user-profile.service.ts`, `src/app/file-upload`).
+  - **Classes:** PascalCase (e.g., `UserProfileService`).
 - **Linter & Formatter:** We use **Biome** exclusively (no ESLint/Prettier).
   - *Reference:* Rules are defined in `biome.json`.
-- **Validation:** **Zod** is the standard for DTOs and input validation.
+- **Validation:** **Zod** is the standard for DTOs and input validation via `nestjs-zod`.
+  - **Strict Rule:** Do not use `class-validator`.
+  - **Pattern:** Create a Zod schema, then create a class extending `createZodDto(Schema)`.
   - *Reference:* See usage in `src/app/profile/types/profile-update.input.ts`.
 - **Mandatory Verification:** All code changes must pass the strict verification script: `npm run check`.
   - This script aggregates **TypeScript compilation checks**, **Linter fixes**, and **Dead code analysis** (Knip).
@@ -27,6 +32,7 @@ This project is a high-performance, modular Node.js backend system designed for 
 ### Testing Strategy
 - **No Manual Tests:** Writing Unit or E2E tests is **not required**.
 - **Quality Gate:** We rely entirely on strict static analysis. The `npm run check` command is the single source of truth for code quality.
+  - If `npm run check` passes, the code is considered technically valid.
 
 ### Database Workflow
 Any change to `prisma/schema.prisma` **must** be followed by this exact sequence of commands to ensure the database is synchronized and the client is regenerated:
