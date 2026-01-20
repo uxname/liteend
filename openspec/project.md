@@ -24,13 +24,18 @@ This project is a high-performance, modular Node.js backend system designed for 
   - This script aggregates **TypeScript compilation checks**, **Linter fixes**, and **Dead code analysis** (Knip).
   - Developers must fix all errors reported by this command before finalizing tasks.
 
+### Testing Strategy
+- **No Manual Tests:** Writing Unit or E2E tests is **not required**.
+- **Quality Gate:** We rely entirely on strict static analysis. The `npm run check` command is the single source of truth for code quality.
+
 ### Database Workflow
-To modify the database structure, follow this strict sequence to ensure the schema is applied and the client is regenerated:
-1.  **Modify** `prisma/schema.prisma`.
-2.  **Format** the schema: `npm run db:schema:format`.
-3.  **Create Migration:** `npm run db:migrations:create`.
-4.  **Apply Migration:** `npm run db:migrations:apply`.
-  *   *Note:* The Prisma Client is only updated/regenerated after the migration is applied.
+Any change to `prisma/schema.prisma` **must** be followed by this exact sequence of commands to ensure the database is synchronized and the client is regenerated:
+
+1.  **Format Schema:** `npm run db:schema:format`
+2.  **Create Migration:** `npm run db:migrations:create`
+3.  **Apply Migration:** `npm run db:migrations:apply`
+
+*Note:* Do not manually run `prisma generate`. It is automatically triggered by the migration apply command.
 
 ### Architecture Patterns
 - **Folder Structure (Modular Monolith):**
