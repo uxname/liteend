@@ -42,10 +42,10 @@
     "postupdate": "npm run lint:fix && npm run check"
   },
   "dependencies": {
-    "@bull-board/api": "^6.16.2",
-    "@bull-board/fastify": "^6.16.2",
-    "@bull-board/nestjs": "^6.16.2",
-    "@dotenvx/dotenvx": "^1.51.4",
+    "@bull-board/api": "^6.16.4",
+    "@bull-board/fastify": "^6.16.4",
+    "@bull-board/nestjs": "^6.16.4",
+    "@dotenvx/dotenvx": "^1.52.0",
     "@fastify/compress": "^8.3.1",
     "@fastify/helmet": "^13.0.2",
     "@fastify/multipart": "^9.4.0",
@@ -61,10 +61,10 @@
     "@nestjs/platform-fastify": "^11.1.12",
     "@nestjs/swagger": "^11.2.5",
     "@nestjs/websockets": "^11.1.12",
-    "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "altair-fastify-plugin": "^8.5.1",
-    "bullmq": "^5.66.5",
+    "bullmq": "^5.66.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "cross-env": "^10.1.0",
@@ -91,17 +91,17 @@
     "pino-roll": "^4.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
-    "@fission-ai/openspec": "^0.22.0",
+    "@fission-ai/openspec": "^0.23.0",
     "@nestjs/cli": "^11.0.16",
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.12",
     "@swc/core": "^1.15.10",
     "@types/ioredis": "^5.0.0",
-    "@types/node": "^25.0.9",
+    "@types/node": "^25.0.10",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.16.0",
     "knip": "^5.82.1",
@@ -109,13 +109,13 @@
     "npm-check-updates": "^19.3.1",
     "npm-run-all": "^4.1.5",
     "pactum": "^3.9.0",
-    "prisma": "^7.2.0",
+    "prisma": "^7.3.0",
     "rimraf": "^6.1.2",
     "tsconfig-paths": "4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "unplugin-swc": "^1.5.9",
     "vite-tsconfig-paths": "^6.0.4",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   }
 }
