@@ -17,9 +17,7 @@
     }
   },
   "cleaner": {
-    "whitelist": [
-      "//!"
-    ],
+    "whitelist": ["//!"],
     "keepJSDoc": true,
     "useGitignore": true
   },
