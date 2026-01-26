@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/uxname/kodu/refs/heads/master/kodu.schema.json",
+  "llm": {
+    "model": "openai/gpt-5-mini",
+    "apiKeyEnv": "OPENAI_API_KEY",
+    "commands": {
+      "commit": {
+        "modelSettings": {
+          "maxOutputTokens": 1500
+        }
+      },
+      "review": {
+        "modelSettings": {
+          "maxOutputTokens": 5000
+        }
+      }
+    }
+  },
+  "cleaner": {
+    "whitelist": [
+      "//!"
+    ],
+    "keepJSDoc": true,
+    "useGitignore": true
+  },
+  "packer": {
+    "ignore": [
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      ".git",
+      ".kodu",
+      "node_modules",
+      "dist",
+      "coverage"
+    ],
+    "useGitignore": true
+  },
+  "prompts": {
+    "review": {
+      "bug": ".kodu/prompts/review-bug.md",
+      "style": ".kodu/prompts/review-style.md",
+      "security": ".kodu/prompts/review-security.md"
+    },
+    "commit": ".kodu/prompts/commit.md",
+    "pack": ".kodu/prompts/pack.md"
+  }
+}
