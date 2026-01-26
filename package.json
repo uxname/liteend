@@ -36,7 +36,6 @@
     "db:studio": "prisma studio --browser none --port 5555",
     "db:seed": "tsx prisma/seed.ts",
     "________________ OTHER ________________": "",
-    "postinstall": "npm run prepare",
     "prepare": "lefthook install",
     "update": "npm-check-updates -u && rimraf node_modules package-lock.json && npm i",
     "postupdate": "npm run lint:fix && npm run check"
