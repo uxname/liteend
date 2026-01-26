@@ -1,6 +1,6 @@
 {
   "name": "liteend",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Lightweight, fast, and easy to use backend app template for Node.js",
   "author": "uxname",
   "private": true,
