@@ -39,3 +39,4 @@ tsconfig.tsbuildinfo
 .husky
 
 src/@generated/prisma/
+.kodu/context.txt
