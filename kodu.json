@@ -19,7 +19,8 @@
   "cleaner": {
     "whitelist": ["//!"],
     "keepJSDoc": true,
-    "useGitignore": true
+    "useGitignore": true,
+    "ignore": []
   },
   "packer": {
     "ignore": [
@@ -30,9 +31,16 @@
       ".kodu",
       "node_modules",
       "dist",
-      "coverage"
+      "coverage",
+      ".claude",
+      ".codex",
+      ".cursor",
+      ".kodu",
+      ".qwen",
+      ".windsurf"
     ],
-    "useGitignore": true
+    "useGitignore": true,
+    "contentBasedBinaryDetection": false
   },
   "prompts": {
     "review": {
