@@ -10,6 +10,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { GraphQLError } from 'graphql/error';
 import { getComplexity, simpleEstimator } from 'graphql-query-complexity';
 import GraphQLJSON from 'graphql-type-json';
+import mqemitterRedis from 'mqemitter-redis';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { AppController } from '@/app/app.controller';
 import { DebugModule } from '@/app/debug/debug.module';
@@ -27,9 +28,6 @@ import { LoggerModule } from '@/common/logger/logger.module';
 import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
 import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const mqEmitterRedis = require('mqemitter-redis');
 
 @Module({
   imports: [
@@ -71,7 +69,7 @@ const mqEmitterRedis = require('mqemitter-redis');
         ],
 
         subscription: {
-          emitter: mqEmitterRedis({
+          emitter: mqemitterRedis({
             host: configService.getOrThrow<string>('REDIS_HOST'),
             port: configService.getOrThrow<number>('REDIS_PORT'),
             password: configService.getOrThrow<string>('REDIS_PASSWORD'),

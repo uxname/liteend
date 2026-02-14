@@ -41,6 +41,9 @@
     "noImplicitUseStrict": false,
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
-    "noStrictGenericChecks": false
-  }
+    "noStrictGenericChecks": false,
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*", "test/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
