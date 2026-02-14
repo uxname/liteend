@@ -44,7 +44,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql
     ports:
       - "127.0.0.1:${DATABASE_PORT}:${DATABASE_PORT}"
     command: -p ${DATABASE_PORT}
