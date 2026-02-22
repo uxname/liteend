@@ -7,8 +7,6 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { GraphQLError } from 'graphql/error';
-import { getComplexity, simpleEstimator } from 'graphql-query-complexity';
 import GraphQLJSON from 'graphql-type-json';
 import mqemitterRedis from 'mqemitter-redis';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
@@ -42,31 +40,6 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
         graphiql: false,
         jit: 1,
         cache: false,
-
-        validationRules: ({ variables }) => [
-          (context) => ({
-            OperationDefinition(node) {
-              const schema = context.getSchema();
-              const complexity = getComplexity({
-                schema,
-                operationName: node.name?.value,
-                query: context.getDocument(),
-                variables: variables,
-                estimators: [simpleEstimator({ defaultComplexity: 1 })],
-              });
-
-              const MAX_COMPLEXITY = 1000;
-
-              if (complexity > MAX_COMPLEXITY) {
-                context.reportError(
-                  new GraphQLError(
-                    `Query is too complex: ${complexity}. Maximum allowed complexity: ${MAX_COMPLEXITY}`,
-                  ),
-                );
-              }
-            },
-          }),
-        ],
 
         subscription: {
           emitter: mqemitterRedis({

@@ -52,6 +52,10 @@ async function bootstrap(): Promise<void> {
   await app.register(rateLimit, {
     max: 100,
     timeWindow: '1 minute',
+    allowList: (request) => {
+      const url = request.url;
+      return url.startsWith('/studio') || url.startsWith('/board');
+    },
   });
 
   await app.register(compression, {

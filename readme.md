@@ -40,6 +40,13 @@ npx degit uxname/liteend my-app && cd my-app && git init && cp .env.example .env
     - [Health Check](#health-check)
     - [Logs](#logs)
     - [Database Admin Panel](#database-admin-panel-prisma-studio)
+- [Quick Examples](#quick-examples)
+  - [Create a New Module/Resource](#create-a-new-moduleresource)
+  - [Add a New GraphQL Query](#add-a-new-graphql-query)
+  - [Add a New REST Endpoint](#add-a-new-rest-endpoint)
+  - [Common Development Tasks](#common-development-tasks)
+- [Architecture](#architecture)
+  - [Key Files](#key-files)
 - [Docker](#docker)
   - [Overview](#overview)
   - [Docker Compose Usage](#docker-compose-usage)
@@ -222,6 +229,113 @@ The application provides built-in endpoints for monitoring and administration:
 #### GraphQL Debug Query
 
 - **Query:** `debug`: A GraphQL query available in the main GraphQL endpoint (`/graphql`) that returns system information like application version, uptime, and the last git commit.
+
+## Quick Examples
+
+### Create a New Module/Resource
+
+Generate a new feature module using NestJS CLI:
+
+```bash
+# Generate module, service, and controller
+npx nest g module modules/users
+npx nest g service modules/users
+npx nest g controller modules/users
+```
+
+Then add your logic to the generated files. Don't forget to register the module in `src/app.module.ts`.
+
+### Add a New GraphQL Query
+
+In `src/modules/your-module/your-module.resolver.ts`:
+
+```typescript
+import { Resolver, Query, Args, Int } from '@nestjs/graphql';
+
+@Resolver()
+export class YourModuleResolver {
+  @Query(() => String)
+  helloWorld(@Args('name', { type: () => String, nullable: true }) name?: string): string {
+    return `Hello, ${name || 'World'}!`;
+  }
+
+  @Query(() => [YourEntity])
+  async getItems(): Promise<YourEntity[]> {
+    return this.yourService.findAll();
+  }
+}
+```
+
+### Add a New REST Endpoint
+
+In `src/modules/your-module/your-module.controller.ts`:
+
+```typescript
+import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+
+@Controller('items')
+export class YourModuleController {
+  @Get()
+  findAll() {
+    return this.yourService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.yourService.findById(id);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createDto: CreateDto) {
+    return this.yourService.create(createDto);
+  }
+}
+```
+
+### Common Development Tasks
+
+| Task | Command |
+|------|---------|
+| Create migration | `npm run db:migrations:create` |
+| Apply migrations | `npm run db:migrations:apply` |
+| Generate Prisma client | `npm run db:gen` |
+| Reset database | `npm run db:reset` |
+| Run linter | `npm run lint` |
+| Run tests | `npm run test` |
+| Full check before commit | `npm run check` |
+
+## Architecture
+
+```
+src/
+├── app.module.ts          # Root application module
+├── main.ts                # Application entry point
+├── common/                # Shared utilities
+│   ├── decorators/        # Custom decorators (@CurrentUser, etc.)
+│   ├── filters/          # Exception filters
+│   ├── guards/           # Auth guards, roles
+│   ├── interceptors/     # Response/ logging interceptors
+│   └── logger-serve/    # Log viewer controller
+├── config/                # Configuration schemas
+├── i18n/                  # Internationalization files
+├── modules/               # Feature modules
+│   └── [feature]/
+│       ├── dto/          # Data Transfer Objects
+│       ├── entities/     # Prisma entities / GraphQL types
+│       ├── [feature].controller.ts
+│       ├── [feature].module.ts
+│       ├── [feature].resolver.ts   # GraphQL resolvers
+│       └── [feature].service.ts
+└── tasks/                 # Background job processors
+```
+
+### Key Files
+
+- `prisma/schema.prisma` — Database schema and migrations
+- `docker-compose.yml` — Local development services
+- `.env.example` — Environment variables template
+- `lefthook.yml` — Pre-commit hooks configuration
 
 ## Docker
 

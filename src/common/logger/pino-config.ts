@@ -6,7 +6,9 @@ import { TransportTargetOptions } from 'pino';
 import packageJson from '../../../package.json';
 
 const LOG_DIR = path.join(process.cwd(), 'data', 'logs');
-const IS_DEV = process.env.NODE_ENV !== 'production';
+const IS_DEV =
+  process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 const LOG_ROTATION_SIZE = '20m';
 const LOG_RETENTION_COUNT = 10;
@@ -48,7 +50,7 @@ interface PinoCustomProps {
 
 export const pinoConfig: Params = {
   pinoHttp: {
-    level: IS_DEV ? 'trace' : 'info',
+    level: IS_TEST ? 'silent' : IS_DEV ? 'trace' : 'info',
 
     mixin: () => ({
       app: { name: packageJson.name, version: packageJson.version },
@@ -119,22 +121,20 @@ export const pinoConfig: Params = {
 
     transport: {
       targets: [
-        IS_DEV
-          ? {
-              target: 'pino-pretty',
-              level: 'trace',
-              options: {
-                colorize: true,
-                translateTime: 'yyyy-mm-dd HH:MM:ss',
-                ignore: 'pid,hostname,app',
-                singleLine: true,
+        ...(IS_DEV
+          ? [
+              {
+                target: 'pino-pretty',
+                level: 'trace',
+                options: {
+                  colorize: true,
+                  translateTime: 'yyyy-mm-dd HH:MM:ss',
+                  ignore: 'pid,hostname,app',
+                  singleLine: true,
+                },
               },
-            }
-          : {
-              target: 'pino/file',
-              level: 'info',
-              options: { destination: 1 },
-            },
+            ]
+          : /* Production: no stdout transport = default JSON output */ []),
         createFileTransport('all/log', 'trace'),
         createFileTransport('error/log', 'error'),
       ],

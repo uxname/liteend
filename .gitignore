@@ -37,6 +37,7 @@ lerna-debug.log*
 .env
 tsconfig.tsbuildinfo
 .husky
+.worktrees
 
 src/@generated/prisma/
 .kodu/context.txt
