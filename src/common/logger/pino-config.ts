@@ -82,13 +82,21 @@ export const pinoConfig: Params = {
         body: shouldCaptureBody(req.url) && req.body ? req.body : undefined,
         query: req.query,
       }),
-      res: (res) => ({
-        statusCode: res.statusCode,
-        headers: {
-          'content-type': res.getHeader('content-type'),
-          'content-length': res.getHeader('content-length'),
-        },
-      }),
+      res: (res) => {
+        const getHeader = (key: string) => {
+          if (typeof res.getHeader === 'function') return res.getHeader(key);
+          if (res.headers && typeof res.headers === 'object')
+            return res.headers[key];
+          return undefined;
+        };
+        return {
+          statusCode: res.statusCode,
+          headers: {
+            'content-type': getHeader('content-type'),
+            'content-length': getHeader('content-length'),
+          },
+        };
+      },
     },
 
     customProps: (req: IncomingMessage) => {
@@ -127,10 +135,20 @@ export const pinoConfig: Params = {
     ) => {
       const customReq = req as unknown as PinoCustomProps;
       const gql = customReq.graphql || customReq.raw?.graphql;
+      const user = customReq.user || customReq.raw?.user;
+
+      const userId = user?.id;
+      const userRole = user?.roles?.join(',');
+      const userDisplay = userId
+        ? `User(${userId})${userRole ? ` [${userRole}]` : ''}`
+        : 'Guest';
+
+      const timing = ` ⚡ ${Math.round(responseTime)}ms`;
+
       if (gql) {
-        return `GraphQL ${gql.type} ${gql.operation} completed in ${Math.round(responseTime)}ms`;
+        return `👤 ${userDisplay} | GQL ${gql.type} '${gql.operation}'${timing}`;
       }
-      return `${req.method} ${req.url} completed in ${Math.round(responseTime)}ms`;
+      return `👤 ${userDisplay} | ${req.method} ${req.url}${timing}`;
     },
 
     autoLogging: true,
@@ -168,47 +186,8 @@ export const pinoConfig: Params = {
                 options: {
                   colorize: true,
                   translateTime: 'HH:MM:ss.l',
-                  ignore: 'pid,hostname,app',
-                  singleLine: false,
-                  messageFormat: (log: Record<string, unknown>) => {
-                    const gql = log.graphql as
-                      | { type: string; operation: string }
-                      | undefined;
-                    const req = log.req as
-                      | { method: string; url: string }
-                      | undefined;
-                    const user = log.userId
-                      ? `User(${log.userId})${log.userRole ? ` [${log.userRole}]` : ''}`
-                      : 'Guest';
-                    const timing = log.responseTime
-                      ? ` ⚡ ${log.responseTime}ms`
-                      : '';
-                    if (gql) {
-                      return `👤 ${user} | GQL ${gql.type} '${gql.operation}'${timing}`;
-                    }
-                    const method = req?.method || '';
-                    const url = req?.url || '';
-                    return `👤 ${user} | ${method} ${url}${timing}`;
-                  },
-                  levelPrettifier: (level: number) => {
-                    const colors: Record<number, string> = {
-                      10: '\x1b[90m',
-                      20: '\x1b[36m',
-                      30: '\x1b[32m',
-                      40: '\x1b[33m',
-                      50: '\x1b[31m',
-                      60: '\x1b[35m',
-                    };
-                    const labels: Record<number, string> = {
-                      10: 'TRACE',
-                      20: 'DEBUG',
-                      30: 'INFO',
-                      40: 'WARN',
-                      50: 'ERROR',
-                      60: 'FATAL',
-                    };
-                    return `\x1b[1m${colors[level] || ''}${labels[level] || level}\x1b[0m`;
-                  },
+                  ignore: 'pid,hostname,app,userId,userRole,responseTime',
+                  singleLine: true,
                 },
               },
             ]

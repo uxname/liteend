@@ -187,6 +187,10 @@ export const LOGGER_UI_HTML = `
             const [error, setError] = useState(null);
             const [filter, setFilter] = useState('');
             const [autoRefresh, setAutoRefresh] = useState(false);
+            const [levelFilter, setLevelFilter] = useState({ error: true, warn: true, info: true, debug: true, trace: true });
+            const [typeFilter, setTypeFilter] = useState({ graphql: true, rest: true, system: true });
+            const [userIdFilter, setUserIdFilter] = useState('');
+            const [timeRange, setTimeRange] = useState('all');
             const offsetRef = useRef(0);
             const autoRefreshRef = useRef(false);
 
@@ -277,17 +281,57 @@ export const LOGGER_UI_HTML = `
             }, [selectedFile]);
 
             const filteredLogs = useMemo(() => {
-                if (!filter) return logs;
-                const lowerFilter = filter.toLowerCase();
-                return logs.filter(l => {
-                    if (l.isJson) {
-                        return (l.msg && l.msg.toLowerCase().includes(lowerFilter)) ||
-                               (l.context && l.context.toLowerCase().includes(lowerFilter)) ||
-                               JSON.stringify(l.raw).toLowerCase().includes(lowerFilter);
-                    }
-                    return l.raw.toLowerCase().includes(lowerFilter);
+                let result = logs;
+                
+                // Level filter
+                result = result.filter(l => {
+                    if (!l.isJson) return levelFilter.trace;
+                    const level = l.level;
+                    if (level >= 50) return levelFilter.error;
+                    if (level >= 40) return levelFilter.warn;
+                    if (level >= 30) return levelFilter.info;
+                    if (level >= 20) return levelFilter.debug;
+                    return levelFilter.trace;
                 });
-            }, [logs, filter]);
+                
+                // Type filter (GQL/REST/System)
+                result = result.filter(l => {
+                    if (!l.isJson) return typeFilter.system;
+                    const hasGql = l.raw.graphql;
+                    const hasRest = l.raw.req?.method;
+                    if (hasGql) return typeFilter.graphql;
+                    if (hasRest) return typeFilter.rest;
+                    return typeFilter.system;
+                });
+                
+                // User ID filter
+                if (userIdFilter) {
+                    result = result.filter(l => l.isJson && String(l.raw.userId) === userIdFilter);
+                }
+                
+                // Time range filter
+                if (timeRange !== 'all') {
+                    const now = Date.now();
+                    const ranges = { '5m': 5*60*1000, '15m': 15*60*1000, '1h': 60*60*1000, '24h': 24*60*60*1000 };
+                    const cutoff = now - (ranges[timeRange] || 0);
+                    result = result.filter(l => l.isJson && l.raw.time > cutoff);
+                }
+                
+                // Text filter
+                if (filter) {
+                    const lowerFilter = filter.toLowerCase();
+                    result = result.filter(l => {
+                        if (l.isJson) {
+                            return (l.msg && l.msg.toLowerCase().includes(lowerFilter)) ||
+                                   (l.context && l.context.toLowerCase().includes(lowerFilter)) ||
+                                   JSON.stringify(l.raw).toLowerCase().includes(lowerFilter);
+                        }
+                        return l.raw.toLowerCase().includes(lowerFilter);
+                    });
+                }
+                
+                return result;
+            }, [logs, filter, levelFilter, typeFilter, userIdFilter, timeRange]);
 
             return html\`
                 <div class="flex flex-col h-full">
@@ -316,6 +360,54 @@ export const LOGGER_UI_HTML = `
                             <button onClick=\${() => fetchLogs(false)} class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-lg shadow-indigo-900/20">
                                 Refresh
                             </button>
+                            <div class="flex items-center gap-1">
+                                \${['error', 'warn', 'info', 'debug', 'trace'].map(level => html\`
+                                    <button
+                                        onClick=\${() => setLevelFilter(prev => ({ ...prev, [level]: !prev[level] }))}
+                                        class="px-2 py-1 rounded text-[10px] font-medium transition-all \${levelFilter[level] 
+                                            ? level === 'error' ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                                            : level === 'warn' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                            : level === 'info' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                            : level === 'debug' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                            : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                            : 'bg-slate-800 text-slate-600 border border-slate-700'}"
+                                    >
+                                        \${level.toUpperCase()}
+                                    </button>
+                                \`)}
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    onClick=\${() => setTypeFilter(prev => ({ ...prev, graphql: !prev.graphql }))}
+                                    class="px-2 py-1 rounded text-[10px] font-medium \${typeFilter.graphql ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-slate-800 text-slate-600 border border-slate-700'}"
+                                >
+                                    GQL
+                                </button>
+                                <button
+                                    onClick=\${() => setTypeFilter(prev => ({ ...prev, rest: !prev.rest }))}
+                                    class="px-2 py-1 rounded text-[10px] font-medium \${typeFilter.rest ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-slate-800 text-slate-600 border border-slate-700'}"
+                                >
+                                    REST
+                                </button>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="User ID..."
+                                class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 w-20 focus:outline-none focus:border-indigo-500"
+                                value=\${userIdFilter}
+                                onInput=\${e => setUserIdFilter(e.target.value)}
+                            />
+                            <select
+                                class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-indigo-500"
+                                value=\${timeRange}
+                                onChange=\${e => setTimeRange(e.target.value)}
+                            >
+                                <option value="all">All time</option>
+                                <option value="5m">Last 5m</option>
+                                <option value="15m">Last 15m</option>
+                                <option value="1h">Last 1h</option>
+                                <option value="24h">Last 24h</option>
+                            </select>
                         </div>
                     </header>
 
