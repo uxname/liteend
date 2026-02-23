@@ -22,6 +22,12 @@ const IGNORED_PATH_SEGMENTS = [
   '/.well-known',
 ];
 
+const IGNORED_BODY_PATHS = ['/upload', '/uploads/', '/health', '/.well-known'];
+
+function shouldCaptureBody(url: string): boolean {
+  return !IGNORED_BODY_PATHS.some((path) => url.startsWith(path));
+}
+
 const createFileTransport = (
   filename: string,
   level: string,
@@ -40,11 +46,23 @@ const createFileTransport = (
 });
 
 interface PinoCustomProps {
-  user?: { id: number | string };
-  graphql?: { type: string; operation: string };
+  user?: { id: number | string; roles?: string[] };
+  graphql?: {
+    type: string;
+    operation: string;
+    responseTime?: number;
+    response?: unknown;
+    args?: unknown;
+  };
   raw?: {
-    user?: { id: number | string };
-    graphql?: { type: string; operation: string };
+    user?: { id: number | string; roles?: string[] };
+    graphql?: {
+      type: string;
+      operation: string;
+      responseTime?: number;
+      response?: unknown;
+      args?: unknown;
+    };
   };
 }
 
@@ -61,9 +79,15 @@ export const pinoConfig: Params = {
         id: req.id,
         method: req.method,
         url: req.url,
+        body: shouldCaptureBody(req.url) && req.body ? req.body : undefined,
+        query: req.query,
       }),
       res: (res) => ({
         statusCode: res.statusCode,
+        headers: {
+          'content-type': res.getHeader('content-type'),
+          'content-length': res.getHeader('content-length'),
+        },
       }),
     },
 
@@ -71,9 +95,12 @@ export const pinoConfig: Params = {
       const customReq = req as unknown as PinoCustomProps;
       const user = customReq.user || customReq.raw?.user;
       const graphql = customReq.graphql || customReq.raw?.graphql;
+      const roles = user?.roles;
       return {
         userId: user?.id,
+        userRole: roles && roles.length > 0 ? roles.join(',') : null,
         graphql,
+        responseTime: graphql?.responseTime,
       };
     },
 
@@ -111,10 +138,22 @@ export const pinoConfig: Params = {
     redact: {
       paths: [
         'req.headers.authorization',
+        'req.headers["x-api-key"]',
         'req.body.password',
         'req.body.token',
+        'req.body.accessToken',
+        'req.body.refreshToken',
         'req.body.variables.password',
+        'req.body.variables.token',
+        'req.body.variables.accessToken',
+        'req.body.variables.refreshToken',
         'res.headers["set-cookie"]',
+        '*.password',
+        '*.accessToken',
+        '*.refreshToken',
+        '*.secret',
+        '*.apiKey',
+        '*.authorization',
       ],
       remove: true,
     },
@@ -128,9 +167,48 @@ export const pinoConfig: Params = {
                 level: 'trace',
                 options: {
                   colorize: true,
-                  translateTime: 'yyyy-mm-dd HH:MM:ss',
+                  translateTime: 'HH:MM:ss.l',
                   ignore: 'pid,hostname,app',
-                  singleLine: true,
+                  singleLine: false,
+                  messageFormat: (log: Record<string, unknown>) => {
+                    const gql = log.graphql as
+                      | { type: string; operation: string }
+                      | undefined;
+                    const req = log.req as
+                      | { method: string; url: string }
+                      | undefined;
+                    const user = log.userId
+                      ? `User(${log.userId})${log.userRole ? ` [${log.userRole}]` : ''}`
+                      : 'Guest';
+                    const timing = log.responseTime
+                      ? ` ⚡ ${log.responseTime}ms`
+                      : '';
+                    if (gql) {
+                      return `👤 ${user} | GQL ${gql.type} '${gql.operation}'${timing}`;
+                    }
+                    const method = req?.method || '';
+                    const url = req?.url || '';
+                    return `👤 ${user} | ${method} ${url}${timing}`;
+                  },
+                  levelPrettifier: (level: number) => {
+                    const colors: Record<number, string> = {
+                      10: '\x1b[90m',
+                      20: '\x1b[36m',
+                      30: '\x1b[32m',
+                      40: '\x1b[33m',
+                      50: '\x1b[31m',
+                      60: '\x1b[35m',
+                    };
+                    const labels: Record<number, string> = {
+                      10: 'TRACE',
+                      20: 'DEBUG',
+                      30: 'INFO',
+                      40: 'WARN',
+                      50: 'ERROR',
+                      60: 'FATAL',
+                    };
+                    return `\x1b[1m${colors[level] || ''}${labels[level] || level}\x1b[0m`;
+                  },
                 },
               },
             ]
