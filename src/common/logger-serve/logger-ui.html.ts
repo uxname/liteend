@@ -79,32 +79,100 @@ export const LOGGER_UI_HTML = `
 
         const LogItem = ({ item }) => {
             const [expanded, setExpanded] = useState(false);
-
+            
             if (!item.isJson) {
                 return html\`<div class="border-b border-slate-800 py-1 px-4 hover:bg-slate-800/50 text-slate-400 break-all text-[11px]">\${item.raw}</div>\`;
             }
 
             const levelConfig = PINO_LEVELS[item.level] || { label: 'UNK', color: 'text-gray-400', bg: 'bg-gray-500/10' };
-            const msgClass = item.level >= 50 ? 'text-red-300' : 'text-slate-300';
+            const raw = item.raw;
+            
+            const time = raw.time ? new Date(raw.time).toTimeString().slice(0, 12) : '';
+            const userId = raw.userId;
+            const userRole = raw.userRole;
+            const graphql = raw.graphql;
+            const req = raw.req;
+            const responseTime = raw.responseTime || (graphql && graphql.responseTime);
+            const msg = raw.msg || raw.message;
+            
+            let context = '';
+            let statusCode = '';
+            if (graphql) {
+                context = \`[GQL:\${graphql.type}] \${graphql.operation}\`;
+                statusCode = raw.level >= 50 ? 'Error' : 'Success';
+            } else if (req) {
+                context = \`[\${req.method}] \${req.url}\`;
+                statusCode = raw.res?.statusCode || '';
+            }
+            
+            const userDisplay = userId ? \`👤 \${userId}\${userRole ? \` [\${userRole}]\` : ''}\` : '👤 Guest';
+            const isAdmin = userRole && userRole.includes('ADMIN');
+            
+            let timingColor = 'text-slate-500';
+            if (responseTime) {
+                if (responseTime > 1000) timingColor = 'text-red-500';
+                else if (responseTime > 500) timingColor = 'text-yellow-500';
+            }
 
             return html\`
                 <div class="group border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
-                    <div class="flex items-start py-1 px-4 gap-3 cursor-pointer" onClick=\${() => setExpanded(!expanded)}>
-                        <span class="shrink-0 w-32 text-slate-500 text-[10px] mt-0.5 font-sans">\${formatDate(item.timestamp)}</span>
-                        <span class="shrink-0 w-14 text-center text-[10px] font-bold px-1 py-0.5 rounded \${levelConfig.color} \${levelConfig.bg}">
+                    <div class="flex items-center py-1.5 px-4 gap-2 cursor-pointer" onClick=\${() => setExpanded(!expanded)}>
+                        <span class="shrink-0 w-24 text-slate-500 text-[10px] font-mono">\${time}</span>
+                        <span class="shrink-0 w-14 text-center text-[9px] font-bold px-1 py-0.5 rounded \${levelConfig.color} \${levelConfig.bg}">
                             \${levelConfig.label}
                         </span>
-                        <span class="shrink-0 text-[11px] text-indigo-400 w-24 truncate" title=\${item.context}>
-                            \${item.context}
+                        <span class="shrink-0 w-28 text-[11px] \${isAdmin ? 'text-orange-400' : 'text-indigo-400'} truncate" title=\${userDisplay}>
+                            \${userDisplay}
                         </span>
-                        <span class="grow break-words font-sans text-[12px] \${msgClass}">
-                            \${item.msg}
+                        <span class="shrink-0 w-40 text-[11px] text-slate-400 truncate" title=\${context}>
+                            \${context}
                         </span>
-                        <span class="shrink-0 text-slate-600 text-[10px] mt-1 opacity-0 group-hover:opacity-100">\${expanded ? '▲' : '▼'}</span>
+                        <span class="shrink-0 w-16 text-right text-[11px] \${timingColor}">
+                            \${responseTime ? \`⚡ \${responseTime}ms\` : ''}
+                        </span>
+                        <span class="shrink-0 w-12 text-center text-[10px] \${statusCode === 'Error' ? 'text-red-400' : statusCode ? 'text-green-400' : 'text-slate-600'}">
+                            \${statusCode}
+                        </span>
+                        <span class="grow break-words font-sans text-[12px] text-slate-300 truncate">
+                            \${msg}
+                        </span>
+                        <span class="shrink-0 text-slate-600 text-[10px]">\${expanded ? '▲' : '▼'}</span>
                     </div>
                     \${expanded && html\`
-                        <div class="px-4 py-2 bg-slate-900/80 text-xs text-slate-400 overflow-x-auto border-t border-slate-800/50 mx-4 mb-2 rounded">
-                            <pre>\${JSON.stringify(item.raw, null, 2)}</pre>
+                        <div class="px-4 py-3 bg-slate-900/80 border-t border-slate-800/50 mx-4 mb-2 rounded text-xs">
+                            \${raw.req?.body && html\`
+                                <div class="mb-3">
+                                    <div class="text-slate-500 font-semibold mb-1">Request:</div>
+                                    <pre class="bg-slate-950 p-2 rounded overflow-x-auto text-slate-300">\${JSON.stringify(raw.req.body, null, 2)}</pre>
+                                </div>
+                            \`}
+                            \${graphql && graphql.args && html\`
+                                <div class="mb-3">
+                                    <div class="text-slate-500 font-semibold mb-1">Arguments:</div>
+                                    <pre class="bg-slate-950 p-2 rounded overflow-x-auto text-slate-300">\${JSON.stringify(graphql.args, null, 2)}</pre>
+                                </div>
+                            \`}
+                            \${graphql && graphql.response && html\`
+                                <div class="mb-3">
+                                    <div class="text-slate-500 font-semibold mb-1">Response:</div>
+                                    <pre class="bg-slate-950 p-2 rounded overflow-x-auto text-slate-300">\${JSON.stringify(graphql.response, null, 2)}</pre>
+                                </div>
+                            \`}
+                            \${raw.stack && html\`
+                                <div class="mb-3">
+                                    <div class="text-red-400 font-semibold mb-1">Stack Trace:</div>
+                                    <pre class="bg-slate-950 p-2 rounded overflow-x-auto text-red-300">\${raw.stack}</pre>
+                                </div>
+                            \`}
+                            \${raw.details && html\`
+                                <div class="mb-3">
+                                    <div class="text-yellow-400 font-semibold mb-1">Details:</div>
+                                    <pre class="bg-slate-950 p-2 rounded overflow-x-auto text-yellow-300">\${JSON.stringify(raw.details, null, 2)}</pre>
+                                </div>
+                            \`}
+                            <div class="text-slate-600 mt-2">
+                                <span>Request ID: \${raw.id || (raw.req && raw.req.id) || 'N/A'}</span>
+                            </div>
                         </div>
                     \`}
                 </div>
