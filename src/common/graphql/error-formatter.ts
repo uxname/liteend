@@ -114,8 +114,13 @@ export function gqlErrorFormatter(
       path: error.path,
     });
 
+    const errorMessage =
+      originalError instanceof Error
+        ? originalError.message
+        : 'Internal Server Error';
+
     return {
-      message: 'Internal Server Error',
+      message: errorMessage,
       locations: error.locations,
       path: error.path,
       extensions: {
