@@ -7,6 +7,7 @@ import {
 import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { PinoLogger } from 'nestjs-pino';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 const SENSITIVE_KEYS = [
   'password',
@@ -17,6 +18,47 @@ const SENSITIVE_KEYS = [
   'cookie',
   'sig',
 ];
+
+const MAX_RESPONSE_BYTES = 4096;
+const MAX_ARRAY_ELEMENTS = 5;
+
+function truncateResponse(
+  data: unknown,
+  maxBytes: number = MAX_RESPONSE_BYTES,
+  maxArrayItems: number = MAX_ARRAY_ELEMENTS,
+): unknown {
+  if (data === null || data === undefined) return data;
+  if (typeof data === 'string') {
+    return data.length > maxBytes
+      ? `${data.slice(0, maxBytes)}...truncated (${data.length} bytes total)`
+      : data;
+  }
+  if (Array.isArray(data)) {
+    if (data.length <= maxArrayItems)
+      return data.map((v) => truncateResponse(v, maxBytes, maxArrayItems));
+    return [
+      ...data
+        .slice(0, maxArrayItems)
+        .map((v) => truncateResponse(v, maxBytes, maxArrayItems)),
+      `[... +${data.length - maxArrayItems} items]`,
+    ];
+  }
+  if (typeof data === 'object') {
+    const result: Record<string, unknown> = {};
+    const jsonStr = JSON.stringify(data);
+    if (jsonStr.length > maxBytes) {
+      const truncated = jsonStr.slice(0, maxBytes);
+      return JSON.parse(truncated) as object;
+    }
+    for (const [key, value] of Object.entries(
+      data as Record<string, unknown>,
+    )) {
+      result[key] = truncateResponse(value, maxBytes, maxArrayItems);
+    }
+    return result;
+  }
+  return data;
+}
 
 @Injectable()
 export class GqlLoggingInterceptor implements NestInterceptor {
@@ -34,13 +76,13 @@ export class GqlLoggingInterceptor implements NestInterceptor {
     const args = gqlContext.getArgs();
 
     const req = gqlContext.getContext().req as {
-      graphql?: unknown;
-      raw?: { graphql?: unknown };
+      graphql?: Record<string, unknown>;
+      raw?: { graphql?: Record<string, unknown> };
     };
 
     if (!req) return next.handle();
 
-    const graphqlData = {
+    const graphqlData: Record<string, unknown> = {
       type: info.parentType?.name || 'Unknown',
       operation: info.fieldName,
       args: this.redact(args),
@@ -48,10 +90,24 @@ export class GqlLoggingInterceptor implements NestInterceptor {
 
     req.graphql = graphqlData;
     if (req.raw) {
-      (req.raw as typeof req.raw & { graphql?: unknown }).graphql = graphqlData;
+      req.raw.graphql = graphqlData;
     }
 
-    return next.handle();
+    const startTime = Date.now();
+
+    return next.handle().pipe(
+      tap({
+        next: (data) => {
+          graphqlData.response = truncateResponse(data);
+          graphqlData.responseTime = Date.now() - startTime;
+        },
+        error: (error) => {
+          graphqlData.error =
+            error instanceof Error ? error.message : 'Unknown error';
+          graphqlData.responseTime = Date.now() - startTime;
+        },
+      }),
+    );
   }
 
   private redact(args: unknown): unknown {
