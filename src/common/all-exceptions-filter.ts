@@ -97,11 +97,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
           exc instanceof Error
             ? { message: exc.message, stack: exc.stack }
             : exc,
+        stack: exc instanceof Error ? exc.stack : undefined,
       });
       return;
     }
 
-    this.logger.warn({ ...logData, msg: 'HTTP Client Error' });
+    let details: Array<{ field: string; message: string }> | undefined;
+    if (exc instanceof ZodValidationException) {
+      const zodError = exc.getZodError() as ZodError;
+      details = zodError.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      }));
+    }
+
+    this.logger.warn({
+      ...logData,
+      msg: 'HTTP Client Error',
+      details,
+    });
   }
 
   private buildErrorBody(
