@@ -185,7 +185,7 @@ export const pinoConfig: Params = {
                 level: 'trace',
                 options: {
                   colorize: true,
-                  translateTime: 'HH:MM:ss.l',
+                  translateTime: 'SYS:standard',
                   ignore: 'pid,hostname,app,userId,userRole,responseTime',
                   singleLine: true,
                 },
