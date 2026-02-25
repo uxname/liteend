@@ -12,6 +12,7 @@ import mqemitterRedis from 'mqemitter-redis';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { AppController } from '@/app/app.controller';
 import { DebugModule } from '@/app/debug/debug.module';
+import { DevLauncherModule } from '@/app/dev-launcher/dev-launcher.module';
 import { FileUploadModule } from '@/app/file-upload/file-upload.module';
 import { HealthModule } from '@/app/health/health.module';
 import { ProfileModule } from '@/app/profile/profile.module';
@@ -30,6 +31,7 @@ import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module'
 @Module({
   imports: [
     AuthModule,
+    DevLauncherModule,
     TestQueueModule,
     GraphQLModule.forRootAsync<MercuriusDriverConfig>({
       driver: MercuriusDriver,
