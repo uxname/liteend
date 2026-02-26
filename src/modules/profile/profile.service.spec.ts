@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
-import { ProfileService } from '@/app/profile/profile.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
   let service: ProfileService;

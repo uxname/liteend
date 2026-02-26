@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
+import { PrismaStudioService } from './prisma-studio.service';
 
 const STUDIO_ROUTES = [
   'studio',

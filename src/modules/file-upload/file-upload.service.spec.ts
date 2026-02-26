@@ -1,8 +1,8 @@
 import { MultipartFile } from '@fastify/multipart';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { FileUploadService } from './file-upload.service';
 
 interface MockMultipartFile {
   mimetype: string;

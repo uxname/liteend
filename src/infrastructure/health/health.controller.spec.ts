@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyReply } from 'fastify';
 import Redis from 'ioredis';
-import { HealthController } from '@/app/health/health.controller';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { HealthController } from './health.controller';
 
 describe('HealthController', () => {
   let controller: HealthController;

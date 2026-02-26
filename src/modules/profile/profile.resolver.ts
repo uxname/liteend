@@ -8,15 +8,15 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { PubSub } from 'mercurius';
-import { ProfileService } from '@/app/profile/profile.service';
-import { Profile } from '@/app/profile/types/profile.object-type';
-import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
 import {
   CurrentUser,
   CurrentUserType,
 } from '@/common/auth/current-user.decorator';
 import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
 import { RolesGuard } from '@/common/auth/roles.guard';
+import { ProfileService } from './profile.service';
+import { Profile } from './types/profile.object-type';
+import { ProfileUpdateInput } from './types/profile-update.input';
 
 const EVENTS = {
   PROFILE_UPDATED: 'profileUpdated',

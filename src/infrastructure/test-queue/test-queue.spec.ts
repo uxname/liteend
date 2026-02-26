@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TestQueueProcessor } from '@/app/test-queue/test-queue.processor';
-import { TestQueueResolver } from '@/app/test-queue/test-queue.resolver';
+import { TestQueueProcessor } from './test-queue.processor';
+import { TestQueueResolver } from './test-queue.resolver';
 
 describe('TestQueueProcessor', () => {
   let processor: TestQueueProcessor;

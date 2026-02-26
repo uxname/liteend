@@ -1,8 +1,7 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaStudioService } from '@/common/prisma-studio/prisma-studio.service';
-
 import { PrismaStudioController } from './prisma-studio.controller';
+import { PrismaStudioService } from './prisma-studio.service';
 
 @Module({
   imports: [ConfigModule.forRoot()],

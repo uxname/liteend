@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
-import { ProfileUpdateInput } from '@/app/profile/types/profile-update.input';
+import { ProfileUpdateInput } from './types/profile-update.input';
 
 type CurrentUserType = {
   id: number;
@@ -49,7 +49,7 @@ describe('ProfileResolver (logic)', () => {
   let ProfileResolver: ResolverClass;
 
   beforeEach(async () => {
-    const module = await import('@/app/profile/profile.resolver');
+    const module = await import('./profile.resolver');
     ProfileResolver = module.ProfileResolver as unknown as ResolverClass;
     mockPubSub = { publish: vi.fn() };
   });

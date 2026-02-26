@@ -10,23 +10,23 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import GraphQLJSON from 'graphql-type-json';
 import mqemitterRedis from 'mqemitter-redis';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
-import { AppController } from '@/app/app.controller';
-import { DebugModule } from '@/app/debug/debug.module';
-import { DevLauncherModule } from '@/app/dev-launcher/dev-launcher.module';
-import { FileUploadModule } from '@/app/file-upload/file-upload.module';
-import { HealthModule } from '@/app/health/health.module';
-import { ProfileModule } from '@/app/profile/profile.module';
-import { TestQueueModule } from '@/app/test-queue/test-queue.module';
 import { AllExceptionsFilter } from '@/common/all-exceptions-filter';
 import { AuthModule } from '@/common/auth/auth.module';
-import { BullBoardModule } from '@/common/bull-board/bull-board.module';
 import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { gqlErrorFormatter } from '@/common/graphql/error-formatter';
 import { GqlLoggingInterceptor } from '@/common/logger/gql-logging.interceptor';
 import { LoggerModule } from '@/common/logger/logger.module';
-import { LoggerServeModule } from '@/common/logger-serve/logger-serve.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
-import { PrismaStudioModule } from '@/common/prisma-studio/prisma-studio.module';
+import { BullBoardModule } from '@/dev-tools/bull-board/bull-board.module';
+import { DebugModule } from '@/dev-tools/debug/debug.module';
+import { DevLauncherModule } from '@/dev-tools/dev-launcher/dev-launcher.module';
+import { LoggerServeModule } from '@/dev-tools/logger-serve/logger-serve.module';
+import { PrismaStudioModule } from '@/dev-tools/prisma-studio/prisma-studio.module';
+import { HealthModule } from '@/infrastructure/health/health.module';
+import { TestQueueModule } from '@/infrastructure/test-queue/test-queue.module';
+import { FileUploadModule } from '@/modules/file-upload/file-upload.module';
+import { ProfileModule } from '@/modules/profile/profile.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [

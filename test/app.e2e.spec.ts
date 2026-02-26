@@ -5,7 +5,7 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import * as pactum from 'pactum';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AppModule } from '@/app/app.module';
+import { AppModule } from '@/app.module';
 
 describe('AppController (e2e)', () => {
   let app: NestFastifyApplication;

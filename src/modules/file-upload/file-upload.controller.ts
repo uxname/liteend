@@ -18,9 +18,9 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { FileUploadService } from '@/app/file-upload/file-upload.service';
 import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
 import { RealIp } from '@/common/real-ip/real-ip.decorator';
+import { FileUploadService } from './file-upload.service';
 
 @Controller()
 export class FileUploadController {

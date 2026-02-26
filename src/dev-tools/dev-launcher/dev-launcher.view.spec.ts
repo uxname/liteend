@@ -1,4 +1,4 @@
-import { renderDevLauncherView } from '@/app/dev-launcher/dev-launcher.view';
+import { renderDevLauncherView } from './dev-launcher.view';
 
 it('renders the hero and tool cards in English', () => {
   const html = renderDevLauncherView({

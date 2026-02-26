@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { DebugResolver } from '@/app/debug/debug.resolver';
+import { DebugResolver } from './debug.resolver';
 
 @Module({
   providers: [DebugResolver],

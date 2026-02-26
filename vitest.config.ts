@@ -7,7 +7,6 @@ export default defineConfig({
     globals: true,
     root: './',
     environment: 'node',
-    includeSource: ['src/**/*.ts'],
   },
   plugins: [
     tsconfigPaths(),

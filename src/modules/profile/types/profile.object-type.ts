@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-import { ProfileRole } from '@/app/profile/types/profile-role.enum';
+import { ProfileRole } from './profile-role.enum';
 
 @ObjectType()
 export class Profile {

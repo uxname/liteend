@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 
-import { AuthGuard } from '@/common/logger-serve/auth/auth.guard';
+import { AuthGuard } from './auth/auth.guard';
 import { LOGGER_UI_HTML } from './logger-ui.html';
 
 @Controller('logs')

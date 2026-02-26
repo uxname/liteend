@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { DevLauncherController } from '@/app/dev-launcher/dev-launcher.controller';
+import { DevLauncherController } from './dev-launcher.controller';
 
 it('serves cached html with correct headers', async () => {
   const moduleRef = await Test.createTestingModule({

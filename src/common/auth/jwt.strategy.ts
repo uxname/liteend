@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Profile } from '@/app/profile/types/profile.object-type';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { Profile } from '@/modules/profile/types/profile.object-type';
 
 interface JwtPayload {
   sub: string;

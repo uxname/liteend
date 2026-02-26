@@ -13,7 +13,7 @@ import { AltairFastify } from 'altair-fastify-plugin';
 import { Logger } from 'nestjs-pino';
 import { cleanupOpenApiDoc, ZodValidationPipe } from 'nestjs-zod';
 import packageJson from '../package.json';
-import { AppModule } from './app/app.module';
+import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const adapter = new FastifyAdapter({
