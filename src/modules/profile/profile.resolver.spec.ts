@@ -1,124 +1,101 @@
-import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { Test, TestingModule } from '@nestjs/testing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
+import { JwtAuthGuard } from '@/common/auth/jwt-auth.guard';
+import { RolesGuard } from '@/common/auth/roles.guard';
+import {
+  createProfileServiceMock,
+  createPubSubMock,
+} from '../../../test/utils/mocks';
+import { ProfileResolver } from './profile.resolver';
+import { ProfileService } from './profile.service';
 import { ProfileUpdateInput } from './types/profile-update.input';
 
-type CurrentUserType = {
-  id: number;
-  oidcSub: string;
-  roles: ProfileRole[];
-};
-
-type PubSubType = {
-  publish: Mock;
-};
-
-type ResolverClass = new (service: {
-  updateProfile: Mock;
-}) => {
-  me: (user: CurrentUserType) => CurrentUserType;
-  updateProfile: (
-    user: CurrentUserType,
-    input: ProfileUpdateInput,
-    pubSub: PubSubType,
-  ) => Promise<Profile>;
-};
-
-describe('ProfileResolver (logic)', () => {
-  const mockProfile: Profile = {
-    id: 1,
-    oidcSub: 'oauth2|12345',
-    roles: [ProfileRole.USER],
-    avatarUrl: 'https://example.com/avatar.png',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  const mockCurrentUser: CurrentUserType = {
-    id: 1,
-    oidcSub: 'oauth2|12345',
-    roles: [ProfileRole.USER],
-  };
-
-  const mockProfileService = {
-    updateProfile: vi.fn(),
-  };
-
-  let mockPubSub: PubSubType;
-
-  // Dynamic import of resolver
-  let ProfileResolver: ResolverClass;
+describe('ProfileResolver', () => {
+  let resolver: ProfileResolver;
+  let profileService: ReturnType<typeof createProfileServiceMock>;
+  let pubSub: ReturnType<typeof createPubSubMock>;
 
   beforeEach(async () => {
-    const module = await import('./profile.resolver');
-    ProfileResolver = module.ProfileResolver as unknown as ResolverClass;
-    mockPubSub = { publish: vi.fn() };
-  });
+    profileService = createProfileServiceMock();
+    pubSub = createPubSubMock();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ProfileResolver,
+        { provide: ProfileService, useValue: profileService },
+      ],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: vi.fn().mockReturnValue(true) })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: vi.fn().mockReturnValue(true) })
+      .compile();
 
-  afterEach(() => {
-    vi.clearAllMocks();
+    resolver = module.get(ProfileResolver);
   });
 
   describe('me', () => {
-    it('should return current user', async () => {
-      const resolver = new ProfileResolver(mockProfileService as never);
-      const result = await resolver.me(mockCurrentUser);
+    it('should return the current user payload verbatim', async () => {
+      const currentUser: Profile = {
+        id: 1,
+        oidcSub: 'oauth2|12345',
+        roles: [ProfileRole.USER],
+        avatarUrl: 'https://example.com/avatar.png',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      expect(result).toEqual(mockCurrentUser);
+      const result = await resolver.me(currentUser);
+
+      expect(result).toEqual(currentUser);
     });
   });
 
   describe('updateProfile', () => {
-    it('should call service.updateProfile and publish event', async () => {
-      const resolver = new ProfileResolver(mockProfileService as never);
+    it('should update the profile and publish an event', async () => {
+      const currentUser: Profile = {
+        id: 1,
+        oidcSub: 'oauth2|12345',
+        roles: [ProfileRole.USER],
+        avatarUrl: 'https://example.com/avatar.png',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       const input: ProfileUpdateInput = {
         avatarUrl: 'https://new.com/ava.png',
       };
+      const updatedProfile: Profile = { ...currentUser, ...input };
 
-      mockProfileService.updateProfile.mockResolvedValue({
-        ...mockProfile,
-        ...input,
-      });
+      profileService.updateProfile.mockResolvedValue(updatedProfile);
 
-      const result = await resolver.updateProfile(
-        mockCurrentUser,
-        input,
-        mockPubSub,
-      );
+      const result = await resolver.updateProfile(currentUser, input, pubSub);
 
-      expect(mockProfileService.updateProfile).toHaveBeenCalledWith(1, input);
-      expect(mockPubSub.publish).toHaveBeenCalledWith({
+      expect(result).toEqual(updatedProfile);
+      expect(profileService.updateProfile).toHaveBeenCalledWith(1, input);
+      expect(pubSub.publish).toHaveBeenCalledWith({
         topic: 'profileUpdated',
-        payload: { profileUpdated: result },
+        payload: { profileUpdated: updatedProfile },
       });
     });
 
-    it('should filter event by user id in subscription', () => {
-      // Test filtering logic
+    it('should only publish an event to the matching user', () => {
       const filter = (
         payload: { profileUpdated: { id: number } },
-        _variables: Record<string, unknown>,
+        _vars: Record<string, unknown>,
         context: { req?: { user?: { id: number } } },
       ) => {
-        const updatedProfileId = payload.profileUpdated.id;
+        const updatedId = payload.profileUpdated.id;
         const currentUserId = context.req?.user?.id;
-        return currentUserId === updatedProfileId;
+        return updatedId === currentUserId;
       };
 
-      // User 1 updated their profile - should receive notification
-      const result1 = filter(
-        { profileUpdated: { id: 1 } },
-        {},
-        { req: { user: { id: 1 } } },
-      );
-      expect(result1).toBe(true);
-
-      // User 2 updated user 1's profile - should NOT receive notification
-      const result2 = filter(
-        { profileUpdated: { id: 1 } },
-        {},
-        { req: { user: { id: 2 } } },
-      );
-      expect(result2).toBe(false);
+      expect(
+        filter({ profileUpdated: { id: 1 } }, {}, { req: { user: { id: 1 } } }),
+      ).toBe(true);
+      expect(
+        filter({ profileUpdated: { id: 1 } }, {}, { req: { user: { id: 2 } } }),
+      ).toBe(false);
     });
   });
 });

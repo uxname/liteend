@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { MultipartFile } from '@fastify/multipart';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -161,6 +162,35 @@ describe('FileUploadService', () => {
       );
 
       expect(result).toBeNull();
+    });
+
+    it('should throw when writing to disk fails', async () => {
+      const mockPart: MockMultipartFile = {
+        mimetype: 'image/png',
+        filename: 'file.png',
+        toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
+        file: {
+          pipe: vi.fn(),
+        },
+      };
+
+      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+      const mkdirSpy = vi
+        .spyOn(fs, 'mkdirSync')
+        .mockImplementation(() => undefined);
+      const createWriteStreamSpy = vi
+        .spyOn(fs, 'createWriteStream')
+        .mockImplementation(() => {
+          throw new Error('write failure');
+        });
+
+      await expect(
+        service.processFile(mockPart as unknown as MultipartFile),
+      ).rejects.toThrow('write failure');
+
+      existsSpy.mockRestore();
+      mkdirSpy.mockRestore();
+      createWriteStreamSpy.mockRestore();
     });
   });
 });

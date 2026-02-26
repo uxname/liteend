@@ -6,7 +6,6 @@ import { Logger } from './logger';
 
 const logger = new Logger({ name: 'Backup' });
 
-// Environment variables with strict types and validation
 interface EnvironmentVariables {
   DATABASE_HOST: string;
   DATABASE_PORT: string;
@@ -38,7 +37,6 @@ const environment: EnvironmentVariables = {
   BACKUP_COMPRESS: process.env.BACKUP_COMPRESS === 'true',
 };
 
-// Safe logging of environment variables
 const safeEnvironment: EnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
@@ -46,7 +44,6 @@ const safeEnvironment: EnvironmentVariables = {
 
 logger.info('Environment variables:', safeEnvironment);
 
-// Ensure backup directory exists
 async function ensureBackupDirectoryExists(): Promise<void> {
   try {
     await fs.access(environment.BACKUP_DIR);
@@ -58,7 +55,6 @@ async function ensureBackupDirectoryExists(): Promise<void> {
 
 let isBackingUp = false;
 
-// Function to create a backup
 async function createBackup(): Promise<void> {
   if (isBackingUp) {
     logger.warn('Another backup is already in progress. Skipping this backup.');
@@ -100,7 +96,6 @@ async function createBackup(): Promise<void> {
   }
 }
 
-// Execute a shell command and handle errors
 async function executeCommand(
   command: string,
   backupFilePath: string,
@@ -128,7 +123,6 @@ async function executeCommand(
   });
 }
 
-// Function to rotate backups
 async function rotateBackups(): Promise<void> {
   try {
     const files: string[] = (await fs.readdir(environment.BACKUP_DIR)).filter(
@@ -161,7 +155,6 @@ async function rotateBackups(): Promise<void> {
   }
 }
 
-// Initial backup on script start
 async function initializeBackup(): Promise<void> {
   try {
     await ensureBackupDirectoryExists();
@@ -172,12 +165,10 @@ async function initializeBackup(): Promise<void> {
   }
 }
 
-// Schedule backups at the specified interval
 function scheduleBackups(): void {
   setInterval(createBackup, environment.BACKUP_INTERVAL);
 }
 
-// Main function
 async function main(): Promise<void> {
   await initializeBackup();
   scheduleBackups();

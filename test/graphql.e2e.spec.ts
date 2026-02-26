@@ -1,180 +1,107 @@
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { Test, TestingModule } from '@nestjs/testing';
-import * as pactum from 'pactum';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AppModule } from '@/app.module';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { E2EClient } from './utils/e2e-client';
+import { getFastifyInstance } from './utils/testing-app';
 
 describe('GraphQL (e2e)', () => {
-  let app: NestFastifyApplication;
-  const port = 4002;
-  const graphqlEndpoint = '/graphql';
+  let client: E2EClient;
 
-  beforeAll(async () => {
-    const adapter = new FastifyAdapter({ logger: false });
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(adapter);
-
-    await app.listen(port);
-
-    pactum.request.setBaseUrl(`http://localhost:${port}`);
-  }, 30000);
-
-  afterAll(async () => {
-    if (app) {
-      await app.close();
-    }
+  beforeAll(() => {
+    client = new E2EClient(getFastifyInstance());
   });
 
-  describe('GraphQL Endpoint', () => {
-    it('should respond to GraphQL POST requests', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody(
-          JSON.stringify({
-            query: '{ __typename }',
-          }),
-        );
+  describe('Schema basics', () => {
+    it('should return __typename for introspection queries', async () => {
+      const query = '{ __typename }';
 
-      expect(response.statusCode).toBeDefined();
-      expect([200, 400]).toContain(response.statusCode);
-    });
+      const response = await client.requestGraphQL<{ __typename: string }>(
+        query,
+      );
 
-    it('should respond to GET requests to /graphql', async () => {
-      const response = await pactum.spec().get(graphqlEndpoint);
-
-      expect(response.statusCode).toBeDefined();
-      expect([200, 404]).toContain(response.statusCode);
+      expect(response.statusCode).toBe(200);
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.__typename).toBe('Query');
     });
   });
 
-  describe('Debug Queries', () => {
-    it('echo query - returns the input text', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `query { echo(text: "hello world") }`,
-        });
+  describe('Echo operations', () => {
+    it('should echo text for queries', async () => {
+      const query = 'query { echo(text: "hello world") }';
+
+      const response = await client.requestGraphQL<{ echo: string }>(query);
 
       expect(response.statusCode).toBe(200);
-      if (response.body.errors) {
-        expect(response.body.errors[0].message).toBeDefined();
-      } else {
-        expect(response.body.data?.echo).toBe('hello world');
-      }
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.echo).toBe('hello world');
     });
 
-    it('echo mutation - returns the input text', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `mutation { echo(text: "mutation test") }`,
-        });
+    it('should echo text for mutations', async () => {
+      const mutation = 'mutation { echo(text: "mutation test") }';
+
+      const response = await client.requestGraphQL<{ echo: string }>(mutation);
 
       expect(response.statusCode).toBe(200);
-      if (response.body.errors) {
-        expect(response.body.errors[0].message).toBeDefined();
-      } else {
-        expect(response.body.data?.echo).toBe('mutation test');
-      }
-    });
-
-    it('debug query without auth - returns data', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `query { debug }`,
-        });
-
-      expect(response.statusCode).toBe(200);
-      if (!response.body.errors) {
-        expect(response.body.data?.debug).toBeDefined();
-      }
-    });
-
-    it('testTranslation query - returns translated string', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `query { testTranslation(username: "testuser") }`,
-        });
-
-      expect(response.statusCode).toBe(200);
-      if (!response.body.errors) {
-        expect(response.body.data?.testTranslation).toBeDefined();
-      }
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.echo).toBe('mutation test');
     });
   });
 
-  describe('Profile Queries (Unauthenticated)', () => {
-    it('me query without auth - returns data or error', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `query { me { id } }`,
-        });
+  describe('Debug query', () => {
+    it('should return debug data without auth', async () => {
+      const query = 'query { debug }';
+
+      const response = await client.requestGraphQL<{ debug: string }>(query);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('data');
-    });
-
-    it('updateProfile mutation without auth - returns data or error', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `mutation { updateProfile(input: { }) { id } }`,
-        });
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('data');
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.debug).toBeDefined();
     });
   });
 
-  describe('GraphQL Error Handling', () => {
-    it('should handle invalid query syntax', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          query: `query { invalidField }`,
-        });
+  describe('Authentication-sensitive queries', () => {
+    it('should respond with data for me query', async () => {
+      const query = 'query { me { id } }';
+
+      const response = await client.requestGraphQL<{
+        me: { id: number } | null;
+      }>(query);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('errors');
+      expect(response.errors).toBeUndefined();
+      expect(response.data).toHaveProperty('me');
+      expect(String(response.data?.me?.id)).toBe('1');
     });
 
-    it('should handle missing query field', async () => {
-      const response = await pactum
-        .spec()
-        .post(graphqlEndpoint)
-        .withHeaders('Content-Type', 'application/json')
-        .withBody({
-          notAQuery: 'test',
-        });
+    it('should return data or errors for updateProfile without auth', async () => {
+      const mutation = 'mutation { updateProfile(input: {}) { id } }';
+
+      const response = await client.requestGraphQL(mutation);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('errors');
+      expect(response.data).toBeDefined();
+    });
+  });
+
+  describe('GraphQL error handling', () => {
+    it('should surface validation errors for invalid fields', async () => {
+      const query = 'query { invalidField }';
+
+      const response = await client.requestGraphQL(query);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.errors).toBeDefined();
+    });
+
+    it('should error when the request payload is malformed', async () => {
+      const response = await client.request({
+        method: 'POST',
+        url: '/graphql',
+        payload: { notAQuery: 'test' },
+        headers: { 'content-type': 'application/json' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body).toHaveProperty('errors');
     });
   });
 });

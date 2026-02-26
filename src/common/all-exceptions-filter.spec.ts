@@ -1,6 +1,7 @@
-import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllExceptionsFilter } from '@/common/all-exceptions-filter';
+import { createArgumentsHostMock } from '../../test/utils/mocks';
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
@@ -27,16 +28,16 @@ describe('AllExceptionsFilter', () => {
       user: undefined,
     };
 
-    const mockContext = {
-      switchToHttp: vi.fn().mockReturnValue({
-        getResponse: vi.fn().mockReturnValue(mockResponse),
-        getRequest: vi.fn().mockReturnValue(mockRequest),
-      }),
-      getType: vi.fn().mockReturnValue(type),
-    };
+    const mockContext = createArgumentsHostMock();
+    mockContext.getType.mockReturnValue(type);
+    mockContext.switchToHttp.mockReturnValue({
+      getResponse: vi.fn().mockReturnValue(mockResponse),
+      getRequest: vi.fn().mockReturnValue(mockRequest),
+      getNext: vi.fn(),
+    });
 
     return {
-      context: mockContext as unknown as ArgumentsHost,
+      context: mockContext,
       response: mockResponse,
       request: mockRequest,
     };

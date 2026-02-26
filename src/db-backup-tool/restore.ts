@@ -6,7 +6,6 @@ import { Logger } from './logger';
 
 const logger = new Logger({ name: 'Restore' });
 
-// Environment variables with strict types
 interface EnvironmentVariables {
   DATABASE_HOST: string;
   DATABASE_PORT: string;
@@ -25,7 +24,6 @@ const environment: EnvironmentVariables = {
   BACKUP_DIR: process.env.BACKUP_DIR || './data/database_backups',
 };
 
-// Safe logging of environment variables
 const safeEnvironment: EnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
@@ -33,7 +31,6 @@ const safeEnvironment: EnvironmentVariables = {
 
 logger.info('Environment variables:', safeEnvironment);
 
-// Function to restore a backup
 async function restoreBackup(backupFileName: string): Promise<void> {
   const backupFilePath: string = path.join(
     environment.BACKUP_DIR,
@@ -49,7 +46,6 @@ async function restoreBackup(backupFileName: string): Promise<void> {
 
   const isCompressed: boolean = backupFileName.endsWith('.gz');
 
-  // Command for restoration
   const restoreCommand: string = isCompressed
     ? `gunzip -c ${backupFilePath} | psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME}`
     : `psql -h ${environment.DATABASE_HOST} -p ${environment.DATABASE_PORT} -U ${environment.DATABASE_USER} -d ${environment.DATABASE_NAME} -f ${backupFilePath}`;
@@ -58,7 +54,6 @@ async function restoreBackup(backupFileName: string): Promise<void> {
   await executeCommand(restoreCommand);
 }
 
-// Execute a shell command and handle errors
 async function executeCommand(command: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     childProcess.exec(
@@ -77,7 +72,6 @@ async function executeCommand(command: string): Promise<void> {
   });
 }
 
-// Main function
 async function main(backupFileName: string): Promise<void> {
   try {
     await restoreBackup(backupFileName);
@@ -87,7 +81,6 @@ async function main(backupFileName: string): Promise<void> {
   }
 }
 
-// Example usage: tsx restore.ts backup_file_name.sql.gz
 const backupFileName = process.argv[2];
 if (!backupFileName) {
   logger.error('Please provide the backup file name as an argument.');

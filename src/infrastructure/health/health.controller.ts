@@ -1,8 +1,8 @@
 import { Controller, Get, HttpStatus, Logger, Res } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FastifyReply } from 'fastify';
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { RedisService } from '@/common/redis/redis.service';
 
 @Controller('health')
 export class HealthController {
@@ -11,13 +11,9 @@ export class HealthController {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
+    redisService: RedisService,
   ) {
-    const redisHost = this.configService.get<string>('REDIS_HOST');
-    const redisPort = this.configService.get<number>('REDIS_PORT');
-    const redisPassword = this.configService.get<string>('REDIS_PASSWORD');
-    const redisUrl = `redis://${redisHost}:${redisPort}?password=${redisPassword}`;
-    this.client = new Redis(redisUrl);
+    this.client = redisService.getClient();
   }
 
   @Get()

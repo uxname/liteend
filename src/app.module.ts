@@ -17,6 +17,7 @@ import { gqlErrorFormatter } from '@/common/graphql/error-formatter';
 import { GqlLoggingInterceptor } from '@/common/logger/gql-logging.interceptor';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { PrismaModule } from '@/common/prisma/prisma.module';
+import { RedisModule } from '@/common/redis/redis.module';
 import { BullBoardModule } from '@/dev-tools/bull-board/bull-board.module';
 import { DebugModule } from '@/dev-tools/debug/debug.module';
 import { DevLauncherModule } from '@/dev-tools/dev-launcher/dev-launcher.module';
@@ -75,6 +76,7 @@ import { AppController } from './app.controller';
     DebugModule,
     LoggerModule,
     PrismaModule,
+    RedisModule,
     PrismaStudioModule,
     LoggerServeModule,
     FileUploadModule,

@@ -1,4 +1,3 @@
-// src/app/test-queue/test-queue.module.ts
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullModule } from '@nestjs/bullmq';

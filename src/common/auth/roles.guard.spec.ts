@@ -1,13 +1,40 @@
-import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mock } from 'vitest-mock-extended';
 import { ProfileRole } from '@/@generated/prisma/client';
 import { RolesGuard } from '@/common/auth/roles.guard';
+import { createExecutionContextMock } from '../../../test/utils/mocks';
 
-interface MockGqlContext {
-  getContext: ReturnType<typeof vi.fn>;
-}
+const buildHttpExecutionContext = (user: {
+  roles?: ProfileRole[] | undefined;
+}) => {
+  const context = createExecutionContextMock();
+  context.getType.mockReturnValue('http');
+  context.switchToHttp.mockReturnValue({
+    getRequest: vi.fn().mockReturnValue({ user }),
+    getResponse: vi.fn(),
+    getNext: vi.fn(),
+  });
+  context.getHandler.mockReturnValue(vi.fn());
+  context.getClass.mockReturnValue(vi.fn());
+  return context;
+};
+
+const buildGraphQLExecutionContext = (user: {
+  roles?: ProfileRole[] | undefined;
+}) => {
+  const context = createExecutionContextMock();
+  context.getType.mockReturnValue('graphql');
+  context.switchToHttp.mockReturnValue({
+    getRequest: vi.fn().mockReturnValue({ user }),
+    getResponse: vi.fn(),
+    getNext: vi.fn(),
+  });
+  context.getHandler.mockReturnValue(vi.fn());
+  context.getClass.mockReturnValue(vi.fn());
+  return context;
+};
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
@@ -24,19 +51,11 @@ describe('RolesGuard', () => {
     it('should return true when no roles are required', () => {
       vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(undefined);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('http'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi
-            .fn()
-            .mockReturnValue({ user: { roles: [ProfileRole.USER] } }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildHttpExecutionContext({
+        roles: [ProfileRole.USER],
+      });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(true);
+      expect(guard.canActivate(mockContext)).toBe(true);
     });
 
     it('should return true when user has required role', () => {
@@ -44,28 +63,17 @@ describe('RolesGuard', () => {
         ProfileRole.USER,
       ]);
 
-      const mockGqlContext: MockGqlContext = {
-        getContext: vi.fn().mockReturnValue({
-          req: { user: { roles: [ProfileRole.USER] } },
-        }),
-      };
-      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
-        mockGqlContext as unknown as GqlExecutionContext,
-      );
+      const gqlContext = mock<GqlExecutionContext>();
+      gqlContext.getContext.mockReturnValue({
+        req: { user: { roles: [ProfileRole.USER] } },
+      });
+      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlContext);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('graphql'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi
-            .fn()
-            .mockReturnValue({ user: { roles: [ProfileRole.USER] } }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildGraphQLExecutionContext({
+        roles: [ProfileRole.USER],
+      });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(true);
+      expect(guard.canActivate(mockContext)).toBe(true);
     });
 
     it('should return false when user does not have required role', () => {
@@ -73,28 +81,17 @@ describe('RolesGuard', () => {
         ProfileRole.ADMIN,
       ]);
 
-      const mockGqlContext: MockGqlContext = {
-        getContext: vi.fn().mockReturnValue({
-          req: { user: { roles: [ProfileRole.USER] } },
-        }),
-      };
-      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
-        mockGqlContext as unknown as GqlExecutionContext,
-      );
+      const gqlContext = mock<GqlExecutionContext>();
+      gqlContext.getContext.mockReturnValue({
+        req: { user: { roles: [ProfileRole.USER] } },
+      });
+      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlContext);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('graphql'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi
-            .fn()
-            .mockReturnValue({ user: { roles: [ProfileRole.USER] } }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildGraphQLExecutionContext({
+        roles: [ProfileRole.USER],
+      });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(false);
+      expect(guard.canActivate(mockContext)).toBe(false);
     });
 
     it('should return false when user has no roles', () => {
@@ -102,26 +99,15 @@ describe('RolesGuard', () => {
         ProfileRole.ADMIN,
       ]);
 
-      const mockGqlContext: MockGqlContext = {
-        getContext: vi.fn().mockReturnValue({
-          req: { user: { roles: [] } },
-        }),
-      };
-      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
-        mockGqlContext as unknown as GqlExecutionContext,
-      );
+      const gqlContext = mock<GqlExecutionContext>();
+      gqlContext.getContext.mockReturnValue({
+        req: { user: { roles: [] } },
+      });
+      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlContext);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('graphql'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi.fn().mockReturnValue({ user: { roles: [] } }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildGraphQLExecutionContext({ roles: [] });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(false);
+      expect(guard.canActivate(mockContext)).toBe(false);
     });
 
     it('should return false when user is undefined', () => {
@@ -129,26 +115,15 @@ describe('RolesGuard', () => {
         ProfileRole.ADMIN,
       ]);
 
-      const mockGqlContext: MockGqlContext = {
-        getContext: vi.fn().mockReturnValue({
-          req: { user: undefined },
-        }),
-      };
-      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
-        mockGqlContext as unknown as GqlExecutionContext,
-      );
+      const gqlContext = mock<GqlExecutionContext>();
+      gqlContext.getContext.mockReturnValue({
+        req: { user: undefined },
+      });
+      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlContext);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('graphql'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi.fn().mockReturnValue({ user: undefined }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildGraphQLExecutionContext({ roles: undefined });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(false);
+      expect(guard.canActivate(mockContext)).toBe(false);
     });
 
     it('should return true when user has one of required roles', () => {
@@ -157,28 +132,17 @@ describe('RolesGuard', () => {
         ProfileRole.USER,
       ]);
 
-      const mockGqlContext: MockGqlContext = {
-        getContext: vi.fn().mockReturnValue({
-          req: { user: { roles: [ProfileRole.USER] } },
-        }),
-      };
-      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
-        mockGqlContext as unknown as GqlExecutionContext,
-      );
+      const gqlContext = mock<GqlExecutionContext>();
+      gqlContext.getContext.mockReturnValue({
+        req: { user: { roles: [ProfileRole.USER] } },
+      });
+      vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlContext);
 
-      const mockContext = {
-        getHandler: vi.fn(),
-        getClass: vi.fn(),
-        getType: vi.fn().mockReturnValue('graphql'),
-        switchToHttp: vi.fn().mockReturnValue({
-          getRequest: vi
-            .fn()
-            .mockReturnValue({ user: { roles: [ProfileRole.USER] } }),
-        }),
-      } as unknown as ExecutionContext;
+      const mockContext = buildGraphQLExecutionContext({
+        roles: [ProfileRole.USER],
+      });
 
-      const result = guard.canActivate(mockContext);
-      expect(result).toBe(true);
+      expect(guard.canActivate(mockContext)).toBe(true);
     });
   });
 });

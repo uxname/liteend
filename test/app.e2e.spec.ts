@@ -1,50 +1,42 @@
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { Test, TestingModule } from '@nestjs/testing';
-import * as pactum from 'pactum';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AppModule } from '@/app.module';
+import type { InjectOptions } from 'fastify';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { E2EClient } from './utils/e2e-client';
+import { createTestingApp } from './utils/testing-app';
 
 describe('AppController (e2e)', () => {
-  let app: NestFastifyApplication;
-  const port = 4001;
+  let client: E2EClient;
 
   beforeAll(async () => {
-    const adapter = new FastifyAdapter({ logger: false });
+    const { fastify } = await createTestingApp();
 
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(adapter);
-
-    await app.listen(port);
-
-    pactum.request.setBaseUrl(`http://localhost:${port}`);
+    client = new E2EClient(fastify);
   });
 
-  afterAll(async () => {
-    if (app) {
-      await app.close();
-    }
+  it('GET /health returns ok info when dependencies are healthy', async () => {
+    const options: InjectOptions = { method: 'GET', url: '/health' };
+
+    const response = await client.request(options);
+    const body = response.json();
+
+    expect({
+      statusCode: response.statusCode,
+      status: body.status,
+      databaseStatus: body.info.database.status,
+      redisStatus: body.info.redis.status,
+    }).toEqual({
+      statusCode: 200,
+      status: 'ok',
+      databaseStatus: 'ok',
+      redisStatus: 'ok',
+    });
   });
 
-  it('/health (GET) - app is running', async () => {
-    const response = await pactum.spec().get('/health');
+  it('GET / returns 404', async () => {
+    const response = await client.request({
+      method: 'GET',
+      url: '/',
+    } as InjectOptions);
 
-    // App is running and responding - status depends on DB/Redis availability
-    expect(response.statusCode).toBeDefined();
-    expect(response.body).toHaveProperty('status');
-    expect(response.body).toHaveProperty('info');
-
-    console.log(
-      `Health: status=${response.body.status}, db=${response.body.info?.database?.status}, redis=${response.body.info?.redis?.status}`,
-    );
-  });
-
-  it('/ (GET) - should return 404 for root', () => {
-    return pactum.spec().get('/').expectStatus(404);
+    expect(response.statusCode).toBe(404);
   });
 });

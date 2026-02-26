@@ -1,9 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyReply } from 'fastify';
-import Redis from 'ioredis';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { RedisService } from '@/common/redis/redis.service';
 import { HealthController } from './health.controller';
 
 describe('HealthController', () => {
@@ -16,21 +15,16 @@ describe('HealthController', () => {
     $executeRaw: vi.fn(),
   };
 
-  const mockConfigService = {
-    get: vi.fn((key: string) => {
-      const config: Record<string, string | number> = {
-        REDIS_HOST: 'localhost',
-        REDIS_PORT: 6379,
-        REDIS_PASSWORD: 'password',
-      };
-      return config[key];
-    }),
+  const mockRedisService = {
+    getClient: vi.fn(),
   };
 
   beforeEach(async () => {
     mockRedis = {
       ping: vi.fn().mockResolvedValue('PONG'),
     };
+
+    mockRedisService.getClient.mockReturnValue(mockRedis);
 
     responseCode = 0;
     responseBody = null;
@@ -49,15 +43,11 @@ describe('HealthController', () => {
       send: mockSendFn,
     };
 
-    vi.spyOn(Redis.prototype, 'ping').mockImplementation(
-      mockRedis.ping as (this: Redis) => Promise<string>,
-    );
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         HealthController,
         { provide: PrismaService, useValue: mockPrismaService },
-        { provide: ConfigService, useValue: mockConfigService },
+        { provide: RedisService, useValue: mockRedisService },
       ],
     }).compile();
 

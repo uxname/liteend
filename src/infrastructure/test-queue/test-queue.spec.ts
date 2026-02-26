@@ -1,21 +1,27 @@
 import { Job } from 'bullmq';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createJobMock } from '../../../test/utils/mocks';
 import { TestQueueProcessor } from './test-queue.processor';
 import { TestQueueResolver } from './test-queue.resolver';
 
 describe('TestQueueProcessor', () => {
   let processor: TestQueueProcessor;
+  let mockJob: Job;
 
-  const mockJob = {
-    id: '123',
-    name: 'test-job',
-    data: { message: 'test message', date: '2024-01-01T00:00:00.000Z' },
-    log: vi.fn(),
-    updateProgress: vi.fn(),
-  } as unknown as Job;
+  const buildJob = (overrides?: Partial<Job>): Job => {
+    const job = createJobMock();
+    job.id = overrides?.id ?? '123';
+    job.name = overrides?.name ?? 'test-job';
+    job.data = overrides?.data ?? {
+      message: 'test message',
+      date: '2024-01-01T00:00:00.000Z',
+    };
+    return job;
+  };
 
   beforeEach(() => {
     processor = new TestQueueProcessor();
+    mockJob = buildJob();
   });
 
   afterEach(() => {
@@ -30,11 +36,12 @@ describe('TestQueueProcessor', () => {
     });
 
     it('should log start and finish messages', async () => {
-      const loggerSpy = vi.spyOn(
-        (processor as unknown as { logger: { log: ReturnType<typeof vi.fn> } })
-          .logger,
-        'log',
-      );
+      const logger = (
+        processor as TestQueueProcessor & {
+          logger: { log: (...args: unknown[]) => unknown };
+        }
+      )['logger'];
+      const loggerSpy = vi.spyOn(logger, 'log');
 
       await processor.process(mockJob);
 
@@ -47,11 +54,11 @@ describe('TestQueueProcessor', () => {
     });
 
     it('should process job with different data', async () => {
-      const customJob = {
+      const customJob = buildJob({
         id: '456',
         name: 'custom-job',
         data: { message: 'custom message', date: '2024-02-01T00:00:00.000Z' },
-      } as unknown as Job;
+      });
 
       const result = await processor.process(customJob);
 

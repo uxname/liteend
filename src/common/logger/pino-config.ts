@@ -191,7 +191,7 @@ export const pinoConfig: Params = {
                 },
               },
             ]
-          : /* Production: no stdout transport = default JSON output */ []),
+          : /*! Production: no stdout transport = default JSON output */ []),
         createFileTransport('all/log', 'trace'),
         createFileTransport('error/log', 'error'),
       ],

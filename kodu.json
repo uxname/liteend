@@ -17,10 +17,10 @@
     }
   },
   "cleaner": {
-    "whitelist": ["//!"],
+    "whitelist": ["//!", "/*!"],
     "keepJSDoc": true,
     "useGitignore": true,
-    "ignore": []
+    "ignore": ["src/@generated"]
   },
   "packer": {
     "ignore": [

@@ -85,10 +85,8 @@ export class DebugResolver {
     );
     const uptimePretty = `${uptimeDays}d ${uptimeHours}h ${uptimeMinutes}m ${uptimeSeconds}s`;
 
-    // Logic for sensitive data
     let totalUsers: number | undefined;
 
-    // Check if user exists AND has ADMIN role
     if (user?.roles.includes(ProfileRole.ADMIN)) {
       totalUsers = await this.prisma.profile.count();
     }

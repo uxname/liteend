@@ -13,7 +13,6 @@ interface CommitInfo {
   hash: string;
 }
 
-// Check if Git is installed
 function isGitInstalled(): boolean {
   try {
     execSync('git --version');
@@ -24,7 +23,6 @@ function isGitInstalled(): boolean {
   }
 }
 
-// Check if the current directory is inside a Git repository
 function isGitRepo(): boolean {
   if (!isGitInstalled()) return false;
 
@@ -37,7 +35,6 @@ function isGitRepo(): boolean {
   }
 }
 
-// Get the last commit info
 function getLastCommitInfo(): CommitInfo {
   if (!isGitRepo()) return { name: 'NO_COMMIT_NAME', hash: 'NO_COMMIT_HASH' };
 
@@ -51,7 +48,6 @@ function getLastCommitInfo(): CommitInfo {
   }
 }
 
-// Ensure the dist directory exists
 function ensureDistributionFolderExists(): void {
   if (!existsSync(DIST_FOLDER_PATH)) {
     mkdirSync(DIST_FOLDER_PATH);
@@ -59,13 +55,11 @@ function ensureDistributionFolderExists(): void {
   }
 }
 
-// Save the last commit info to a JSON file
 function saveCommitInfo(): void {
   const lastCommitInfo = getLastCommitInfo();
   writeFileSync(LAST_COMMIT_INFO_FILE_PATH, JSON.stringify(lastCommitInfo));
   console.log('Last commit info saved to:', LAST_COMMIT_INFO_FILE_PATH);
 }
 
-// Main execution flow
 ensureDistributionFolderExists();
 saveCommitInfo();
