@@ -69,4 +69,14 @@ export const tools: DevTool[] = [
     icon: '🧭',
     path: '/swagger',
   },
+  {
+    name: 'Health Check',
+    description:
+      'Service liveness/readiness probe endpoint at /health (used for monitoring and orchestration).',
+    href: '/health',
+    category: 'api',
+    badge: 'monitoring',
+    icon: '❤️',
+    path: '/health',
+  },
 ];
