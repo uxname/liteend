@@ -79,4 +79,15 @@ export const tools: DevTool[] = [
     icon: '❤️',
     path: '/health',
   },
+  {
+    name: 'Logs Admin',
+    description:
+      'View and filter application logs via /logs (supports search and level filtering).',
+    href: '/logs',
+    category: 'infra',
+    badge: 'observability',
+    icon: '📜',
+    path: '/logs',
+    wide: true,
+  },
 ];
