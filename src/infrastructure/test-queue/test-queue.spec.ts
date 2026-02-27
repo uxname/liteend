@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createJobMock } from '../../../test/utils/mocks';
@@ -36,12 +37,7 @@ describe('TestQueueProcessor', () => {
     });
 
     it('should log start and finish messages', async () => {
-      const logger = (
-        processor as TestQueueProcessor & {
-          logger: { log: (...args: unknown[]) => unknown };
-        }
-      )['logger'];
-      const loggerSpy = vi.spyOn(logger, 'log');
+      const loggerSpy = vi.spyOn(Logger.prototype, 'log');
 
       await processor.process(mockJob);
 
