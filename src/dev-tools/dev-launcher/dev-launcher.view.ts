@@ -1,6 +1,6 @@
 import type { DevTool, DevToolCategory } from './tools';
 
-export interface DevLauncherViewProps {
+interface DevLauncherViewProps {
   heroTitle?: string;
   heroSubtitle?: string;
   heroNote?: string;
