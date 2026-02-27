@@ -31,16 +31,16 @@ Do not bypass hooks unless explicitly asked.
 - **E2E tests**: `npm run test:e2e`
 - **All tests**: `npm run test:all`
 
-**Run a single test file**:
+**Run a single unit test file (use npm scripts to preserve `VITEST_TARGET`)**:
 
 ```bash
-npx vitest run test/unit/profile.service.spec.ts
+npm run test -- src/modules/profile/profile.service.spec.ts
 ```
 
-**Run a single test by name**:
+**Run a single E2E test file**:
 
 ```bash
-npx vitest -t "should create profile"
+npm run test:e2e -- test/app.e2e.spec.ts
 ```
 
 ## Environment & Infra
@@ -91,6 +91,13 @@ docker-compose up -d db redis
 - Keep dependencies explicit (Nest DI, constructor injection).
 - Avoid mutation and hidden side effects where possible.
 
+### Testing Rules (Strict!)
+
+- **E2E Tests:** Do NOT use `supertest`, `pactum`, or `axios`. Always use `E2EClient` and `createTestingApp` from `test/utils/` (Fastify inject).
+- **Mocking:** Do NOT use `as unknown as Type` in tests. Always use `mock<T>()` or `mockDeep<T>()` from `vitest-mock-extended`.
+- **AAA Pattern:** Follow Arrange-Act-Assert strictly. Do NOT use `if/else` logic inside tests.
+- **Context Mocks:** For `ExecutionContext` and `ArgumentsHost`, use factories from `test/utils/mocks.ts`.
+
 ## Error Handling & Logging
 
 - Global exception handling uses `AllExceptionsFilter`.
@@ -116,8 +123,14 @@ No Cursor rules (`.cursor/rules/`, `.cursorrules`) or Copilot rules
 - Use Biome to format and organize imports.
 - Follow NestJS module/service/controller/resolver patterns.
 - Prefer explicit types at boundaries (DTOs, config, external IO).
+- Use `vitest-mock-extended` (`mockDeep`) for mocking dependencies.
+- Use `E2EClient` (Fastify inject) for all E2E testing.
+- Follow the AAA (Arrange-Act-Assert) pattern in specs.
 
 **Don’t**
 - Bypass lefthook/pre-commit checks unless explicitly asked.
 - Introduce unused imports/variables (Biome treats them as errors).
 - Add undocumented scripts or commands not present in package.json.
+- Use `as unknown as` to bypass TypeScript in tests.
+- Use `pactum`, `supertest`, or bind real ports in E2E tests.
+- Write conditional logic (`if/else`) inside test assertions.
