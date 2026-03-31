@@ -30,10 +30,10 @@ The user wants to write unit tests for one or more existing files in the liteend
 4. **Write the spec file** following the structure below
 5. **Run tests** to verify they pass:
    ```bash
-   cd /home/dex/Документы/Work/liteend
    npm test -- <path/to/file.spec.ts>
    ```
 6. If tests fail, read the error and fix — do NOT skip or comment out failing tests
+7. Run `npm run check` to verify the new test file passes linting and type checking.
 
 ## Spec file structure
 

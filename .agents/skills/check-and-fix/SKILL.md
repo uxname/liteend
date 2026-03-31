@@ -18,7 +18,6 @@ Pre-commit hook (lefthook) runs the same pipeline automatically on every commit.
 ## Running the check
 
 ```bash
-cd /home/dex/Документы/Work/liteend
 npm run check
 ```
 

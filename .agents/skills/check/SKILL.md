@@ -10,7 +10,6 @@ The user wants to verify the liteend project passes all code quality checks.
 Run the check pipeline and report the results:
 
 ```bash
-cd /home/dex/Документы/Work/liteend
 npm run check
 ```
 
