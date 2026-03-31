@@ -1,5 +1,4 @@
 import swc from 'unplugin-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 const vitestTarget = process.env.VITEST_TARGET ?? 'unit';
@@ -36,9 +35,11 @@ export default defineConfig({
     setupFiles: ['test/setup.ts'],
     maxConcurrency: isE2ETarget ? 1 : configDefaults.maxConcurrency,
   },
+  resolve: {
+    tsconfigPaths: true,
+  },
+  oxc: false,
   plugins: [
-    tsconfigPaths(),
-
     swc.vite({
       module: { type: 'nodenext' },
     }),

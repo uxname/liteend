@@ -6,6 +6,10 @@ import { Profile, ProfileRole } from '@/@generated/prisma/client';
 import { JwtStrategy } from '@/common/auth/jwt.strategy';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
+vi.mock('jwks-rsa', () => ({
+  passportJwtSecret: vi.fn(() => () => 'test-secret'),
+}));
+
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
 
@@ -27,10 +31,6 @@ describe('JwtStrategy', () => {
   };
 
   beforeEach(async () => {
-    vi.mock('jwks-rsa', () => ({
-      passportJwtSecret: vi.fn(() => () => 'test-secret'),
-    }));
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JwtStrategy,

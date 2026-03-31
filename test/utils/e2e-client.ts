@@ -6,7 +6,7 @@ import type {
 
 function assertJson(response: LightMyRequestResponse): void {
   const contentType = response.headers['content-type'];
-  if (!contentType || !contentType.includes('application/json')) {
+  if (!contentType?.includes('application/json')) {
     throw new Error('Expected JSON response');
   }
 }

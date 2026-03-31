@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     const response = context.switchToHttp().getResponse<FastifyReply>();
 
     const authHeader = request.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
+    if (!authHeader?.startsWith('Basic ')) {
       this.requestCredentials(response);
       throw new UnauthorizedException('Missing Authorization header');
     }

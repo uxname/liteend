@@ -1,10 +1,9 @@
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mock } from 'vitest-mock-extended';
 import { ProfileRole } from '@/@generated/prisma/client';
 import { RolesGuard } from '@/common/auth/roles.guard';
-import { createExecutionContextMock } from '../../../test/utils/mocks';
+import { createExecutionContextMock, mock } from '../../../test/utils/mocks';
 
 const buildHttpExecutionContext = (user: {
   roles?: ProfileRole[] | undefined;

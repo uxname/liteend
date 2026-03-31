@@ -15,6 +15,9 @@ services:
     <<: *common-restart-policy
     env_file:
       - .env
+    environment:
+      - DATABASE_HOST=db
+      - REDIS_HOST=redis
     ports:
       - "127.0.0.1:${PORT}:${PORT}"
     volumes:
