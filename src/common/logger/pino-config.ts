@@ -178,20 +178,20 @@ export const pinoConfig: Params = {
 
     transport: {
       targets: [
-        ...(IS_DEV
+        ...(!IS_TEST
           ? [
               {
                 target: 'pino-pretty',
-                level: 'trace',
+                level: IS_DEV ? 'trace' : 'info',
                 options: {
-                  colorize: true,
+                  colorize: IS_DEV,
                   translateTime: 'SYS:standard',
                   ignore: 'pid,hostname,app,userId,userRole,responseTime',
                   singleLine: true,
                 },
               },
             ]
-          : /*! Production: no stdout transport = default JSON output */ []),
+          : []),
         createFileTransport('all/log', 'trace'),
         createFileTransport('error/log', 'error'),
       ],
