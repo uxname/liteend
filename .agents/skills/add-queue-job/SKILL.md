@@ -99,7 +99,10 @@ export class <QueueName>Module {}
 ```typescript
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+// Globals (describe, it, expect, vi, beforeEach, afterEach) are available without import (vitest globals: true)
+// Import path to mocks is relative — adjust depth based on file location:
+//   src/infrastructure/<queue-name>/  → '../../../test/utils/mocks'
+//   src/modules/<module>/            → '../../../test/utils/mocks'
 import { createJobMock } from '../../../test/utils/mocks';
 import { <QueueName>Processor } from './<queue-name>.processor';
 import { <QueueName>Service } from './<queue-name>.service';

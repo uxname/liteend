@@ -57,10 +57,10 @@ After regenerating the client, check and update:
 ### Step 5 — Verify
 
 ```bash
-npm run ts:check
+npm run check
 ```
 
-Fix any TypeScript errors before proceeding.
+Fix any TypeScript, Biome, or Knip errors before proceeding.
 
 ## Common patterns
 

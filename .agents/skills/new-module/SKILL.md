@@ -190,3 +190,4 @@ import { <Name>Module } from '@/modules/<name>/<name>.module';
 2. Create all necessary files based on user requirements (resolver vs controller vs both)
 3. Register the module in `app.module.ts`
 4. Run `npm run check` from the project root to verify types and linting pass
+5. Run `npm test -- <path/to/name.spec.ts>` to verify the generated tests pass

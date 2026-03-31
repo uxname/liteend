@@ -168,4 +168,4 @@ pubSub.publish({
 1. Determine which type(s) are needed (ObjectType, InputType, enum)
 2. Create the type file(s) in the appropriate `types/` directory
 3. Import and use the type in the module's resolver
-4. Run `npm run ts:check` to verify the types are correct
+4. Run `npm run check` to verify the types, linting, and unused exports
