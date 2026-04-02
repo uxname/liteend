@@ -1,9 +1,9 @@
 ---
 name: check-and-fix
-description: Run the full liteend code quality pipeline (TypeScript check + Biome lint/format + Knip unused code) and fix all issues found.
+description: Run the full code quality pipeline (TypeScript check + Biome lint/format + Knip unused code) and fix all issues found.
 ---
 
-The user wants to run the full code quality check for the liteend project and fix any issues.
+The user wants to run the full code quality check for the project and fix any issues.
 
 ## What the check pipeline does
 

@@ -1,9 +1,9 @@
 ---
 name: prisma-change
-description: Guide through a full Prisma schema change workflow in the liteend project — edit schema, create migration, regenerate client, update affected services.
+description: Guide through a full Prisma schema change workflow — edit schema, create migration, regenerate client, update affected services.
 ---
 
-The user wants to modify the database schema in the liteend project. This is a multi-step workflow where skipping any step causes runtime errors.
+The user wants to modify the database schema in the project. This is a multi-step workflow where skipping any step causes runtime errors.
 
 ## Project-specific Prisma setup
 

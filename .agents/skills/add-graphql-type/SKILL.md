@@ -1,9 +1,9 @@
 ---
 name: add-graphql-type
-description: Add a new GraphQL ObjectType, InputType, or Enum to the liteend project following its code-first (NestJS + Mercurius) conventions.
+description: Add a new GraphQL ObjectType, InputType, or Enum to the project following its code-first (NestJS + Mercurius) conventions.
 ---
 
-The user wants to add a new GraphQL type to the liteend project. They may be adding an `@ObjectType`, `@InputType`, an enum, or a combination.
+The user wants to add a new GraphQL type to the project. They may be adding an `@ObjectType`, `@InputType`, an enum, or a combination.
 
 ## Project GraphQL setup
 

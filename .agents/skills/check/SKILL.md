@@ -3,7 +3,7 @@ name: check
 description: Run npm run check to verify the project passes TypeScript, Biome, and Knip checks. Report errors without auto-fixing.
 ---
 
-The user wants to verify the liteend project passes all code quality checks.
+The user wants to verify the project passes all code quality checks.
 
 ## What to do
 

@@ -1,9 +1,9 @@
 ---
 name: add-queue-job
-description: Add a new BullMQ job queue to the liteend project — processor, producer injection, module registration, Bull Board integration, and unit tests.
+description: Add a new BullMQ job queue to the project — processor, producer injection, module registration, Bull Board integration, and unit tests.
 ---
 
-The user wants to add a new BullMQ job queue to the liteend project. They will provide the queue name and describe what the job should do.
+The user wants to add a new BullMQ job queue to the project. They will provide the queue name and describe what the job should do.
 
 ## Project BullMQ setup
 

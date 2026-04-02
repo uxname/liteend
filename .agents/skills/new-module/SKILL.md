@@ -1,9 +1,9 @@
 ---
 name: new-module
-description: Scaffold a new NestJS business module in the liteend project following the project's file structure, naming, and import conventions.
+description: Scaffold a new NestJS business module in the project following the project's file structure, naming, and import conventions.
 ---
 
-The user wants to create a new NestJS module for the liteend project. They will provide the module name and whether it should expose a GraphQL resolver, a REST controller, or both.
+The user wants to create a new NestJS module for the project. They will provide the module name and whether it should expose a GraphQL resolver, a REST controller, or both.
 
 ## Project Conventions
 

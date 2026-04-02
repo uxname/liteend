@@ -1,9 +1,9 @@
 ---
 name: add-tests
-description: Write unit tests for an existing NestJS service, resolver, or controller in the liteend project following its Vitest + NestJS Testing conventions.
+description: Write unit tests for an existing NestJS service, resolver, or controller in the project following its Vitest + NestJS Testing conventions.
 ---
 
-The user wants to write unit tests for one or more existing files in the liteend project. They will provide the file path(s) to test.
+The user wants to write unit tests for one or more existing files in the project. They will provide the file path(s) to test.
 
 ## Test framework & setup
 
