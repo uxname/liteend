@@ -116,6 +116,12 @@ docker-compose up -d db redis
 No Cursor rules (`.cursor/rules/`, `.cursorrules`) or Copilot rules
 (`.github/copilot-instructions.md`) were found in this repo.
 
+## Skills
+
+Skills live in `.agents/skills/`. Each skill is a `SKILL.md` file that guides agents through a specific workflow.
+
+**All skill content must be written in English only.** This applies to descriptions, instructions, comments, and any other text inside SKILL.md files.
+
 ## Do / Don’t for Agents
 
 **Do**
