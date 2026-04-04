@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 # git required for lefthook
 COPY .git .git
-RUN npm i
+RUN PRISMA_SKIP_POSTINSTALL_GENERATE=1 npm i
 COPY . .
 RUN npm run db:gen && npm run build && chmod +x ./healthcheck.sh && rm -rf .git .env
 
