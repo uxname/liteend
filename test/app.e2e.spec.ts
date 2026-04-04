@@ -26,8 +26,8 @@ describe('AppController (e2e)', () => {
     }).toEqual({
       statusCode: 200,
       status: 'ok',
-      databaseStatus: 'ok',
-      redisStatus: 'ok',
+      databaseStatus: 'up',
+      redisStatus: 'up',
     });
   });
 

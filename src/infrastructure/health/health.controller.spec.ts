@@ -1,143 +1,185 @@
-import { HttpStatus } from '@nestjs/common';
+import { ServiceUnavailableException } from '@nestjs/common';
+import {
+  DiskHealthIndicator,
+  HealthCheckResult,
+  HealthCheckService,
+  MemoryHealthIndicator,
+  PrismaHealthIndicator,
+} from '@nestjs/terminus';
 import { Test, TestingModule } from '@nestjs/testing';
-import { FastifyReply } from 'fastify';
 import { PrismaService } from '@/common/prisma/prisma.service';
-import { RedisService } from '@/common/redis/redis.service';
 import { HealthController } from './health.controller';
+import { RedisHealthIndicator } from './indicators/redis.health';
 
 describe('HealthController', () => {
+  let module: TestingModule;
   let controller: HealthController;
-  let mockRedis: { ping: ReturnType<typeof vi.fn> };
-  let responseCode: number;
-  let responseBody: unknown;
+  let dbIndicator: PrismaHealthIndicator;
+  let redisIndicator: RedisHealthIndicator;
+  let memoryIndicator: MemoryHealthIndicator;
+  let diskIndicator: DiskHealthIndicator;
 
-  const mockPrismaService = {
-    $executeRaw: vi.fn(),
-  };
-
-  const mockRedisService = {
-    getClient: vi.fn(),
+  const mockHealthCheckResult: HealthCheckResult = {
+    status: 'ok',
+    info: {
+      database: { status: 'up' },
+      redis: { status: 'up' },
+      memory_heap: { status: 'up' },
+      storage: { status: 'up' },
+    },
+    error: {},
+    details: {
+      database: { status: 'up' },
+      redis: { status: 'up' },
+      memory_heap: { status: 'up' },
+      storage: { status: 'up' },
+    },
   };
 
   beforeEach(async () => {
-    mockRedis = {
-      ping: vi.fn().mockResolvedValue('PONG'),
+    const mockDbIndicator = {
+      pingCheck: vi.fn().mockResolvedValue({
+        database: { status: 'up' },
+      }),
     };
 
-    mockRedisService.getClient.mockReturnValue(mockRedis);
-
-    responseCode = 0;
-    responseBody = null;
-
-    const mockSendFn = vi.fn().mockImplementation((body: unknown) => {
-      responseBody = body;
-      return mockResponse as FastifyReply;
-    });
-    const mockCodeFn = vi.fn().mockImplementation((code: number) => {
-      responseCode = code;
-      return mockResponse as FastifyReply;
-    });
-
-    const mockResponse: Partial<FastifyReply> = {
-      code: mockCodeFn,
-      send: mockSendFn,
+    const mockRedisIndicator = {
+      isHealthy: vi.fn().mockResolvedValue({
+        redis: { status: 'up' },
+      }),
     };
 
-    const module: TestingModule = await Test.createTestingModule({
+    const mockMemoryIndicator = {
+      checkHeap: vi.fn().mockResolvedValue({
+        memory_heap: { status: 'up' },
+      }),
+    };
+
+    const mockDiskIndicator = {
+      checkStorage: vi.fn().mockResolvedValue({
+        storage: { status: 'up' },
+      }),
+    };
+
+    const mockHealthCheckService = {
+      check: vi.fn().mockImplementation(async (indicators) => {
+        // Call all indicator functions and aggregate results
+        for (const indicator of indicators) {
+          await indicator();
+        }
+        return mockHealthCheckResult;
+      }),
+    };
+
+    const mockPrismaService = {
+      $executeRaw: vi.fn(),
+    };
+
+    module = await Test.createTestingModule({
+      controllers: [HealthController],
       providers: [
-        HealthController,
+        { provide: HealthCheckService, useValue: mockHealthCheckService },
+        { provide: PrismaHealthIndicator, useValue: mockDbIndicator },
+        { provide: RedisHealthIndicator, useValue: mockRedisIndicator },
+        { provide: MemoryHealthIndicator, useValue: mockMemoryIndicator },
+        { provide: DiskHealthIndicator, useValue: mockDiskIndicator },
         { provide: PrismaService, useValue: mockPrismaService },
-        { provide: RedisService, useValue: mockRedisService },
       ],
     }).compile();
 
     controller = module.get<HealthController>(HealthController);
+    dbIndicator = module.get<PrismaHealthIndicator>(PrismaHealthIndicator);
+    redisIndicator = module.get<RedisHealthIndicator>(RedisHealthIndicator);
+    memoryIndicator = module.get<MemoryHealthIndicator>(MemoryHealthIndicator);
+    diskIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  const getResponse = (): FastifyReply => {
-    const mockSendFn = vi.fn().mockImplementation((body: unknown) => {
-      responseBody = body;
-      return mockResponse as FastifyReply;
-    });
-    const mockCodeFn = vi.fn().mockImplementation((code: number) => {
-      responseCode = code;
-      return mockResponse as FastifyReply;
-    });
-    const mockResponse: Partial<FastifyReply> = {
-      code: mockCodeFn,
-      send: mockSendFn,
-    };
-    return mockResponse as FastifyReply;
-  };
+  describe('check', () => {
+    it('should return health check result when all systems are healthy', async () => {
+      const result = await controller.check();
 
-  const getBodyValue = <T>(key: keyof T): unknown => {
-    return (responseBody as T)[key];
-  };
-
-  describe('getHealth', () => {
-    it('should return OK status when both database and Redis are healthy', async () => {
-      mockPrismaService.$executeRaw.mockResolvedValue({});
-      mockRedis.ping.mockResolvedValue('PONG');
-
-      await controller.getHealth(getResponse());
-
-      expect(responseCode).toBe(HttpStatus.OK);
-      expect(getBodyValue<{ status: string }>('status')).toBe('ok');
-      expect(
-        getBodyValue<{ info: { database: { status: string } } }>('info'),
-      ).toHaveProperty('database');
+      expect(result).toEqual(mockHealthCheckResult);
+      expect(result.status).toBe('ok');
     });
 
-    it('should return error status when database is down', async () => {
-      mockPrismaService.$executeRaw.mockRejectedValue(
-        new Error('Database connection failed'),
+    it('should include database indicator', async () => {
+      await controller.check();
+
+      expect(dbIndicator.pingCheck).toHaveBeenCalledWith(
+        'database',
+        expect.any(Object),
       );
-      mockRedis.ping.mockResolvedValue('PONG');
+    });
 
-      await controller.getHealth(getResponse());
+    it('should include redis indicator', async () => {
+      await controller.check();
 
-      expect(responseCode).toBe(HttpStatus.SERVICE_UNAVAILABLE);
-      expect(getBodyValue<{ status: string }>('status')).toBe('error');
-      const info = getBodyValue<{ info: { database: { status: string } } }>(
-        'info',
+      expect(redisIndicator.isHealthy).toHaveBeenCalled();
+    });
+
+    it('should include memory indicator', async () => {
+      await controller.check();
+
+      expect(memoryIndicator.checkHeap).toHaveBeenCalledWith(
+        'memory_heap',
+        150 * 1024 * 1024,
       );
-      expect(info).toHaveProperty('database');
     });
 
-    it('should return error status when Redis is down', async () => {
-      mockPrismaService.$executeRaw.mockResolvedValue({});
-      mockRedis.ping.mockRejectedValue(new Error('Redis connection failed'));
+    it('should include disk indicator', async () => {
+      await controller.check();
 
-      await controller.getHealth(getResponse());
-
-      expect(responseCode).toBe(HttpStatus.SERVICE_UNAVAILABLE);
-      expect(getBodyValue<{ status: string }>('status')).toBe('error');
+      expect(diskIndicator.checkStorage).toHaveBeenCalledWith('storage', {
+        path: '/',
+        thresholdPercent: 0.9,
+      });
     });
 
-    it('should return error status when both database and Redis are down', async () => {
-      mockPrismaService.$executeRaw.mockRejectedValue(
-        new Error('Database connection failed'),
+    it('should call check with 4 indicator functions', async () => {
+      await controller.check();
+
+      expect(dbIndicator.pingCheck).toHaveBeenCalled();
+      expect(redisIndicator.isHealthy).toHaveBeenCalled();
+      expect(memoryIndicator.checkHeap).toHaveBeenCalled();
+      expect(diskIndicator.checkStorage).toHaveBeenCalled();
+    });
+
+    it('should throw ServiceUnavailableException when redis is unhealthy', async () => {
+      const healthCheckService =
+        module.get<HealthCheckService>(HealthCheckService);
+      vi.mocked(healthCheckService.check).mockRejectedValue(
+        new ServiceUnavailableException({
+          status: 'error',
+          info: {},
+          error: { redis: { status: 'down' } },
+          details: { redis: { status: 'down' } },
+        }),
       );
-      mockRedis.ping.mockRejectedValue(new Error('Redis connection failed'));
 
-      await controller.getHealth(getResponse());
-
-      expect(responseCode).toBe(HttpStatus.SERVICE_UNAVAILABLE);
-      expect(getBodyValue<{ status: string }>('status')).toBe('error');
+      await expect(controller.check()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
 
-    it('should return error status when Redis returns non-PONG response', async () => {
-      mockPrismaService.$executeRaw.mockResolvedValue({});
-      mockRedis.ping.mockResolvedValue('NOT_PONG');
+    it('should throw ServiceUnavailableException when database is unhealthy', async () => {
+      const healthCheckService =
+        module.get<HealthCheckService>(HealthCheckService);
+      vi.mocked(healthCheckService.check).mockRejectedValue(
+        new ServiceUnavailableException({
+          status: 'error',
+          info: {},
+          error: { database: { status: 'down' } },
+          details: { database: { status: 'down' } },
+        }),
+      );
 
-      await controller.getHealth(getResponse());
-
-      expect(responseCode).toBe(HttpStatus.SERVICE_UNAVAILABLE);
-      expect(getBodyValue<{ status: string }>('status')).toBe('error');
+      await expect(controller.check()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
   });
 });
