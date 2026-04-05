@@ -129,6 +129,28 @@ describe('FileUploadService', () => {
     });
   });
 
+  describe('getSafeFileInfo', () => {
+    it('should throw ForbiddenException for path traversal attempt', () => {
+      expect(() => service.getSafeFileInfo('../../etc/passwd')).toThrow();
+    });
+
+    it('should throw NotFoundException when file does not exist', () => {
+      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+      expect(() => service.getSafeFileInfo('2024/01/01/image.png')).toThrow(
+        'File not found',
+      );
+      existsSpy.mockRestore();
+    });
+
+    it('should return fullPath and mimeType when file exists', () => {
+      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+      const result = service.getSafeFileInfo('2024/01/01/image.png');
+      expect(result.fullPath).toContain('image.png');
+      expect(result.mimeType).toBe('image/png');
+      existsSpy.mockRestore();
+    });
+  });
+
   describe('processFile', () => {
     it('should return null for disallowed mime type', async () => {
       const mockPart: MockMultipartFile = {

@@ -79,6 +79,15 @@ describe('ProfileResolver', () => {
       });
     });
 
+    it('should call pubSub.subscribe for profileUpdated subscription', () => {
+      pubSub.subscribe.mockReturnValue('subscription-stream' as never);
+
+      const result = resolver.profileUpdated(pubSub);
+
+      expect(pubSub.subscribe).toHaveBeenCalledWith('profileUpdated');
+      expect(result).toBe('subscription-stream');
+    });
+
     it('should only publish an event to the matching user', () => {
       const filter = (
         payload: { profileUpdated: { id: number } },

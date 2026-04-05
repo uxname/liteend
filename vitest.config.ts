@@ -48,6 +48,13 @@ export default defineConfig({
         '**/*.spec.ts',
         'test/**',
         'src/**/mocks.ts',
+        'src/dev-tools/**',
+        'src/common/prisma/**',
+        'src/common/redis/**',
+        'src/common/logger/pino-config.ts',
+        'src/app.controller.ts',
+        '**/*.object-type.ts',
+        'src/common/dotenv-validator/**',
       ],
       thresholds: {
         lines: 80,

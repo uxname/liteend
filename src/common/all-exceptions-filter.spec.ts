@@ -1,7 +1,15 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { ZodValidationException } from 'nestjs-zod';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
 import { AllExceptionsFilter } from '@/common/all-exceptions-filter';
 import { createArgumentsHostMock } from '../../test/utils/mocks';
+
+function makeZodException() {
+  const schema = z.object({ name: z.string() });
+  const result = schema.safeParse({ name: 123 });
+  return new ZodValidationException((result as { error: z.ZodError }).error);
+}
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
@@ -137,6 +145,52 @@ describe('AllExceptionsFilter', () => {
       filter.catch(exception, context);
 
       expect(response.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+    });
+
+    it('should silently handle 404 for static file extensions', () => {
+      const { context, response } = createMockHost('http', 404, '/app.js.map');
+      const exception = new HttpException('Not Found', HttpStatus.NOT_FOUND);
+
+      filter.catch(exception, context);
+
+      expect(response.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(response.send).toHaveBeenCalled();
+    });
+
+    it('should handle ZodValidationException with details', () => {
+      const { context, response } = createMockHost('http');
+      const exception = makeZodException();
+
+      filter.catch(exception, context);
+
+      expect(response.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+      expect(response.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Validation Failed',
+          message: 'Input validation error',
+          details: expect.arrayContaining([
+            expect.objectContaining({
+              field: 'name',
+              message: expect.any(String),
+            }),
+          ]),
+        }),
+      );
+    });
+
+    it('should log ZodValidationException details as warning', () => {
+      const { context } = createMockHost('http');
+      const exception = makeZodException();
+      const filterWithLogger = filter as unknown as {
+        logger: { warn: (...args: unknown[]) => void };
+      };
+      const loggerWarn = vi.spyOn(filterWithLogger.logger, 'warn');
+
+      filter.catch(exception, context);
+
+      expect(loggerWarn).toHaveBeenCalledWith(
+        expect.objectContaining({ details: expect.any(Array) }),
+      );
     });
   });
 });
