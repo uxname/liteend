@@ -1,9 +1,13 @@
 import type { Redis } from 'ioredis';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PrismaClient } from '@/@generated/prisma/client';
-import { clearDatabase, clearRedis } from './clear-state';
+import { clearDatabase, clearRedis, resetTableNamesCache } from './clear-state';
 
 describe('clear-state helpers', () => {
+  beforeEach(() => {
+    resetTableNamesCache();
+  });
+
   it('should truncate all tables and flush redis', async () => {
     const prisma = {
       $queryRaw: vi

@@ -86,13 +86,4 @@ Fix any TypeScript, Biome, or Knip errors before proceeding.
 
 ## Enum file pattern
 
-```typescript
-import { registerEnumType } from '@nestjs/graphql';
-
-export enum <EnumName> {
-  VALUE_ONE = 'VALUE_ONE',
-  VALUE_TWO = 'VALUE_TWO',
-}
-
-registerEnumType(<EnumName>, { name: '<EnumName>', description: undefined });
-```
+Use the `/add-graphql-type` skill for the enum file template and conventions.

@@ -1,4 +1,13 @@
 pre-commit:
-  jobs:
-    - name: Check project
+  parallel: true
+  commands:
+    check-types-and-lint:
       run: npm run check
+    test-unit:
+      run: npm run test
+
+pre-push:
+  parallel: false
+  commands:
+    test-coverage:
+      run: npm run test:cov

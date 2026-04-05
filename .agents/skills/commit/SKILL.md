@@ -15,7 +15,7 @@ Before doing anything else, run:
 npm run check
 ```
 
-If the check **fails**, fix all errors before proceeding — do not commit broken code. Use the `check-and-fix` skill guidance to resolve issues, then re-run `npm run check` until it passes cleanly.
+If the check **fails**, fix all errors before proceeding — do not commit broken code. Use the `check` skill guidance to resolve issues, then re-run `npm run check` until it passes cleanly.
 
 ### Step 2: Review what will be committed
 

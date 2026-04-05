@@ -22,7 +22,9 @@ src/modules/<name>/
   types/
     <name>.object-type.ts (GraphQL @ObjectType)
     <name>.input.ts       (GraphQL @InputType with Zod validation)
-  <name>.spec.ts          (unit tests for service + resolver/controller)
+  <name>.service.spec.ts  (unit tests for service)
+test/
+  <name>.e2e.spec.ts      (E2E tests for resolver/controller)
 ```
 
 **Imports use `@/` alias** (maps to `src/`), e.g. `import { PrismaService } from '@/common/prisma/prisma.service'`
@@ -71,41 +73,9 @@ export class <Name>Resolver {
 }
 ```
 
-### `types/<name>.object-type.ts`
-```typescript
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+### `types/<name>.object-type.ts` and `types/<name>.input.ts`
 
-@ObjectType()
-export class <Name> {
-  @Field(() => Int, { nullable: false })
-  id!: number;
-
-  @Field(() => Date, { nullable: false })
-  createdAt!: Date;
-
-  @Field(() => Date, { nullable: false })
-  updatedAt!: Date;
-}
-```
-
-### `types/<name>.input.ts` (GraphQL InputType with Zod)
-```typescript
-import { Field, InputType } from '@nestjs/graphql';
-import { createZodDto } from 'nestjs-zod';
-import { z } from 'zod';
-
-const <Name>InputSchema = z.object({
-  // define fields here
-});
-
-class <Name>ZodDto extends createZodDto(<Name>InputSchema) {}
-
-@InputType()
-export class <Name>Input extends <Name>ZodDto {
-  @Field(() => String, { nullable: true })
-  declare someField?: string;
-}
-```
+Use the `/add-graphql-type` skill for templates and conventions for `@ObjectType`, `@InputType`, and enum types.
 
 ### `<name>.controller.ts` (REST)
 ```typescript
@@ -140,32 +110,10 @@ Add controller to module (use `controllers`, not `providers`):
 })
 ```
 
-### `<name>.spec.ts` (unit test pattern)
-```typescript
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { <Name>Service } from './<name>.service';
+### `<name>.service.spec.ts` and `test/<name>.e2e.spec.ts`
 
-describe('<Name>Service', () => {
-  let service: <Name>Service;
-
-  const mockPrisma = {
-    <modelName>: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  };
-
-  beforeEach(() => {
-    service = new <Name>Service(mockPrisma as never);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  // write tests here
-});
-```
+Use the `/add-tests` skill for unit test templates and patterns.
+Use the `/add-e2e-test` skill for E2E test templates.
 
 ## Registration in AppModule
 
@@ -189,5 +137,5 @@ import { <Name>Module } from '@/modules/<name>/<name>.module';
 1. Read the existing `src/app.module.ts` to understand the current imports list
 2. Create all necessary files based on user requirements (resolver vs controller vs both)
 3. Register the module in `app.module.ts`
-4. Run `npm run check` from the project root to verify types and linting pass
-5. Run `npm test -- <path/to/name.spec.ts>` to verify the generated tests pass
+4. Use `/add-tests` to create the unit test and `/add-e2e-test` to create the E2E test
+5. Run `npm run check` from the project root to verify types and linting pass

@@ -34,6 +34,28 @@ export default defineConfig({
     exclude: excludePatterns,
     setupFiles: ['test/setup.ts'],
     maxConcurrency: isE2ETarget ? 1 : configDefaults.maxConcurrency,
+    fileParallelism: !isE2ETarget,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'src/@generated/**',
+        'src/main.ts',
+        'src/bootstrap/**',
+        '**/*.module.ts',
+        'src/db-backup-tool/**',
+        'src/i18n/**',
+        '**/*.spec.ts',
+        'test/**',
+        'src/**/mocks.ts',
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+    },
   },
   resolve: {
     tsconfigPaths: true,

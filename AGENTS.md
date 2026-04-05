@@ -20,7 +20,10 @@ It summarizes the commands, conventions, and constraints inferred from configura
 - **Type check**: `npm run ts:check`
 - **Full check**: `npm run check` (type check + lint:fix + knip)
 
-**Pre-commit hooks**: `lefthook.yml` runs `npm run check` on commit.
+**Pre-commit hooks** (`lefthook.yml`):
+- `pre-commit` (parallel): runs `npm run check` + `npm run test` (unit)
+- `pre-push`: runs `npm run test:cov` — blocks push if coverage drops below 80%
+
 Do not bypass hooks unless explicitly asked.
 
 ## Tests (Vitest)
@@ -85,6 +88,13 @@ docker-compose up -d db redis
 - Resolvers: `*.resolver.ts`
 - Feature modules live under `src/app/` and shared/common code under `src/common/`.
 
+### Architecture Boundaries
+
+- **Thin Controllers/Resolvers:** Handle ONLY HTTP/GraphQL specifics (decorators, extracting inputs). No business logic, no `if/else` on domain data.
+- **Fat Services:** All business logic, Prisma calls, and external integrations live here.
+- **Validation:** Use `nestjs-zod` for all DTOs and GraphQL Inputs. Never validate manually inside services.
+- **Imports:** ALWAYS use the `@/` alias for internal imports (maps to `src/`). Never use relative paths like `../../`.
+
 ### Patterns
 
 - Prefer small, focused functions.
@@ -93,10 +103,19 @@ docker-compose up -d db redis
 
 ### Testing Rules (Strict!)
 
+- **TDD is mandatory:** Write the test BEFORE the implementation (Red → Green → Refactor).
+- **Framework:** ALWAYS use `vitest`. Never use `jest`.
+- **Test placement by layer:**
+  - Controllers and Resolvers → E2E tests only (`test/<name>.e2e.spec.ts`)
+  - Services → Unit tests only (`src/modules/<name>/<name>.service.spec.ts`)
 - **E2E Tests:** Do NOT use `supertest`, `pactum`, or `axios`. Always use `E2EClient` and `createTestingApp` from `test/utils/` (Fastify inject).
 - **Mocking:** Do NOT use `as unknown as Type` in tests. Always use `mock<T>()` or `mockDeep<T>()` from `vitest-mock-extended`.
+- **Test Data:** Do NOT call `prisma.model.create()` directly in tests. Use factories from `test/factories/` (e.g. `createProfile`, `createUpload`). If a factory for a model doesn't exist, create it first.
+- **RBAC testing:** Use `client.loginAs(user)` to authenticate as a specific factory-created profile. Use `client.logout()` to reset.
+- **File uploads:** Use `client.uploadFile(url, filename, buffer, mimetype)` — do NOT construct `multipart/form-data` manually.
 - **AAA Pattern:** Follow Arrange-Act-Assert strictly. Do NOT use `if/else` logic inside tests.
 - **Context Mocks:** For `ExecutionContext` and `ArgumentsHost`, use factories from `test/utils/mocks.ts`.
+- **Coverage threshold:** Lines / Functions / Branches / Statements must stay ≥ 80%. Check with `npm run test:cov`.
 
 ## Error Handling & Logging
 
@@ -111,10 +130,9 @@ docker-compose up -d db redis
 - Use `ConfigService.getOrThrow()` for required envs.
 - Validation uses `nestjs-zod` + `ZodValidationPipe`.
 
-## Cursor / Copilot Rules
+## Copilot Rules
 
-No Cursor rules (`.cursor/rules/`, `.cursorrules`) or Copilot rules
-(`.github/copilot-instructions.md`) were found in this repo.
+No Copilot rules (`.github/copilot-instructions.md`) are used in this repo.
 
 ## Skills
 
@@ -125,18 +143,25 @@ Skills live in `.agents/skills/`. Each skill is a `SKILL.md` file that guides ag
 ## Do / Don’t for Agents
 
 **Do**
+- Write tests BEFORE implementation (TDD: Red → Green → Refactor).
 - Use `npm run check` before commit.
 - Use Biome to format and organize imports.
 - Follow NestJS module/service/controller/resolver patterns.
 - Prefer explicit types at boundaries (DTOs, config, external IO).
 - Use `vitest-mock-extended` (`mockDeep`) for mocking dependencies.
 - Use `E2EClient` (Fastify inject) for all E2E testing.
+- Use factories (`test/factories/`) to create test data in E2E tests.
 - Follow the AAA (Arrange-Act-Assert) pattern in specs.
+- Keep Controllers/Resolvers thin — business logic belongs in Services.
 
 **Don’t**
+- Write production code before writing the failing test.
 - Bypass lefthook/pre-commit checks unless explicitly asked.
 - Introduce unused imports/variables (Biome treats them as errors).
 - Add undocumented scripts or commands not present in package.json.
 - Use `as unknown as` to bypass TypeScript in tests.
 - Use `pactum`, `supertest`, or bind real ports in E2E tests.
 - Write conditional logic (`if/else`) inside test assertions.
+- Call `prisma.model.create()` directly in tests — use factories instead.
+- Put business logic in Controllers or Resolvers.
+- Use relative paths (`../../`) for internal imports — use `@/` alias.

@@ -33,7 +33,22 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = this.getRequest(context) as RequestWithUser;
 
     if (isMockEnabled) {
-      const user = await this.prisma.profile.upsert({
+      const mockSub = (
+        request as RequestWithUser & { headers?: Record<string, string> }
+      ).headers?.['x-mock-sub'];
+
+      if (mockSub) {
+        const user = await this.prisma.profile.findUnique({
+          where: { oidcSub: mockSub },
+        });
+        if (user) {
+          this.syncUser(request, user);
+          return true;
+        }
+      }
+
+      // Fallback: default user for tests without explicit loginAs
+      const defaultUser = await this.prisma.profile.upsert({
         where: { oidcSub: 'mock-oidc-sub' },
         create: {
           oidcSub: 'mock-oidc-sub',
@@ -46,7 +61,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         },
       });
 
-      this.syncUser(request, user);
+      this.syncUser(request, defaultUser);
       return true;
     }
 
