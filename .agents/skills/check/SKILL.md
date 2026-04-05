@@ -3,6 +3,8 @@ name: check
 description: Run the full code quality pipeline (TypeScript + Biome + Knip), fix all issues, and clean up comments in changed code.
 ---
 
+This skill is the central entry point for fixing any CI/CD or pre-commit hook failures. Invoke this skill whenever a build or validation step fails.
+
 The user wants to verify and fix all code quality issues in the project.
 
 ## What the pipeline checks
@@ -41,9 +43,10 @@ The project uses `declare` to re-declare Zod DTO fields with GraphQL decorators 
 @InputType()
 export class MyInput extends MyZodDto {
   @Field(() => String, { nullable: true })
-  declare myField?: string;   // ← 'declare' is required, not assignment
+  declare myField?: string;
 }
 ```
+See the `/add-graphql-type` skill for full details on integrating Zod with GraphQL InputTypes.
 
 **Import path errors:**
 - Always use `@/` alias for internal imports (maps to `src/`)
@@ -68,6 +71,7 @@ Knip flags exports that are not imported anywhere in production code (`--product
 **When Knip flags something legitimately unused:**
 - Remove the export if it's truly dead code
 - If it's a public API for external consumers, verify the import chain
+- **DEFENSIVE DELETION RULE:** NEVER delete classes decorated with `@Injectable`, `@Resolver`, `@Controller`, `@ObjectType`, `@InputType`, or `@Module` just because Knip flagged them. If one of these is flagged, it usually means you forgot to register it in its parent `*.module.ts` or `app.module.ts`. Fix the DI wiring instead of deleting the code. Delete code ONLY if it is a truly obsolete helper function or dead logic.
 
 ## Comment cleanup
 
@@ -85,3 +89,10 @@ After fixing tool errors, review all changed/created code for comment quality:
 5. For Knip warnings, investigate each flagged export before removing
 6. Clean up comments in changed/created files
 7. Re-run `npm run check` until clean
+
+## Fallback Strategy (Circuit Breaker)
+
+**CRITICAL:** Do not enter an infinite loop of fixing. If you attempt to fix a `check` error and the EXACT SAME error persists after **3 attempts**, STOP.
+1. Undo the specific change that caused the unresolvable error.
+2. Stop the workflow.
+3. Explain the underlying issue to the user and ask for human guidance.

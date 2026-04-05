@@ -6,11 +6,10 @@ description: Create an End-to-End (E2E) test for a REST controller or GraphQL re
 ## Rules
 1. Never import `supertest`.
 2. Use `E2EClient` and `createTestingApp` from `test/utils/testing-app.ts`.
-3. Use vitest globals (`describe`, `it`, `expect`).
+3. Do not import `describe`, `it`, `expect`, `beforeAll`, etc. from 'vitest', as they are globally available.
 
 ## Template for REST:
 ```typescript
-import { beforeAll, describe, expect, it } from 'vitest';
 import { E2EClient } from '../../test/utils/e2e-client';
 import { createTestingApp } from '../../test/utils/testing-app';
 

@@ -99,6 +99,8 @@ export class <QueueName>Module {}
 ```typescript
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
+import { Test } from '@nestjs/testing';
+import { getQueueToken } from '@nestjs/bullmq';
 // Globals (describe, it, expect, vi, beforeEach, afterEach) are available without import (vitest globals: true)
 // Import path to mocks is relative — adjust depth based on file location:
 //   src/infrastructure/<queue-name>/  → '../../../test/utils/mocks'
@@ -146,8 +148,18 @@ describe('<QueueName>Service', () => {
     add: vi.fn().mockResolvedValue(undefined),
   };
 
-  beforeEach(() => {
-    service = new <QueueName>Service(mockQueue as never);
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        <QueueName>Service,
+        {
+          provide: getQueueToken('<queue-name>'),
+          useValue: mockQueue,
+        },
+      ],
+    }).compile();
+
+    service = module.get(<QueueName>Service);
   });
 
   afterEach(() => {

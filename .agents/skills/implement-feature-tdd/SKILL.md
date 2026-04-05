@@ -5,12 +5,14 @@ description: Use this workflow to implement ANY new feature following Test-Drive
 
 ## Workflow Steps
 
-1. **Write failing tests FIRST (RED)**:
+1. **Write failing E2E tests FIRST (RED)**:
    - Write E2E test for API boundaries (Controller/Resolver) using `/add-e2e-test` skill.
    - Run `npm run test:e2e` to verify it FAILS.
-2. **Write implementation (GREEN)**:
-   - Implement the minimum code required in the Controller/Resolver and Service to make the test pass.
-3. **Verify**:
+2. **Write unit tests (RED)**:
+   - Use the `/add-tests` skill to write failing unit tests for the Services and Resolvers/Controllers.
+   - Run `npm run test` to verify they FAIL.
+3. **Write implementation (GREEN)**:
+   - Implement the minimum code required in the Controller/Resolver and Service to make both E2E and unit tests pass.
    - Run tests until they PASS.
 4. **Refactor and Check (REFACTOR)**:
    - Run `npm run check` to fix linting and types.

@@ -49,7 +49,7 @@ This runs `prisma generate --no-hints` and outputs the client to `src/@generated
 
 After regenerating the client, check and update:
 - Services that use `PrismaService` and reference the changed model
-- GraphQL `@ObjectType` classes in `src/modules/<module>/types/*.object-type.ts` — these are hand-written and must be kept in sync with the Prisma schema manually
+- GraphQL `@ObjectType` classes and Enums must be kept in sync manually. **CRITICAL:** Invoke the `/add-graphql-type` skill to scaffold or update the corresponding GraphQL types to match the new Prisma schema.
 - Enum types in `types/*-role.enum.ts` or similar — must match Prisma enums
 
 **Important:** The Prisma-generated types in `src/@generated/prisma/client` and the GraphQL `@ObjectType` classes are separate. The GraphQL types are NOT auto-generated — update them manually.
@@ -60,7 +60,7 @@ After regenerating the client, check and update:
 npm run check
 ```
 
-Fix any TypeScript, Biome, or Knip errors before proceeding.
+If it fails, do not proceed. Invoke the `/check` skill to diagnose and automatically fix linting, typing, or unused code errors, then return to this workflow.
 
 ## Common patterns
 

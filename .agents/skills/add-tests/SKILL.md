@@ -18,6 +18,10 @@ The user wants to write unit tests for one or more existing files in the project
   - `createPubSubMock()` — shallow mock for Mercurius `PubSub`
   - `createJobMock()` — deep mock for BullMQ `Job`
   - Add new `createXxxMock()` factories to this file when they would be reused across multiple spec files
+  - **Pathing rule for mocks:** Since `test/utils/mocks.ts` is outside `src/`, calculate the relative path carefully:
+    - From `src/modules/<name>/<name>.service.spec.ts` -> use `../../../test/utils/mocks`
+    - From `src/common/<name>/<name>.spec.ts` -> use `../../../test/utils/mocks`
+    - From `src/infrastructure/<name>/<name>.spec.ts` -> use `../../../test/utils/mocks`
 
 ## Steps
 

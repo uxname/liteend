@@ -1,7 +1,6 @@
 ---
 name: update-deps
 description: Use this skill when the user asks to update dependencies, upgrade packages, update npm packages, or keep the project up to date. Trigger phrases: "update dependencies", "upgrade packages", "npm update", "update npm".
-version: 1.1.0
 ---
 
 # Update Dependencies
@@ -55,10 +54,10 @@ These packages often have breaking changes — read the changelog before updatin
 
 ## After Updating
 
-1. Run `npm run check` — fixes lint issues and validates types
+1. Run `npm run check` — if it fails, invoke the `/check` skill to diagnose and fix issues, then return here
 2. Run `npm run test` — ensure no regressions
 3. Run `npm run build` — verify production build works
-4. Check dev mode for runtime errors: `npm run start:dev`
+4. Ask the user to manually run `npm run start:dev` locally to verify runtime stability. Do NOT run start:dev yourself, as it is a blocking process that will hang your terminal.
 
 ## If Something Breaks
 

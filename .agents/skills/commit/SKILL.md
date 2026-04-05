@@ -15,7 +15,7 @@ Before doing anything else, run:
 npm run check
 ```
 
-If the check **fails**, fix all errors before proceeding — do not commit broken code. Use the `check` skill guidance to resolve issues, then re-run `npm run check` until it passes cleanly.
+If it fails, do not proceed. Invoke the `/check` skill to diagnose and automatically fix linting, typing, or unused code errors, then return to this workflow.
 
 ### Step 2: Review what will be committed
 
@@ -62,13 +62,7 @@ EOF
 
 ### Step 6: Handle hook failures
 
-If the pre-commit hook (lefthook) blocks the commit:
-- Read the error output carefully — it's the same `npm run check` pipeline
-- Fix the reported issues
-- Re-stage: `git add -A`
-- Retry the commit (do **not** use `--no-verify`)
-
-Repeat until the commit succeeds.
+If the pre-commit hook blocks the commit, invoke the `/check` skill to resolve the issues, re-stage with `git add -A`, and retry the commit.
 
 ## What NOT to do
 
