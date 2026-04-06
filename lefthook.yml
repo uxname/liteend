@@ -1,13 +1,13 @@
 pre-commit:
-  parallel: true
+  parallel: false
   commands:
-    check-types-and-lint:
+    check:
       run: npm run check
-    test-unit:
-      run: npm run test
 
 pre-push:
   parallel: false
   commands:
-    test-coverage:
-      run: npm run test:cov
+    check:
+      run: npm run check
+    test-all:
+      run: npm run test:all
