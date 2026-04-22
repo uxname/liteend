@@ -186,6 +186,24 @@ describe('FileUploadService', () => {
       expect(result).toBeNull();
     });
 
+    it('should call mkdirSync when upload directory does not exist', () => {
+      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+      const mkdirSpy = vi
+        .spyOn(fs, 'mkdirSync')
+        .mockImplementation(() => undefined);
+
+      (
+        service as unknown as { generatePaths(name: string): unknown }
+      ).generatePaths('test.png');
+
+      expect(mkdirSpy).toHaveBeenCalledWith(expect.any(String), {
+        recursive: true,
+      });
+
+      existsSpy.mockRestore();
+      mkdirSpy.mockRestore();
+    });
+
     it('should throw when writing to disk fails', async () => {
       const mockPart: MockMultipartFile = {
         mimetype: 'image/png',

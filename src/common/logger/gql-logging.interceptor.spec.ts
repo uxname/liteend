@@ -129,6 +129,57 @@ describe('GqlLoggingInterceptor', () => {
     expect(args.username).toBe('alice');
   });
 
+  it('should truncate large string responses', async () => {
+    const ctx = createExecutionContextMock();
+    ctx.getType.mockReturnValue('graphql');
+
+    const req: Record<string, unknown> = {};
+    const gqlCtx = {
+      getInfo: vi
+        .fn()
+        .mockReturnValue({ parentType: { name: 'Query' }, fieldName: 'big' }),
+      getArgs: vi.fn().mockReturnValue({}),
+      getContext: vi.fn().mockReturnValue({ req }),
+    };
+    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlCtx as never);
+
+    const bigString = 'x'.repeat(5000);
+    const next = makeNext(bigString);
+    const obs = interceptor.intercept(ctx as never, next);
+
+    await firstValueFrom(obs);
+    const response = (req.graphql as Record<string, unknown>)
+      .response as string;
+    expect(response).toContain('...truncated');
+    expect(response).toContain('5000 bytes total');
+    expect(response.length).toBeLessThan(bigString.length);
+  });
+
+  it('should truncate arrays exceeding max elements', async () => {
+    const ctx = createExecutionContextMock();
+    ctx.getType.mockReturnValue('graphql');
+
+    const req: Record<string, unknown> = {};
+    const gqlCtx = {
+      getInfo: vi
+        .fn()
+        .mockReturnValue({ parentType: { name: 'Query' }, fieldName: 'list' }),
+      getArgs: vi.fn().mockReturnValue({}),
+      getContext: vi.fn().mockReturnValue({ req }),
+    };
+    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlCtx as never);
+
+    const bigArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const next = makeNext(bigArray);
+    const obs = interceptor.intercept(ctx as never, next);
+
+    await firstValueFrom(obs);
+    const response = (req.graphql as Record<string, unknown>)
+      .response as unknown[];
+    expect(response).toHaveLength(6); // 5 items + truncation marker
+    expect(response[5]).toMatch(/\+5 items/);
+  });
+
   it('should also sync graphql data to req.raw', async () => {
     const ctx = createExecutionContextMock();
     ctx.getType.mockReturnValue('graphql');
