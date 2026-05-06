@@ -1,18 +1,9 @@
 import fs from 'node:fs';
-import { MultipartFile } from '@fastify/multipart';
+import type { MultipartFile } from '@fastify/multipart';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { FileUploadService } from './file-upload.service';
-
-interface MockMultipartFile {
-  mimetype: string;
-  filename: string;
-  toBuffer: ReturnType<typeof vi.fn>;
-  file: {
-    pipe: ReturnType<typeof vi.fn>;
-  };
-}
 
 describe('FileUploadService', () => {
   let service: FileUploadService;
@@ -153,35 +144,35 @@ describe('FileUploadService', () => {
 
   describe('processFile', () => {
     it('should return null for disallowed mime type', async () => {
-      const mockPart: MockMultipartFile = {
+      const mockPart = {
+        type: 'file' as const,
         mimetype: 'application/octet-stream',
         filename: 'file.exe',
+        fieldname: 'file',
+        encoding: '7bit',
+        fields: {},
         toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
-        file: {
-          pipe: vi.fn(),
-        },
-      };
+        file: { pipe: vi.fn() },
+      } as unknown as MultipartFile;
 
-      const result = await service.processFile(
-        mockPart as unknown as MultipartFile,
-      );
+      const result = await service.processFile(mockPart);
 
       expect(result).toBeNull();
     });
 
     it('should return null for text file', async () => {
-      const mockPart: MockMultipartFile = {
+      const mockPart = {
+        type: 'file' as const,
         mimetype: 'text/plain',
         filename: 'file.txt',
+        fieldname: 'file',
+        encoding: '7bit',
+        fields: {},
         toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
-        file: {
-          pipe: vi.fn(),
-        },
-      };
+        file: { pipe: vi.fn() },
+      } as unknown as MultipartFile;
 
-      const result = await service.processFile(
-        mockPart as unknown as MultipartFile,
-      );
+      const result = await service.processFile(mockPart);
 
       expect(result).toBeNull();
     });
@@ -205,14 +196,16 @@ describe('FileUploadService', () => {
     });
 
     it('should throw when writing to disk fails', async () => {
-      const mockPart: MockMultipartFile = {
+      const mockPart = {
+        type: 'file' as const,
         mimetype: 'image/png',
         filename: 'file.png',
+        fieldname: 'file',
+        encoding: '7bit',
+        fields: {},
         toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
-        file: {
-          pipe: vi.fn(),
-        },
-      };
+        file: { pipe: vi.fn() },
+      } as unknown as MultipartFile;
 
       const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       const mkdirSpy = vi
@@ -224,9 +217,9 @@ describe('FileUploadService', () => {
           throw new Error('write failure');
         });
 
-      await expect(
-        service.processFile(mockPart as unknown as MultipartFile),
-      ).rejects.toThrow('write failure');
+      await expect(service.processFile(mockPart)).rejects.toThrow(
+        'write failure',
+      );
 
       existsSpy.mockRestore();
       mkdirSpy.mockRestore();

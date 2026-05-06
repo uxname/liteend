@@ -40,15 +40,13 @@ describe('RolesGuard', () => {
   let reflector: Reflector;
 
   beforeEach(() => {
-    reflector = {
-      getAllAndOverride: vi.fn(),
-    } as unknown as Reflector;
+    reflector = mock<Reflector>();
     guard = new RolesGuard(reflector);
   });
 
   describe('canActivate', () => {
     it('should return true when no roles are required', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(undefined);
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue(undefined);
 
       const mockContext = buildHttpExecutionContext({
         roles: [ProfileRole.USER],
@@ -58,7 +56,7 @@ describe('RolesGuard', () => {
     });
 
     it('should return true when user has required role', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue([
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue([
         ProfileRole.USER,
       ]);
 
@@ -76,7 +74,7 @@ describe('RolesGuard', () => {
     });
 
     it('should return false when user does not have required role', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue([
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue([
         ProfileRole.ADMIN,
       ]);
 
@@ -94,7 +92,7 @@ describe('RolesGuard', () => {
     });
 
     it('should return false when user has no roles', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue([
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue([
         ProfileRole.ADMIN,
       ]);
 
@@ -110,7 +108,7 @@ describe('RolesGuard', () => {
     });
 
     it('should return false when user is undefined', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue([
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue([
         ProfileRole.ADMIN,
       ]);
 
@@ -126,7 +124,7 @@ describe('RolesGuard', () => {
     });
 
     it('should return true when user has one of required roles', () => {
-      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue([
+      vi.mocked(reflector.getAllAndOverride).mockReturnValue([
         ProfileRole.ADMIN,
         ProfileRole.USER,
       ]);

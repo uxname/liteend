@@ -5,7 +5,11 @@ import { PinoLogger } from 'nestjs-pino';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
 import { PrismaService } from '@/common/prisma/prisma.service';
-import { createExecutionContextMock } from '../../../test/utils/mocks';
+import {
+  createExecutionContextMock,
+  mock,
+  mockDeep,
+} from '../../../test/utils/mocks';
 
 vi.mock('@nestjs/passport', () => {
   class PassportAuthGuard {
@@ -41,14 +45,9 @@ describe('JwtAuthGuard', () => {
   let logger: PinoLogger;
 
   beforeEach(() => {
-    configService = {
-      get: vi.fn(),
-      getOrThrow: vi.fn(),
-    } as unknown as ConfigService;
-    prisma = {
-      profile: { findUnique: vi.fn(), upsert: vi.fn() },
-    } as unknown as PrismaService;
-    logger = { setContext: vi.fn(), assign: vi.fn() } as unknown as PinoLogger;
+    configService = mock<ConfigService>();
+    prisma = mockDeep<PrismaService>() as unknown as PrismaService;
+    logger = mock<PinoLogger>();
     guard = new JwtAuthGuard(configService, prisma, logger);
   });
 

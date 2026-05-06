@@ -1,20 +1,21 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createExecutionContextMock } from '../../../../test/utils/mocks';
+import { createExecutionContextMock, mock } from '../../../../test/utils/mocks';
 import { AuthGuard } from './auth.guard';
 
 const VALID_USER = 'admin';
 const VALID_PASS = 'secret';
 
-const makeConfigService = () =>
-  ({
-    getOrThrow: vi.fn((key: string) => {
-      if (key === 'LOGS_ADMIN_PANEL_USER') return VALID_USER;
-      if (key === 'LOGS_ADMIN_PANEL_PASSWORD') return VALID_PASS;
-      throw new Error(`Unknown config key: ${key}`);
-    }),
-  }) as unknown as ConfigService;
+const makeConfigService = () => {
+  const svc = mock<ConfigService>();
+  svc.getOrThrow = vi.fn((key: string) => {
+    if (key === 'LOGS_ADMIN_PANEL_USER') return VALID_USER;
+    if (key === 'LOGS_ADMIN_PANEL_PASSWORD') return VALID_PASS;
+    throw new Error(`Unknown config key: ${key}`);
+  });
+  return svc;
+};
 
 const buildContext = (authHeader: string | undefined) => {
   const ctx = createExecutionContextMock();

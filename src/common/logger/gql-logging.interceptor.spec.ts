@@ -2,17 +2,10 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { PinoLogger } from 'nestjs-pino';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createExecutionContextMock } from '../../../test/utils/mocks';
+import { createExecutionContextMock, mock } from '../../../test/utils/mocks';
 import { GqlLoggingInterceptor } from './gql-logging.interceptor';
 
-const makeLogger = () =>
-  ({
-    setContext: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-    assign: vi.fn(),
-  }) as unknown as PinoLogger;
+const makeLogger = () => mock<PinoLogger>();
 
 const makeNext = (value: unknown = 'result') => ({
   handle: vi.fn().mockReturnValue(of(value)),

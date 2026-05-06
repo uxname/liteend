@@ -45,7 +45,7 @@ function deepFn(): ReturnType<typeof vi.fn> {
   }) as ReturnType<typeof vi.fn>;
 }
 
-function mockDeep<T>(): MockedObjectDeep<T> {
+export function mockDeep<T>(): MockedObjectDeep<T> {
   const cache = new Map<string | symbol, unknown>();
   return new Proxy(
     {},

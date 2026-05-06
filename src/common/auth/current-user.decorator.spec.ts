@@ -1,7 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createExecutionContextMock } from '../../../test/utils/mocks';
+import { createExecutionContextMock, mock } from '../../../test/utils/mocks';
 import { CurrentUser } from './current-user.decorator';
 
 // vi.mock hoisting doesn't work for @nestjs/common with SWC; use Reflect metadata instead
@@ -31,9 +31,9 @@ describe('CurrentUser decorator', () => {
     const mockUser = { id: 1, oidcSub: 'user-gql' };
     const ctx = createExecutionContextMock();
 
-    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue({
-      getContext: vi.fn().mockReturnValue({ req: { user: mockUser } }),
-    } as unknown as GqlExecutionContext);
+    const gqlCtx = mock<GqlExecutionContext>();
+    gqlCtx.getContext.mockReturnValue({ req: { user: mockUser } });
+    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlCtx);
 
     const result = factory(undefined, ctx);
     expect(result).toBe(mockUser);
@@ -43,9 +43,9 @@ describe('CurrentUser decorator', () => {
     const mockUser = { id: 2, oidcSub: 'user-http' };
     const ctx = createExecutionContextMock();
 
-    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue({
-      getContext: vi.fn().mockReturnValue({ req: null }),
-    } as unknown as GqlExecutionContext);
+    const gqlCtx = mock<GqlExecutionContext>();
+    gqlCtx.getContext.mockReturnValue({ req: null });
+    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlCtx);
 
     ctx.switchToHttp.mockReturnValue({
       getRequest: vi.fn().mockReturnValue({ user: mockUser }),
@@ -60,9 +60,9 @@ describe('CurrentUser decorator', () => {
   it('should return undefined when HTTP context has no user', () => {
     const ctx = createExecutionContextMock();
 
-    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue({
-      getContext: vi.fn().mockReturnValue({ req: null }),
-    } as unknown as GqlExecutionContext);
+    const gqlCtx = mock<GqlExecutionContext>();
+    gqlCtx.getContext.mockReturnValue({ req: null });
+    vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(gqlCtx);
 
     ctx.switchToHttp.mockReturnValue({
       getRequest: vi.fn().mockReturnValue({ user: undefined }),
