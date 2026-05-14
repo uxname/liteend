@@ -159,6 +159,7 @@ Skills live in `.agents/skills/`. Each skill is a `SKILL.md` file that guides ag
 - Bypass lefthook/pre-commit checks unless explicitly asked.
 - Introduce unused imports/variables (Biome treats them as errors).
 - Add undocumented scripts or commands not present in package.json.
+- Run `npm run lint` or `npm run ts:check` separately — always use `npm run check` (runs both + knip).
 - Use `as unknown as` to bypass TypeScript in tests.
 - Use `pactum`, `supertest`, or bind real ports in E2E tests.
 - Write conditional logic (`if/else`) inside test assertions.
