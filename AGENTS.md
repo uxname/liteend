@@ -20,6 +20,11 @@ It summarizes the commands, conventions, and constraints inferred from configura
 - **Type check**: `npm run ts:check`
 - **Full check**: `npm run check` (type check + lint:fix + knip)
 
+### IMPORTANT — Quality Gate Rule
+
+- **Always** use `npm run check` for the full quality gate.
+- **Never** call `npm run lint && npm run ts:check` separately — this skips knip, steiger, and biome auto-fix, which will cause pre-commit (lefthook) to fail. Rely on `npm run check` exclusively.
+
 **Pre-commit hooks** (`lefthook.yml`):
 - `pre-commit` (parallel): runs `npm run check` + `npm run test` (unit)
 - `pre-push`: runs `npm run test:cov` — blocks push if coverage drops below 80%
@@ -159,7 +164,6 @@ Skills live in `.agents/skills/`. Each skill is a `SKILL.md` file that guides ag
 - Bypass lefthook/pre-commit checks unless explicitly asked.
 - Introduce unused imports/variables (Biome treats them as errors).
 - Add undocumented scripts or commands not present in package.json.
-- Run `npm run lint` or `npm run ts:check` separately — always use `npm run check` (runs both + knip).
 - Use `as unknown as` to bypass TypeScript in tests.
 - Use `pactum`, `supertest`, or bind real ports in E2E tests.
 - Write conditional logic (`if/else`) inside test assertions.
