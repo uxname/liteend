@@ -29,7 +29,7 @@
 | ARC-02 | JwtStrategy тоже обращается к БД | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — `prisma.profile.upsert()` | **1. Вынести в сервис** \\ 2. Кэшировать профиль в Redis \\ 3. Использовать guard-level сервис | Нет |
 | OWA-02 | TestQueueResolver без auth guards | ❌ FAIL 🟠 | `test-queue.resolver.ts:10-18` — `addTestJob` без `@UseGuards` | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Добавить проверку ролей \\ 3. Настроить resolver-level middleware | Нет |
 | OWA-02 | DebugResolver без auth guards | ❌ FAIL 🟠 | `debug.resolver.ts` — `echo`, `testTranslation`, `echoMutation` без guards | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Ограничить dev-режимом \\ 3. Вынести в dev-only модуль | Нет |
-| BUG-03 | CurrentUser возвращает undefined | ❌ FAIL 🟡 | `current-user.decorator.ts:14` — возвращает `Profile` (non-null) но может быть undefined | **1. Добавить `throw new UnauthorizedException()`** \\ 2. Изменить тип на `Profile \| undefined` \\ 3. Использовать default-значение | Нет |
+| BUG-03 | CurrentUser возвращает undefined | ❌ FAIL 🟡 | `current-user.decorator.ts:14` — возвращает `Profile` (non-null) но может быть undefined | **1. Добавить `throw new UnauthorizedException()`** \\ 2. Изменить тип на `Profile \| undefined` \\ 3. Использовать default-значение | ✅ Да |
 
 ---
 
@@ -38,9 +38,9 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | CON-01 | GraphQL типы без описаний | ❌ FAIL 🟠 | 13 из 14 элементов без `description`: Profile, ProfileUpdateInput, enums, резолверы | **1. Добавить `description` в декораторы** \\ 2. Добавить JSDoc \\ 3. Сгенерировать SDL-документацию | Нет |
-| OWA-07 | Утечка внутренних сообщений в GQL ошибках | ❌ FAIL 🟠 | `error-formatter.ts:117-120` — `originalError.message` для необработанных ошибок | **1. Заменить на `'Internal Server Error'`** \\ 2. Логировать оригинал в Pino \\ 3. Использовать machine-readable code | Нет |
-| PERF-03 | Нет ограничения глубины GraphQL запросов | ❌ FAIL 🟠 | `app.module.ts:37-73` — нет `queryDepth`, `validationRules` | **1. Добавить `queryDepth: 8`** \\ 2. Использовать `graphql-query-complexity` \\ 3. Настроить cost-анализ | Нет |
-| PERF-08 | GraphQL кэш отключён | ❌ FAIL 🟠 | `app.module.ts:45` — `cache: false` | **1. Включить `cache: true`** \\ 2. Использовать Redis cache store \\ 3. Настроить per-query кэширование | Нет |
+| OWA-07 | Утечка внутренних сообщений в GQL ошибках | ❌ FAIL 🟠 | `error-formatter.ts:117-120` — `originalError.message` для необработанных ошибок | **1. Заменить на `'Internal Server Error'`** \\ 2. Логировать оригинал в Pino \\ 3. Использовать machine-readable code | ✅ Да |
+| PERF-03 | Нет ограничения глубины GraphQL запросов | ❌ FAIL 🟠 | `app.module.ts:37-73` — нет `queryDepth`, `validationRules` | **1. Добавить `queryDepth: 8`** \\ 2. Использовать `graphql-query-complexity` \\ 3. Настроить cost-анализ | ✅ Да |
+| PERF-08 | GraphQL кэш отключён | ❌ FAIL 🟠 | `app.module.ts:45` — `cache: false` | **1. Включить `cache: true`** \\ 2. Использовать Redis cache store \\ 3. Настроить per-query кэширование | ✅ Да |
 
 ---
 
@@ -48,7 +48,7 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| CON-03 | POST /upload возвращает 200 вместо 201 | ❌ FAIL 🟠 | `file-upload.controller.ts` — нет `@HttpCode(HttpStatus.CREATED)` | **1. Добавить `@HttpCode(201)`** \\ 2. Вернуть Location header \\ 3. Добавить тело ответа с id | Нет |
+| CON-03 | POST /upload возвращает 200 вместо 201 | ❌ FAIL 🟠 | `file-upload.controller.ts` — нет `@HttpCode(HttpStatus.CREATED)` | **1. Добавить `@HttpCode(201)`** \\ 2. Вернуть Location header \\ 3. Добавить тело ответа с id | ✅ Да |
 | CON-04 | Нет версионирования API | ❌ FAIL 🟠 | `main.ts` — нет `enableVersioning()`, нет `setGlobalPrefix()` | **1. Включить `enableVersioning()`** \\ 2. Добавить `/v1/` префикс \\ 3. Версионировать GraphQL через namespace | Нет |
 | VAL-01 | REST эндпоинты без schema-валидации | ❌ FAIL 🟠 | `POST /upload`, `GET /uploads/*`, `GET /` — без ZodDto | **1. Добавить Zod-схемы для всех эндпоинтов** \\ 2. Использовать глобальный ValidationPipe \\ 3. Добавить ручную валидацию | Нет |
 
@@ -71,9 +71,9 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | VAL-08 | MIME тип не верифицируется по содержимому | ❌ FAIL 🟠 | `file-upload.service.ts` — проверка только `part.mimetype` (заголовок) | **1. Использовать `file-type` для проверки содержимого** \\ 2. Белый список MIME-типов \\ 3. Отклонять неизвестные типы | Нет |
-| VAL-08 | Нет лимита размера файла | ❌ FAIL 🟠 | `setu-app.ts:18` — `multiPart` без `limits.fileSize` | **1. Добавить `limits: { fileSize: 5MB }`** \\ 2. Проверять `part.file.truncated` \\ 3. Отклонять oversized файлы | Нет |
-| PERF-02 | Sync I/O в hot path загрузки | ❌ FAIL 🟠 | `file-upload.service.ts:44,65,105-106` — `existsSync`, `statSync`, `mkdirSync` | **1. Заменить на `fs.promises` API** \\ 2. Использовать асинхронные вызовы \\ 3. Убрать лишний `existsSync` перед mkdirSync | Нет |
-| BUG-09 | Локальное время вместо UTC | ❌ FAIL 🟠 | `file-upload.service.ts:95-100` — `getHours()`, `getDate()` вместо UTC | **1. Заменить на `getUTCHours()`, `getUTCDate()`** \\ 2. Использовать `date-fns` UTC-функции \\ 3. Хранить все даты в ISO 8601 | Нет |
+| VAL-08 | Нет лимита размера файла | ❌ FAIL 🟠 | `setup-app.ts:18` — `multiPart` без `limits.fileSize` | **1. Добавить `limits: { fileSize: 5MB }`** \\ 2. Проверять `part.file.truncated` \\ 3. Отклонять oversized файлы | ✅ Да |
+| PERF-02 | Sync I/O в hot path загрузки | ❌ FAIL 🟠 | `file-upload.service.ts:44,65,105-106` — `existsSync`, `statSync`, `mkdirSync` | **1. Заменить на `fs.promises` API** \\ 2. Использовать асинхронные вызовы \\ 3. Убрать лишний `existsSync` перед mkdirSync | ✅ Да |
+| BUG-09 | Локальное время вместо UTC | ❌ FAIL 🟠 | `file-upload.service.ts:95-100` — `getHours()`, `getDate()` вместо UTC | **1. Заменить на `getUTCHours()`, `getUTCDate()`** \\ 2. Использовать `date-fns` UTC-функции \\ 3. Хранить все даты в ISO 8601 | ✅ Да |
 | LOG-02 | FileUpload без аудит-логов | ❌ FAIL 🟠 | `file-upload.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать каждый upload: userId, filename, size \\ 3. Добавить audit-событие | Нет |
 
 ---
@@ -93,7 +93,7 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | ERR-01 | AllExceptionsFilter игнорирует graphql/ws контексты | ❌ FAIL 🟠 | `all-exceptions-filter.ts` — `if (host.getType() !== 'http') return;` | **1. Добавить обработку graphql контекста** \\ 2. Пробрасывать в gqlErrorFormatter \\ 3. Логировать все контексты | Нет |
-| ERR-04 | Нет process-level обработчиков ошибок | ❌ FAIL 🔴 | `main.ts` — нет `process.on('unhandledRejection')` и `process.on('uncaughtException')` | **1. Добавить глобальные обработчики** \\ 2. Логировать и корректно завершать процесс \\ 3. Добавить sentry/similar | Нет |
+| ERR-04 | Нет process-level обработчиков ошибок | ❌ FAIL 🔴 | `main.ts` — нет `process.on('unhandledRejection')` и `process.on('uncaughtException')` | **1. Добавить глобальные обработчики** \\ 2. Логировать и корректно завершать процесс \\ 3. Добавить sentry/similar | ✅ Да |
 | ERR-05 | Внешние вызовы без таймаутов | ❌ FAIL 🟠 | `redis.service.ts`, `prisma.service.ts`, `ofetch` — нет явных таймаутов | **1. Добавить connectTimeout для Redis** \\ 2. Добавить connectionTimeout для Prisma \\ 3. Добавить timeout для HTTP-вызовов | Нет |
 | ERR-08 | BullMQ без retry-стратегии | ❌ FAIL 🟠 | `app.module.ts` — `forRootAsync` без `defaultJobOptions` | **1. Добавить `attempts: 3, backoff: { type: 'exponential', delay: 1000 }`** \\ 2. Добавить jitter \\ 3. Настроить per-queue options | Нет |
 | ERR-09 | Нет AbortSignal/AbortController | ❌ FAIL 🟠 | Везде — 0 использований AbortController | **1. Внедрить AbortController в долгие операции** \\ 2. Использовать AbortSignal в fetch \\ 3. Добавить CancellationToken паттерн | Нет |
@@ -117,8 +117,8 @@
 | DEP-01 | Нет multi-stage build | ❌ FAIL 🟠 | `Dockerfile` — один stage | **1. Разделить на build и production stage** \\ 2. Использовать `npm ci --production` \\ 3. Минимизировать образ | Нет |
 | DEP-05 | Dev-зависимости в production образе | ❌ FAIL 🟠 | `Dockerfile` — `npm i` (не `npm ci --production`) | **1. Multi-stage + `npm ci --production`** \\ 2. Не копировать node_modules из build stage \\ 3. Удалить dev-инструменты | Нет |
 | DEP-08 | .env не в .dockerignore | ❌ FAIL 🟠 | `.dockerignore` — `.env` отсутствует | **1. Добавить `.env` и `.env.*`** \\ 2. Использовать docker secrets \\ 3. Удалить .env из build context | Нет |
-| OWA-05 | CORS открыт всем origins | ❌ FAIL 🟠 | `setup-app.ts` — `app.enableCors()` без опций | **1. Добавить explicit origin whitelist** \\ 2. Использовать env-конфигурацию \\ 3. Добавить dynamic CORS | Нет |
-| OWA-05 | Helmet политики отключены | ❌ FAIL 🟠 | `setup-app.ts` — `contentSecurityPolicy: false`, `crossOriginEmbedderPolicy: false` | **1. Включить CSP с разумными политиками** \\ 2. Включить crossOrigin политики \\ 3. Добавить HSTS | Нет |
+| OWA-05 | CORS открыт всем origins | ❌ FAIL 🟠 | `setup-app.ts` — `app.enableCors()` без опций | **1. Добавить explicit origin whitelist** \\ 2. Использовать env-конфигурацию \\ 3. Добавить dynamic CORS | ✅ Да |
+| OWA-05 | Helmet политики отключены | ❌ FAIL 🟠 | `setup-app.ts` — `contentSecurityPolicy: false`, `crossOriginEmbedderPolicy: false` | **1. Включить CSP с разумными политиками** \\ 2. Включить crossOrigin политики \\ 3. Добавить HSTS | ✅ Да |
 
 ---
 
@@ -126,9 +126,9 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| SEC-07 | Нет автоматического сканирования секретов | ❌ FAIL 🔴 | `lefthook.yml` — нет gitleaks/trufflehog | **1. Добавить gitleaks в pre-commit** \\ 2. Добавить GitHub Secret Scanning \\ 3. Настроить detect-secrets в CI | Нет |
-| SEC-04 | .env.example с реальными credentials | ❌ FAIL 🟡 | `.env.example` — `oalmxx.logto.app`, `sl51b8k688hfuw9it0dqz` | **1. Заменить на placeholder'ы** \\ 2. Добавить комментарии с форматом \\ 3. Удалить реальные значения из истории | Нет |
-| SEC-02 | .gitignore не защищает .env.* | ❌ FAIL 🟡 | `.gitignore` — только `.env`, не `.env.local`/`.env.production` | **1. Добавить `.env.*`** \\ 2. Добавить `*.key`, `*.pem` \\ 3. Проверить git history | Нет |
+| SEC-07 | Нет автоматического сканирования секретов | ❌ FAIL 🔴 | `lefthook.yml` — нет gitleaks/trufflehog | **1. Добавить gitleaks в pre-commit** \\ 2. Добавить GitHub Secret Scanning \\ 3. Настроить detect-secrets в CI | ✅ Да |
+| SEC-04 | .env.example с реальными credentials | ❌ FAIL 🟡 | `.env.example` — `oalmxx.logto.app`, `sl51b8k688hfuw9it0dqz` | **1. Заменить на placeholder'ы** \\ 2. Добавить комментарии с форматом \\ 3. Удалить реальные значения из истории | ✅ Да |
+| SEC-02 | .gitignore не защищает .env.* | ❌ FAIL 🟡 | `.gitignore` — только `.env`, не `.env.local`/`.env.production` | **1. Добавить `.env.*`** \\ 2. Добавить `*.key`, `*.pem` \\ 3. Проверить git history | ✅ Да |
 | OWA-06 | Rate limiting глобальный 100/мин | ❌ FAIL 🟡 | `setup-app.ts` — rate-limit на весь сервер, не специфичен для auth | **1. Добавить отдельный rate-limit на auth routes** \\ 2. Настроить login-specific лимит (5/мин) \\ 3. Использовать Redis-based rate-limit | Нет |
 
 ---
