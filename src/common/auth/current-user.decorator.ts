@@ -5,7 +5,7 @@ import { Profile } from '@/@generated/prisma/client';
 export type CurrentUserType = Profile;
 
 export const CurrentUser = createParamDecorator(
-  (_data: unknown, context: ExecutionContext): CurrentUserType => {
+  (_data: unknown, context: ExecutionContext): CurrentUserType | undefined => {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
 

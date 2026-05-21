@@ -42,7 +42,8 @@ import { AppController } from './app.controller';
         autoSchemaFile: true,
         graphiql: false,
         jit: 1,
-        cache: false,
+        queryDepth: 8,
+        cache: true,
 
         subscription: {
           emitter: mqemitterRedis({

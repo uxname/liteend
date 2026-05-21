@@ -1,6 +1,8 @@
 pre-commit:
   parallel: false
   commands:
+    secrets:
+      run: bash -c 'command -v gitleaks >/dev/null 2>&1 && gitleaks detect --source . -v --no-banner || true'
     check:
       run: npm run check
 

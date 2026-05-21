@@ -15,7 +15,12 @@ export async function setupApp(
   app.useLogger(app.get(Logger));
   app.useGlobalPipes(new ZodValidationPipe());
 
-  await app.register(multiPart);
+  await app.register(multiPart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024,
+      files: 10,
+    },
+  });
 
   await app.register(AltairFastify, {
     path: '/altair',
@@ -23,12 +28,7 @@ export async function setupApp(
     endpointURL: '/graphql',
   });
 
-  await app.register(helmet, {
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: false,
-    crossOriginResourcePolicy: false,
-  });
+  await app.register(helmet);
 
   await app.register(rateLimit, {
     max: 100,
@@ -55,7 +55,12 @@ export async function setupApp(
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('swagger', app, cleanupOpenApiDoc(document));
 
-  app.enableCors();
+  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:4000';
+  app.enableCors({
+    origin: corsOrigin.split(','),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  });
 
   return app;
 }

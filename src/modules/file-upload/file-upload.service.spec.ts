@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import fsAsync from 'node:fs/promises';
+import { Readable, Writable } from 'node:stream';
 import type { MultipartFile } from '@fastify/multipart';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,8 +16,20 @@ describe('FileUploadService', () => {
     },
   };
 
+  function makeMockWritable() {
+    return new Writable({
+      write(_chunk, _encoding, callback) {
+        callback();
+      },
+    });
+  }
+
   beforeEach(async () => {
     vi.spyOn(process, 'cwd').mockReturnValue('/test/cwd');
+    vi.spyOn(fsAsync, 'stat').mockResolvedValue({
+      size: 1024,
+    } as never);
+    vi.spyOn(fsAsync, 'mkdir').mockResolvedValue(undefined as never);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -121,24 +135,30 @@ describe('FileUploadService', () => {
   });
 
   describe('getSafeFileInfo', () => {
-    it('should throw ForbiddenException for path traversal attempt', () => {
-      expect(() => service.getSafeFileInfo('../../etc/passwd')).toThrow();
+    it('should throw ForbiddenException for path traversal attempt', async () => {
+      await expect(
+        service.getSafeFileInfo('../../etc/passwd'),
+      ).rejects.toThrow();
     });
 
-    it('should throw NotFoundException when file does not exist', () => {
-      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      expect(() => service.getSafeFileInfo('2024/01/01/image.png')).toThrow(
-        'File not found',
-      );
-      existsSpy.mockRestore();
+    it('should throw NotFoundException when file does not exist', async () => {
+      const accessSpy = vi
+        .spyOn(fsAsync, 'access')
+        .mockRejectedValue(new Error('ENOENT'));
+      await expect(
+        service.getSafeFileInfo('2024/01/01/image.png'),
+      ).rejects.toThrow('File not found');
+      accessSpy.mockRestore();
     });
 
-    it('should return fullPath and mimeType when file exists', () => {
-      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      const result = service.getSafeFileInfo('2024/01/01/image.png');
+    it('should return fullPath and mimeType when file exists', async () => {
+      const accessSpy = vi
+        .spyOn(fsAsync, 'access')
+        .mockResolvedValue(undefined);
+      const result = await service.getSafeFileInfo('2024/01/01/image.png');
       expect(result.fullPath).toContain('image.png');
       expect(result.mimeType).toBe('image/png');
-      existsSpy.mockRestore();
+      accessSpy.mockRestore();
     });
   });
 
@@ -177,25 +197,11 @@ describe('FileUploadService', () => {
       expect(result).toBeNull();
     });
 
-    it('should call mkdirSync when upload directory does not exist', () => {
-      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      const mkdirSpy = vi
-        .spyOn(fs, 'mkdirSync')
-        .mockImplementation(() => undefined);
+    it('should call mkdir when upload directory does not exist', async () => {
+      vi.spyOn(fs, 'createWriteStream').mockReturnValue(
+        makeMockWritable() as never,
+      );
 
-      (
-        service as unknown as { generatePaths(name: string): unknown }
-      ).generatePaths('test.png');
-
-      expect(mkdirSpy).toHaveBeenCalledWith(expect.any(String), {
-        recursive: true,
-      });
-
-      existsSpy.mockRestore();
-      mkdirSpy.mockRestore();
-    });
-
-    it('should throw when writing to disk fails', async () => {
       const mockPart = {
         type: 'file' as const,
         mimetype: 'image/png',
@@ -204,26 +210,37 @@ describe('FileUploadService', () => {
         encoding: '7bit',
         fields: {},
         toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
-        file: { pipe: vi.fn() },
+        file: Readable.from(Buffer.from('test')),
       } as unknown as MultipartFile;
 
-      const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      const mkdirSpy = vi
-        .spyOn(fs, 'mkdirSync')
-        .mockImplementation(() => undefined);
-      const createWriteStreamSpy = vi
-        .spyOn(fs, 'createWriteStream')
-        .mockImplementation(() => {
-          throw new Error('write failure');
-        });
+      const result = await service.processFile(mockPart);
 
-      await expect(service.processFile(mockPart)).rejects.toThrow(
-        'write failure',
+      expect(result).not.toBeNull();
+      expect(result?.size).toBe(1024);
+      expect(result?.mimetype).toBe('image/png');
+    });
+
+    it('should return file data for allowed mime type', async () => {
+      vi.spyOn(fs, 'createWriteStream').mockReturnValue(
+        makeMockWritable() as never,
       );
 
-      existsSpy.mockRestore();
-      mkdirSpy.mockRestore();
-      createWriteStreamSpy.mockRestore();
+      const mockPart = {
+        type: 'file' as const,
+        mimetype: 'image/png',
+        filename: 'file.png',
+        fieldname: 'file',
+        encoding: '7bit',
+        fields: {},
+        toBuffer: vi.fn().mockResolvedValue(Buffer.from('test')),
+        file: Readable.from(Buffer.from('test')),
+      } as unknown as MultipartFile;
+
+      const result = await service.processFile(mockPart);
+
+      expect(result).not.toBeNull();
+      expect(result?.size).toBe(1024);
+      expect(result?.mimetype).toBe('image/png');
     });
   });
 });

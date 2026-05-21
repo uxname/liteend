@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
+import fsAsync from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { MultipartFile } from '@fastify/multipart';
@@ -29,10 +30,10 @@ export class FileUploadService {
     return lookup(filename) || this.DEFAULT_MIME_TYPE;
   }
 
-  getSafeFileInfo(relativePath: string): {
+  async getSafeFileInfo(relativePath: string): Promise<{
     fullPath: string;
     mimeType: string;
-  } {
+  }> {
     const fullPath = path.join(this.UPLOAD_DIR, relativePath);
     const resolvedPath = path.resolve(fullPath);
     const resolvedRoot = path.resolve(this.UPLOAD_DIR);
@@ -41,7 +42,9 @@ export class FileUploadService {
       throw new ForbiddenException('Access denied');
     }
 
-    if (!fs.existsSync(resolvedPath)) {
+    try {
+      await fsAsync.access(resolvedPath);
+    } catch {
       throw new NotFoundException('File not found');
     }
 
@@ -57,12 +60,11 @@ export class FileUploadService {
       return null;
     }
 
-    const { fullPath, relativeDir, filename, extension } = this.generatePaths(
-      part.filename,
-    );
+    const { fullPath, relativeDir, filename, extension } =
+      await this.generatePaths(part.filename);
 
     await pipeline(part.file, fs.createWriteStream(fullPath));
-    const stats = fs.statSync(fullPath);
+    const stats = await fsAsync.stat(fullPath);
 
     return {
       filename,
@@ -91,20 +93,17 @@ export class FileUploadService {
     });
   }
 
-  private generatePaths(originalFilename: string) {
+  private async generatePaths(originalFilename: string) {
     const now = new Date();
     const relativeDir = path.join(
-      now.getFullYear().toString(),
-      String(now.getMonth() + 1).padStart(2, '0'),
-      String(now.getDate()).padStart(2, '0'),
-      `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`,
+      now.getUTCFullYear().toString(),
+      String(now.getUTCMonth() + 1).padStart(2, '0'),
+      String(now.getUTCDate()).padStart(2, '0'),
+      `${String(now.getUTCHours()).padStart(2, '0')}-${String(now.getUTCMinutes()).padStart(2, '0')}`,
     );
 
     const fullDir = path.join(this.UPLOAD_DIR, relativeDir);
-
-    if (!fs.existsSync(fullDir)) {
-      fs.mkdirSync(fullDir, { recursive: true });
-    }
+    await fsAsync.mkdir(fullDir, { recursive: true });
 
     const extension = path.extname(originalFilename);
     const filename = `${randomUUID()}${extension}`;

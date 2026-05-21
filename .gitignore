@@ -35,6 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 /data/
 .env
+.env.*
 tsconfig.tsbuildinfo
 .husky
 .worktrees

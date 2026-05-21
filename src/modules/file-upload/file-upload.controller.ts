@@ -3,6 +3,8 @@ import {
   BadRequestException,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -27,6 +29,7 @@ export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
   @Post('upload')
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
@@ -85,7 +88,7 @@ export class FileUploadController {
     @Res() response: FastifyReply,
   ) {
     const { fullPath, mimeType } =
-      this.fileUploadService.getSafeFileInfo(filePathParam);
+      await this.fileUploadService.getSafeFileInfo(filePathParam);
 
     response.type(mimeType);
     response.send(fs.createReadStream(fullPath));

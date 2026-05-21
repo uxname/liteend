@@ -8,6 +8,16 @@ import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { setupApp } from './bootstrap/setup-app';
 
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED_REJECTION — process exiting', reason);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('UNCAUGHT_EXCEPTION — process exiting', error);
+  process.exit(1);
+});
+
 async function bootstrap(): Promise<void> {
   const adapter = new FastifyAdapter({
     logger: false,

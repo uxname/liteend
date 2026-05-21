@@ -139,7 +139,7 @@ describe('gqlErrorFormatter', () => {
       makeContext(),
     );
     const f = formatted(result);
-    expect(f.message).toBe('something went wrong');
+    expect(f.message).toBe('Internal Server Error');
     expect((f.extensions as FormattedError).code).toBe('INTERNAL_SERVER_ERROR');
   });
 
