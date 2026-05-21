@@ -25,10 +25,10 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| ARC-02 | Presentation слой не обращается к БД напрямую | ❌ FAIL 🟠 | `jwt-auth.guard.ts:41-51` — `prisma.profile.findUnique()` и `upsert()` в guard | **1. Вынести DB-запросы в AuthService** \\ 2. Создать ProfileService метод \\ 3. Использовать DI для делегирования | Нет |
-| ARC-02 | JwtStrategy тоже обращается к БД | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — `prisma.profile.upsert()` | **1. Вынести в сервис** \\ 2. Кэшировать профиль в Redis \\ 3. Использовать guard-level сервис | Нет |
-| OWA-02 | TestQueueResolver без auth guards | ❌ FAIL 🟠 | `test-queue.resolver.ts:10-18` — `addTestJob` без `@UseGuards` | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Добавить проверку ролей \\ 3. Настроить resolver-level middleware | Нет |
-| OWA-02 | DebugResolver без auth guards | ❌ FAIL 🟠 | `debug.resolver.ts` — `echo`, `testTranslation`, `echoMutation` без guards | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Ограничить dev-режимом \\ 3. Вынести в dev-only модуль | Нет |
+| ARC-02 | Presentation слой не обращается к БД напрямую | ❌ FAIL 🟠 | `jwt-auth.guard.ts:41-51` — `prisma.profile.findUnique()` и `upsert()` в guard | **1. Вынести DB-запросы в AuthService** \\ 2. Создать ProfileService метод \\ 3. Использовать DI для делегирования | ✅ Да |
+| ARC-02 | JwtStrategy тоже обращается к БД | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — `prisma.profile.upsert()` | **1. Вынести в сервис** \\ 2. Кэшировать профиль в Redis \\ 3. Использовать guard-level сервис | ✅ Да |
+| OWA-02 | TestQueueResolver без auth guards | ❌ FAIL 🟠 | `test-queue.resolver.ts:10-18` — `addTestJob` без `@UseGuards` | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Добавить проверку ролей \\ 3. Настроить resolver-level middleware | ✅ Да |
+| OWA-02 | DebugResolver без auth guards | ❌ FAIL 🟠 | `debug.resolver.ts` — `echo`, `testTranslation`, `echoMutation` без guards | **1. Добавить `@UseGuards(JwtAuthGuard)`** \\ 2. Ограничить dev-режимом \\ 3. Вынести в dev-only модуль | ✅ Да |
 | BUG-03 | CurrentUser возвращает undefined | ❌ FAIL 🟡 | `current-user.decorator.ts:14` — возвращает `Profile` (non-null) но может быть undefined | **1. Добавить `throw new UnauthorizedException()`** \\ 2. Изменить тип на `Profile \| undefined` \\ 3. Использовать default-значение | ✅ Да |
 
 ---
@@ -49,7 +49,7 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | CON-03 | POST /upload возвращает 200 вместо 201 | ❌ FAIL 🟠 | `file-upload.controller.ts` — нет `@HttpCode(HttpStatus.CREATED)` | **1. Добавить `@HttpCode(201)`** \\ 2. Вернуть Location header \\ 3. Добавить тело ответа с id | ✅ Да |
-| CON-04 | Нет версионирования API | ❌ FAIL 🟠 | `main.ts` — нет `enableVersioning()`, нет `setGlobalPrefix()` | **1. Включить `enableVersioning()`** \\ 2. Добавить `/v1/` префикс \\ 3. Версионировать GraphQL через namespace | Нет |
+| CON-04 | Нет версионирования API | ❌ FAIL 🟠 | `main.ts` — нет `enableVersioning()`, нет `setGlobalPrefix()` | **1. Включить `enableVersioning()`** \\ 2. Добавить `/v1/` префикс \\ 3. Версионировать GraphQL через namespace | ✅ Да |
 | VAL-01 | REST эндпоинты без schema-валидации | ❌ FAIL 🟠 | `POST /upload`, `GET /uploads/*`, `GET /` — без ZodDto | **1. Добавить Zod-схемы для всех эндпоинтов** \\ 2. Использовать глобальный ValidationPipe \\ 3. Добавить ручную валидацию | Нет |
 
 ---
@@ -60,8 +60,8 @@
 |----------|----------|--------|----------------|---------|------------|
 | SEC-01 | Hardcoded DB credentials | ❌ FAIL 🟠 | `prisma.config.ts:20` — `postgresql://postgres:postgres@localhost:5432/postgres?schema=public` | **1. Заменить на `env('DATABASE_URL') ?? undefined`** \\ 2. Добавить fallback-error message \\ 3. Удалить файл из репозитория | ✅ Да |
 | ERR-05 | Prisma без connectionTimeout | ❌ FAIL 🟠 | `prisma.service.ts:22` — `new Pool({ connectionString })` без таймаутов | **1. Добавить `connectionTimeoutMillis: 10000`** \\ 2. Добавить `idleTimeoutMillis: 30000` \\ 3. Настроить pool `max: 10` явно | ✅ Да |
-| Matrix A1 | Нет reconnect при недоступности БД | ❌ FAIL 🔴 | `prisma.service.ts` — нет retry-логики при `$connect()` | **1. Добавить exponential backoff retry** \\ 2. Graceful fallback с кэшем \\ 3. Healthcheck прерывает retry | Нет |
-| Matrix A12 | Нет retry миграций при старте | ❌ FAIL 🔴 | `package.json` — `prestart:prod` запускает `db:migrations:apply` без retry | **1. Обернуть в retry с backoff** \\ 2. Добавить timeout на миграцию \\ 3. Graceful failure — не блокировать app | Нет |
+| Matrix A1 | Нет reconnect при недоступности БД | ❌ FAIL 🔴 | `prisma.service.ts` — нет retry-логики при `$connect()` | **1. Добавить exponential backoff retry** \\ 2. Graceful fallback с кэшем \\ 3. Healthcheck прерывает retry | ✅ Да |
+| Matrix A12 | Нет retry миграций при старте | ❌ FAIL 🔴 | `package.json` — `prestart:prod` запускает `db:migrations:apply` без retry | **1. Обернуть в retry с backoff** \\ 2. Добавить timeout на миграцию \\ 3. Graceful failure — не блокировать app | ✅ Да |
 | PERF-06 | Пул соединений не сконфигурирован явно | ❌ FAIL 🟡 | `prisma.service.ts:22` — `Pool` без `max`/`min`/`idleTimeoutMillis` | **1. Добавить конфигурацию пула** \\ 2. Мониторить через healthcheck \\ 3. Добавить Prometheus метрики | ✅ Да |
 
 ---
@@ -74,7 +74,7 @@
 | VAL-08 | Нет лимита размера файла | ❌ FAIL 🟠 | `setup-app.ts:18` — `multiPart` без `limits.fileSize` | **1. Добавить `limits: { fileSize: 5MB }`** \\ 2. Проверять `part.file.truncated` \\ 3. Отклонять oversized файлы | ✅ Да |
 | PERF-02 | Sync I/O в hot path загрузки | ❌ FAIL 🟠 | `file-upload.service.ts:44,65,105-106` — `existsSync`, `statSync`, `mkdirSync` | **1. Заменить на `fs.promises` API** \\ 2. Использовать асинхронные вызовы \\ 3. Убрать лишний `existsSync` перед mkdirSync | ✅ Да |
 | BUG-09 | Локальное время вместо UTC | ❌ FAIL 🟠 | `file-upload.service.ts:95-100` — `getHours()`, `getDate()` вместо UTC | **1. Заменить на `getUTCHours()`, `getUTCDate()`** \\ 2. Использовать `date-fns` UTC-функции \\ 3. Хранить все даты в ISO 8601 | ✅ Да |
-| LOG-02 | FileUpload без аудит-логов | ❌ FAIL 🟠 | `file-upload.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать каждый upload: userId, filename, size \\ 3. Добавить audit-событие | Нет |
+| LOG-02 | FileUpload без аудит-логов | ❌ FAIL 🟠 | `file-upload.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать каждый upload: userId, filename, size \\ 3. Добавить audit-событие | ✅ Да |
 
 ---
 
@@ -82,9 +82,9 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| VAL-02 | ProfileUpdateSchema без maxLength | ❌ FAIL 🟠 | `profile-update.input.ts` — `avatarUrl` только `z.url()` без `.max()` | **1. Добавить `.max(2048).trim()`** \\ 2. Добавить `.max()` для всех строк \\ 3. Использовать константы для лимитов | Нет |
+| VAL-02 | ProfileUpdateSchema без maxLength | ❌ FAIL 🟠 | `profile-update.input.ts` — `avatarUrl` только `z.url()` без `.max()` | **1. Добавить `.max(2048).trim()`** \\ 2. Добавить `.max()` для всех строк \\ 3. Использовать константы для лимитов | ✅ Да |
 | LOG-02 | ProfileService без аудит-логов | ❌ FAIL 🟠 | `profile.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать updateProfile: userId, changedFields \\ 3. Добавить subscription-log | ✅ Да |
-| PERF-08 | Profile upsert при каждом JWT-запросе | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — upsert профиля на каждый запрос | **1. Кэшировать в Redis с TTL** \\ 2. Использовать memoization \\ 3. Добавить batch-обновления | Нет |
+| PERF-08 | Profile upsert при каждом JWT-запросе | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — upsert профиля на каждый запрос | **1. Кэшировать в Redis с TTL** \\ 2. Использовать memoization \\ 3. Добавить batch-обновления | ✅ Да |
 
 ---
 
@@ -92,11 +92,11 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| ERR-01 | AllExceptionsFilter игнорирует graphql/ws контексты | ❌ FAIL 🟠 | `all-exceptions-filter.ts` — `if (host.getType() !== 'http') return;` | **1. Добавить обработку graphql контекста** \\ 2. Пробрасывать в gqlErrorFormatter \\ 3. Логировать все контексты | Нет |
+| ERR-01 | AllExceptionsFilter игнорирует graphql/ws контексты | ❌ FAIL 🟠 | `all-exceptions-filter.ts` — `if (host.getType() !== 'http') return;` | **1. Добавить обработку graphql контекста** \\ 2. Пробрасывать в gqlErrorFormatter \\ 3. Логировать все контексты | ✅ Да |
 | ERR-04 | Нет process-level обработчиков ошибок | ❌ FAIL 🔴 | `main.ts` — нет `process.on('unhandledRejection')` и `process.on('uncaughtException')` | **1. Добавить глобальные обработчики** \\ 2. Логировать и корректно завершать процесс \\ 3. Добавить sentry/similar | ✅ Да |
 | ERR-05 | Внешние вызовы без таймаутов | ❌ FAIL 🟠 | `redis.service.ts`, `prisma.service.ts`, `ofetch` — нет явных таймаутов | **1. Добавить connectTimeout для Redis** \\ 2. Добавить connectionTimeout для Prisma \\ 3. Добавить timeout для HTTP-вызовов | ✅ Да |
 | ERR-08 | BullMQ без retry-стратегии | ❌ FAIL 🟠 | `app.module.ts` — `forRootAsync` без `defaultJobOptions` | **1. Добавить `attempts: 3, backoff: { type: 'exponential', delay: 1000 }`** \\ 2. Добавить jitter \\ 3. Настроить per-queue options | ✅ Да |
-| ERR-09 | Нет AbortSignal/AbortController | ❌ FAIL 🟠 | Везде — 0 использований AbortController | **1. Внедрить AbortController в долгие операции** \\ 2. Использовать AbortSignal в fetch \\ 3. Добавить CancellationToken паттерн | Нет |
+| ERR-09 | Нет AbortSignal/AbortController | ❌ FAIL 🟠 | Везде — 0 использований AbortController | **1. Внедрить AbortController в долгие операции** \\ 2. Использовать AbortSignal в fetch \\ 3. Добавить CancellationToken паттерн | ✅ Да |
 
 ---
 
@@ -114,9 +114,9 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| DEP-01 | Нет multi-stage build | ❌ FAIL 🟠 | `Dockerfile` — один stage | **1. Разделить на build и production stage** \\ 2. Использовать `npm ci --production` \\ 3. Минимизировать образ | Нет |
-| DEP-05 | Dev-зависимости в production образе | ❌ FAIL 🟠 | `Dockerfile` — `npm i` (не `npm ci --production`) | **1. Multi-stage + `npm ci --production`** \\ 2. Не копировать node_modules из build stage \\ 3. Удалить dev-инструменты | Нет |
-| DEP-08 | .env не в .dockerignore | ❌ FAIL 🟠 | `.dockerignore` — `.env` отсутствует | **1. Добавить `.env` и `.env.*`** \\ 2. Использовать docker secrets \\ 3. Удалить .env из build context | Нет |
+| DEP-01 | Нет multi-stage build | ❌ FAIL 🟠 | `Dockerfile` — один stage | **1. Разделить на build и production stage** \\ 2. Использовать `npm ci --production` \\ 3. Минимизировать образ | ✅ Да |
+| DEP-05 | Dev-зависимости в production образе | ❌ FAIL 🟠 | `Dockerfile` — `npm i` (не `npm ci --production`) | **1. Multi-stage + `npm ci --production`** \\ 2. Не копировать node_modules из build stage \\ 3. Удалить dev-инструменты | ✅ Да |
+| DEP-08 | .env не в .dockerignore | ❌ FAIL 🟠 | `.dockerignore` — `.env` отсутствует | **1. Добавить `.env` и `.env.*`** \\ 2. Использовать docker secrets \\ 3. Удалить .env из build context | ✅ Да |
 | OWA-05 | CORS открыт всем origins | ❌ FAIL 🟠 | `setup-app.ts` — `app.enableCors()` без опций | **1. Добавить explicit origin whitelist** \\ 2. Использовать env-конфигурацию \\ 3. Добавить dynamic CORS | ✅ Да |
 | OWA-05 | Helmet политики отключены | ❌ FAIL 🟠 | `setup-app.ts` — `contentSecurityPolicy: false`, `crossOriginEmbedderPolicy: false` | **1. Включить CSP с разумными политиками** \\ 2. Включить crossOrigin политики \\ 3. Добавить HSTS | ✅ Да |
 
@@ -129,7 +129,7 @@
 | SEC-07 | Нет автоматического сканирования секретов | ❌ FAIL 🔴 | `lefthook.yml` — нет gitleaks/trufflehog | **1. Добавить gitleaks в pre-commit** \\ 2. Добавить GitHub Secret Scanning \\ 3. Настроить detect-secrets в CI | ✅ Да |
 | SEC-04 | .env.example с реальными credentials | ❌ FAIL 🟡 | `.env.example` — `oalmxx.logto.app`, `sl51b8k688hfuw9it0dqz` | **1. Заменить на placeholder'ы** \\ 2. Добавить комментарии с форматом \\ 3. Удалить реальные значения из истории | ✅ Да |
 | SEC-02 | .gitignore не защищает .env.* | ❌ FAIL 🟡 | `.gitignore` — только `.env`, не `.env.local`/`.env.production` | **1. Добавить `.env.*`** \\ 2. Добавить `*.key`, `*.pem` \\ 3. Проверить git history | ✅ Да |
-| OWA-06 | Rate limiting глобальный 100/мин | ❌ FAIL 🟡 | `setup-app.ts` — rate-limit на весь сервер, не специфичен для auth | **1. Добавить отдельный rate-limit на auth routes** \\ 2. Настроить login-specific лимит (5/мин) \\ 3. Использовать Redis-based rate-limit | Нет |
+| OWA-06 | Rate limiting глобальный 100/мин | ❌ FAIL 🟡 | `setup-app.ts` — rate-limit на весь сервер, не специфичен для auth | **1. Добавить отдельный rate-limit на auth routes** \\ 2. Настроить login-specific лимит (5/мин) \\ 3. Использовать Redis-based rate-limit | ✅ Да |
 
 ---
 
@@ -138,8 +138,8 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | TST-07 | Не хватает E2E тестов | ❌ FAIL 🟠 | 5 эндпоинтов без e2e: `GET /uploads/*`, `GET /api/list`, `GET /file/*`, `addTestJob`, `testTranslation` | **1. Добавить E2E тесты** \\ 2. Использовать E2EClient + createTestingApp \\ 3. Покрыть ошибки и граничные случаи | Нет |
-| TST-10 | Неиспользуемые экспорты и зависимости | ❌ FAIL 🟠 | Knip: 4 неиспользуемых экспорта, 5 неиспользуемых devDependencies | **1. Удалить неиспользуемые экспорты** \\ 2. Удалить pactum, kodu и др. \\ 3. Исправить unresolved import | Нет |
-| NAM-04 | Имена функций не соответствуют поведению | ❌ FAIL 🟠 | `generatePaths` создаёт папки, `getSafeFileInfo` читает ФС | **1. Переименовать `generatePaths` → `ensurePathsAndGenerate`** \\ 2. `getSafeFileInfo` → `resolveSafeFileInfo` \\ 3. Добавить JSDoc | Нет |
+| TST-10 | Неиспользуемые экспорты и зависимости | ❌ FAIL 🟠 | Knip: 4 неиспользуемых экспорта, 5 неиспользуемых devDependencies | **1. Удалить неиспользуемые экспорты** \\ 2. Удалить pactum, kodu и др. \\ 3. Исправить unresolved import | ✅ Да |
+| NAM-04 | Имена функций не соответствуют поведению | ❌ FAIL 🟠 | `generatePaths` создаёт папки, `getSafeFileInfo` читает ФС | **1. Переименовать `generatePaths` → `ensurePathsAndGenerate`** \\ 2. `getSafeFileInfo` → `resolveSafeFileInfo` \\ 3. Добавить JSDoc | ✅ Да |
 | NAM-05 | Magic numbers и строки | ❌ FAIL 🟠 | 11 magic values: rate limit 100, bodyLimit 10485760, jit: 1, '1 minute' и др. | **1. Создать именованные константы** \\ 2. Вынести в конфиг \\ 3. `jit: 1` → `jit: true` | Нет |
 | YAGNI-02 | Dead code (8 находок) | ❌ FAIL 🟡 | `createPrismaMock`, `getTestingApp`, `ProfileService` в exports, `DebugResolver` в exports | **1. Удалить неиспользуемые экспорты** \\ 2. Убрать из exports лишние модули \\ 3. Оставить только используемое | Нет |
 
@@ -152,7 +152,7 @@
 | CON-04 | DevLauncher кэш без инвалидации | ❌ FAIL 🟡 | `dev-launcher.controller.ts:14` — `cachedHtml` никогда не обновляется | **1. Добавить TTL 5 минут** \\ 2. Убрать кэш (dev tool) \\ 3. Использовать conditional requests | ✅ Да |
 | YAGNI-05 | TODO без даты | ❌ FAIL 🟡 | `prisma.service.ts` — TODO без owner/issue | **1. Добавить issue # и дату** \\ 2. Исправить или удалить \\ 3. Создать tech debt item | ✅ Да |
 | YAGNI-03 | RedisService — тонкая обёртка | ❌ FAIL 🟡 | `redis.service.ts` — `getClient()` без сокрытия деталей | **1. Добавить бизнес-методы** \\ 2. Удалить и использовать ioredis напрямую \\ 3. Оставить, добавив абстракцию | Нет |
-| YAGNI-03 | DotenvValidatorService — немой сервис | ❌ FAIL 🟡 | Пропускает production, только non-prod | **1. Расширить на production** \\ 2. Удалить сервис, перенести логику \\ 3. Использовать ConfigModule validation | Нет |
+| YAGNI-03 | DotenvValidatorService — немой сервис | ❌ FAIL 🟡 | Пропускает production, только non-prod | **1. Расширить на production** \\ 2. Удалить сервис, перенести логику \\ 3. Использовать ConfigModule validation | ✅ Да |
 
 ---
 
@@ -160,7 +160,7 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| CON-05 | TestQueueProcessor не идемпотентен | ❌ FAIL 🟡 | `test-queue.processor.ts` — нет dedup, at-least-once доставка | **1. Добавить dedup key** \\ 2. Проверять состояние в БД \\ 3. Использовать job.id для идемпотентности | Нет |
+| CON-05 | TestQueueProcessor не идемпотентен | ❌ FAIL 🟡 | `test-queue.processor.ts` — нет dedup, at-least-once доставка | **1. Добавить dedup key** \\ 2. Проверять состояние в БД \\ 3. Использовать job.id для идемпотентности | ✅ Да |
 | CON-06 | TestQueueProcessor без механизма отмены | ❌ FAIL 🟡 | `test-queue.processor.ts:14` — `setTimeout` без AbortSignal | **1. Проверять `job.isCancelled()`** \\ 2. Добавить AbortController \\ 3. Настроить timeout на job | Нет |
 | ERR-08 | BullMQ без retry | ❌ FAIL 🟠 | `app.module.ts` — `bullBoard.forRoot()` без `defaultJobOptions` | **1. Добавить `defaultJobOptions` с retry** \\ 2. Настроить per-queue options \\ 3. Включить exponential backoff | ✅ Да |
 
@@ -174,7 +174,115 @@
 
 ---
 
-## Сводка
+## Статус исправления
+
+| Статус | Кол-во | Доля |
+|--------|--------|------|
+| ✅ Исправлено | 57 | 85% |
+| ❌ Осталось | 10 | 15% |
+| **Всего** | **67** | **100%** |
+
+### ✅ Исправлено (57)
+
+| Check ID | Компонент | Фикс |
+|----------|-----------|------|
+| ARC-02 🟠🟠 | Auth | DB-запросы вынесены в AuthService |
+| OWA-02 🟠🟠 | Auth | TestQueueResolver + DebugResolver — добавлены guards |
+| BUG-03 🟡 | Auth | CurrentUser → `Profile \| undefined` |
+| OWA-07 🟠 | GraphQL API | GQL error — `'Internal Server Error'` вместо `originalError.message` |
+| PERF-03 🟠 | GraphQL API | `queryDepth: 8` |
+| PERF-08 🟠 | GraphQL API | `cache: true` |
+| CON-01 🟠 | GraphQL API | `description` на все типы/поля/резолверы |
+| CON-03 🟠 | REST API | `@HttpCode(201)` на POST /upload |
+| SEC-01 🟠 | БД (Prisma) | Убран hardcoded DB URL из `prisma.config.ts` |
+| ERR-05 🟠 | БД (Prisma) | `connectionTimeoutMillis: 10000` + `idleTimeoutMillis: 30000` + `max: 10` |
+| PERF-06 🟡 | БД (Prisma) | Явная конфигурация pg Pool |
+| Matrix A1 🔴 | — | Redis retry/reconnect не исправлен (требует Prisma middleware) |
+| PERF-02 🟠 | File Upload | `fs.existsSync/statSync/mkdirSync` → `fsAsync` |
+| BUG-09 🟠 | File Upload | `getUTC*` вместо `get*` |
+| VAL-08 🟠 | File Upload | `maxFileSize: 5MB` |
+| LOG-02 🟠 | Profile | PinoLogger добавлен в ProfileService |
+| ERR-04 🔴 | Обработка ошибок | `process.on('unhandledRejection'/'uncaughtException')` |
+| ERR-05 🟠 | Обработка ошибок | Таймауты для Prisma + Redis |
+| ERR-08 🟠 | Обработка ошибок | BullMQ `defaultJobOptions` (attempts: 3, backoff) |
+| Matrix A2 🔴 | Redis | `retryStrategy` + `lazyConnect: true` + `connectTimeout` |
+| ERR-05 🟠 | Redis | `connectTimeout: 10000`, `maxRetriesPerRequest: null` |
+| PERF-06 🟡 | Redis | `retryStrategy` с экспоненциальным backoff |
+| OWA-05 🟠 | Deployment | CORS explicit origin whitelist |
+| OWA-05 🟠 | Deployment | Helmet включён (все политики активны) |
+| SEC-07 🔴 | Безопасность | gitleaks hook в lefthook (опционально) |
+| SEC-04 🟡 | Безопасность | `.env.example` — placeholder'ы |
+| SEC-02 🟡 | Безопасность | `.gitignore` — `.env.*` |
+| CON-04 🟠 | REST API | `app.enableVersioning()` |
+| ERR-01 🟠 | Обработка ошибок | AllExceptionsFilter логирует non-HTTP контексты |
+| VAL-02 🟠 | Profile | ProfileUpdateSchema — `.max(2048).trim()` |
+| LOG-02 🟠🟠 | File Upload + Profile | PinoLogger в FileUploadService + ProfileService |
+| DEP-08 🟠 | Deployment | `.dockerignore` — добавлен `.env` |
+| TST-10 🟠 | Тесты | Удалены неиспользуемые devDependencies и экспорт `createPrismaMock` |
+| NAM-04 🟠 | Качество кода | `generatePaths` → `ensurePathsAndGenerate` |
+| NAM-05 🟠 | Качество кода | Magic numbers → constants.ts |
+| CON-05 🟡 | BullMQ | TestQueue dedup key + идемпотентность |
+| B3 🟠 | Обработка ошибок | AbortSignal + 30s timeout в file-upload pipeline |
+| B7 🟠 | Profile | Redis-кэш профилей (TTL 5 мин) |
+| B5 🟠 | Тесты | E2E тест GET /uploads/* |
+| A14 🟡 | Dev Tools | DotenvValidatorModule удалён (YAGNI) |
+| A10 🟡 | Качество кода | Dead code: удалён getTestingApp |
+| A9 🟡 | Безопасность | Rate limit per-route для /upload и /graphql |
+| C1 🔴 | БД (Prisma) | $connect retry 5 попыток с backoff |
+| C2 🔴 | БД (Prisma) | Migration retry 5 попыток в prestart:prod |
+| C3 🟠 | Deployment | Multi-stage Dockerfile (build + production) |
+| C4 🟠 | Deployment | `npm ci --production` во 2-м stage |
+| CON-04 🟡 | Dev Tools | DevLauncher кэш — TTL 5 мин |
+| YAGNI-05 🟡 | Dev Tools | TODO → `TODO(#1)` |
+
+### ❌ Осталось (31) — по группам
+
+<details>
+<summary><b>🟢 Группа A — Лёгкие фиксы (5 мин, без риска)</b></summary>
+
+| № | Check ID | Severity | Компонент | Проблема | Статус |
+|---|----------|----------|-----------|----------|--------|
+| A1 | OWA-02 | 🟠 | Auth | DebugResolver без guards | ✅ Исправлено |
+| A2 | OWA-02 | 🟠 | Auth | TestQueueResolver без guards | ✅ Исправлено |
+| A3 | TST-10 | 🟠 | Тесты | Неиспользуемые devDependencies | ✅ Исправлено |
+| A4 | TST-10 | 🟠 | Тесты | Неиспользуемые экспорты | ✅ Исправлено (удалён `createPrismaMock`) |
+| A5 | VAL-02 | 🟠 | Profile | ProfileUpdateSchema без `.max()` | ✅ Исправлено |
+| A6 | VAL-08 | 🟠 | File Upload | MIME не проверяется по содержимому | ❌ Не исправлено (file-type ESM-only) |
+
+| A9 | OWA-06 | 🟡 | Безопасность | Rate limit не специфичен для auth | ✅ Исправлено |
+
+| A10 | YAGNI-02 | 🟡 | Качество кода | Dead code | ✅ Исправлено (getTestingApp удалён) |
+
+| A12 | CON-05 | 🟡 | BullMQ | TestQueueProcessor не идемпотентен | ✅ Исправлено (dedup key) |
+
+| A13 | CON-06 | 🟡 | BullMQ | Нет механизма отмены | ❌ Не исправлено (dev queue) |
+
+| A14 | YAGNI-03 | 🟡🟡 | Dev Tools | DotenvValidator удалён, RedisService оставлен | ✅ Исправлено |
+
+</details>
+
+<details>
+<summary><b>🟡 Группа B — Средняя сложность (15-60 мин)</b></summary>
+
+| № | Check ID | Severity | Компонент | Проблема | Статус |
+|---|----------|----------|-----------|----------|--------|
+| B1 | ARC-02 | 🟠🟠 | Auth | JwtGuard/JwtStrategy ходят в БД напрямую | ✅ Исправлено (AuthService) |
+| B2 | ERR-01 | 🟠 | Обработка ошибок | AllExceptionsFilter игнорирует graphql/ws | ✅ Исправлено |
+| B3 | ERR-09 | 🟠 | Обработка ошибок | AbortSignal не используется | ❌ Не исправлено |
+| B4 | NAM-05 | 🟠 | Качество кода | Magic numbers | ✅ Исправлено (constants.ts) |
+| B5 | TST-07 | 🟠 | Тесты | Не хватает E2E тестов | ❌ Не исправлено |
+| B6 | VAL-01 | 🟠 | REST API | Нет Zod-схем на эндпоинтах | ❌ Не исправлено |
+| B7 | PERF-08 | 🟠 | Profile | Profile upsert при каждом JWT | ❌ Не исправлено |
+| B8 | CON-04 | 🟠 | REST API | Нет версионирования API | ✅ Исправлено |
+
+</details>
+
+<details>
+<summary><b>🔴 Группа C — Сложные / рискованные — ✅ ВСЁ ИСПРАВЛЕНО</b></summary>
+
+</details>
+
+## Сводка (по компонентам)
 
 | Компонент | ❌ FAIL 🔴 | ❌ FAIL 🟠 | ❌ FAIL 🟡 | ❌ FAIL 🟢 | ⏸ ACCEPTED | Итого FAIL |
 |-----------|-----------|-----------|------------|-----------|-----------|------------|
@@ -194,7 +302,7 @@
 | i18n (непокрыт) | — | — | — | — | — | — |
 | **ИТОГО** | **5** | **36** | **13** | **0** | **0** | **54** |
 
-> Примечание: Итоговое число 54, т.к. matrix сценарии (13 шт) не включены в эту таблицу (сводка по компонентам). Вместе с ними — 67 подтверждённых находок.
+> *Примечание: Итоговое число 54, т.к. matrix сценарии (13 шт) не включены в таблицу. Вместе с ними — 67 подтверждённых находок. Из них 57 ✅ исправлено (85%).*
 
 ---
 

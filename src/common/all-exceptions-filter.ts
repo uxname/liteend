@@ -31,7 +31,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    if (host.getType() !== 'http') return;
+    if (host.getType() !== 'http') {
+      this.logger.error({
+        msg: `Unhandled exception in ${host.getType()} context`,
+        err:
+          exception instanceof Error
+            ? { message: exception.message, stack: exception.stack }
+            : exception,
+      });
+      return;
+    }
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();

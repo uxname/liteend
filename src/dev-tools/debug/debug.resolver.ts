@@ -26,6 +26,8 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
   'last-commit-info.json',
 );
 
+@UseGuards(JwtOptionalAuthGuard)
+@Roles(ProfileRole.ADMIN)
 @Resolver(() => Query)
 export class DebugResolver {
   private static readonly logger = new Logger(DebugResolver.name);

@@ -7,6 +7,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AltairFastify } from 'altair-fastify-plugin';
 import { Logger } from 'nestjs-pino';
 import { cleanupOpenApiDoc, ZodValidationPipe } from 'nestjs-zod';
+import {
+  COMPRESSION_THRESHOLD,
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW,
+} from '@/common/constants';
 import packageJson from '../../package.json';
 
 export async function setupApp(
@@ -31,17 +36,25 @@ export async function setupApp(
   await app.register(helmet);
 
   await app.register(rateLimit, {
-    max: 100,
-    timeWindow: '1 minute',
+    max: RATE_LIMIT_MAX,
+    timeWindow: RATE_LIMIT_WINDOW,
     allowList: (request) => {
       const url = request.url;
       return url.startsWith('/studio') || url.startsWith('/board');
+    },
+    keyGenerator: (request) => {
+      const url = request.url;
+      if (url === '/upload' || url.startsWith('/graphql')) {
+        const ip = request.ip;
+        return `auth:${ip}`;
+      }
+      return request.ip;
     },
   });
 
   await app.register(compression, {
     encodings: ['gzip', 'deflate'],
-    threshold: 1024,
+    threshold: COMPRESSION_THRESHOLD,
   });
 
   app.enableShutdownHooks();

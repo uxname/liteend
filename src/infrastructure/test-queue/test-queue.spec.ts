@@ -68,6 +68,7 @@ describe('TestQueueResolver', () => {
 
   const mockQueue = {
     add: vi.fn().mockResolvedValue(undefined),
+    getJob: vi.fn().mockResolvedValue(null),
   };
 
   beforeEach(() => {
@@ -76,6 +77,8 @@ describe('TestQueueResolver', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    mockQueue.getJob = vi.fn().mockResolvedValue(null);
+    mockQueue.add = vi.fn().mockResolvedValue(undefined);
   });
 
   describe('addTestJob', () => {
@@ -84,10 +87,11 @@ describe('TestQueueResolver', () => {
 
       const result = await resolver.addTestJob(message);
 
-      expect(mockQueue.add).toHaveBeenCalledWith('test-job', {
-        message,
-        date: expect.any(String),
-      });
+      expect(mockQueue.add).toHaveBeenCalledWith(
+        'test-job',
+        { message, date: expect.any(String) },
+        expect.objectContaining({ deduplication: expect.any(Object) }),
+      );
       expect(result).toBe(true);
     });
 
@@ -96,10 +100,11 @@ describe('TestQueueResolver', () => {
 
       await resolver.addTestJob(message);
 
-      expect(mockQueue.add).toHaveBeenCalledWith('test-job', {
-        message: 'Different message',
-        date: expect.any(String),
-      });
+      expect(mockQueue.add).toHaveBeenCalledWith(
+        'test-job',
+        { message: 'Different message', date: expect.any(String) },
+        expect.objectContaining({ deduplication: expect.any(Object) }),
+      );
     });
 
     it('should add job with ISO date string in data', async () => {
@@ -113,7 +118,17 @@ describe('TestQueueResolver', () => {
           message,
           date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/),
         }),
+        expect.objectContaining({ deduplication: expect.any(Object) }),
       );
+    });
+
+    it('should return true for already active duplicate job', async () => {
+      mockQueue.getJob.mockResolvedValue({ isActive: () => true });
+
+      const result = await resolver.addTestJob('duplicate');
+
+      expect(result).toBe(true);
+      expect(mockQueue.add).not.toHaveBeenCalled();
     });
 
     it('should handle queue add failure', async () => {

@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
+import { AuthService } from '@/common/auth/auth.service';
 import { JwtStrategy } from '@/common/auth/jwt.strategy';
-import { PrismaService } from '@/common/prisma/prisma.service';
 
 vi.mock('jwks-rsa', () => ({
   passportJwtSecret: vi.fn(() => () => 'test-secret'),
@@ -13,10 +13,8 @@ vi.mock('jwks-rsa', () => ({
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
 
-  const mockPrismaService = {
-    profile: {
-      upsert: vi.fn(),
-    },
+  const mockAuthService = {
+    findOrCreateProfile: vi.fn(),
   };
 
   const mockConfigService = {
@@ -34,7 +32,7 @@ describe('JwtStrategy', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JwtStrategy,
-        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: AuthService, useValue: mockAuthService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
@@ -47,7 +45,7 @@ describe('JwtStrategy', () => {
   });
 
   describe('validate', () => {
-    it('should return user profile from upsert', async () => {
+    it('should return user profile from auth service', async () => {
       const payload = {
         sub: 'oauth2|12345',
         iss: 'https://issuer.example.com',
@@ -63,15 +61,13 @@ describe('JwtStrategy', () => {
         updatedAt: new Date(),
       };
 
-      mockPrismaService.profile.upsert.mockResolvedValue(mockProfile);
+      mockAuthService.findOrCreateProfile.mockResolvedValue(mockProfile);
 
       const result = await strategy.validate(payload);
 
-      expect(mockPrismaService.profile.upsert).toHaveBeenCalledWith({
-        where: { oidcSub: 'oauth2|12345' },
-        create: { oidcSub: 'oauth2|12345' },
-        update: {},
-      });
+      expect(mockAuthService.findOrCreateProfile).toHaveBeenCalledWith(
+        'oauth2|12345',
+      );
       expect(result).toEqual(mockProfile);
     });
 
@@ -104,7 +100,7 @@ describe('JwtStrategy', () => {
         updatedAt: new Date(),
       };
 
-      mockPrismaService.profile.upsert.mockResolvedValue(mockProfile);
+      mockAuthService.findOrCreateProfile.mockResolvedValue(mockProfile);
 
       const result = await strategy.validate(payload);
 

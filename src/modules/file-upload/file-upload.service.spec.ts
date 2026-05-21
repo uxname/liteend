@@ -1,6 +1,5 @@
-import fs from 'node:fs';
 import fsAsync from 'node:fs/promises';
-import { Readable, Writable } from 'node:stream';
+import { Readable } from 'node:stream';
 import type { MultipartFile } from '@fastify/multipart';
 import { Test, TestingModule } from '@nestjs/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,14 +14,6 @@ describe('FileUploadService', () => {
       createMany: vi.fn(),
     },
   };
-
-  function makeMockWritable() {
-    return new Writable({
-      write(_chunk, _encoding, callback) {
-        callback();
-      },
-    });
-  }
 
   beforeEach(async () => {
     vi.spyOn(process, 'cwd').mockReturnValue('/test/cwd');
@@ -198,9 +189,7 @@ describe('FileUploadService', () => {
     });
 
     it('should call mkdir when upload directory does not exist', async () => {
-      vi.spyOn(fs, 'createWriteStream').mockReturnValue(
-        makeMockWritable() as never,
-      );
+      vi.spyOn(fsAsync, 'writeFile').mockResolvedValue(undefined as never);
 
       const mockPart = {
         type: 'file' as const,
@@ -221,9 +210,7 @@ describe('FileUploadService', () => {
     });
 
     it('should return file data for allowed mime type', async () => {
-      vi.spyOn(fs, 'createWriteStream').mockReturnValue(
-        makeMockWritable() as never,
-      );
+      vi.spyOn(fsAsync, 'writeFile').mockResolvedValue(undefined as never);
 
       const mockPart = {
         type: 'file' as const,

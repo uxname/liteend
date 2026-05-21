@@ -1,4 +1,9 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -9,6 +14,8 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(PrismaService.name);
+
   constructor(configService: ConfigService) {
     const DATABASE_HOST = configService.getOrThrow<string>('DATABASE_HOST');
     const DATABASE_PORT = configService.getOrThrow<string>('DATABASE_PORT');
@@ -34,7 +41,21 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    await this.$connect();
+    const maxRetries = 5;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await this.$connect();
+        return;
+      } catch (error) {
+        if (attempt === maxRetries) throw error;
+        const delay = Math.min(attempt * 1000, 5000);
+        this.logger.warn({
+          msg: `DB connection attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms`,
+          err: error instanceof Error ? error.message : error,
+        });
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
   }
 
   async onModuleDestroy() {

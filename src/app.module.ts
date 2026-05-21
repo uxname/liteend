@@ -12,7 +12,6 @@ import mqemitterRedis from 'mqemitter-redis';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { AllExceptionsFilter } from '@/common/all-exceptions-filter';
 import { AuthModule } from '@/common/auth/auth.module';
-import { DotenvValidatorModule } from '@/common/dotenv-validator/dotenv-validator.module';
 import { gqlErrorFormatter } from '@/common/graphql/error-formatter';
 import { GqlLoggingInterceptor } from '@/common/logger/gql-logging.interceptor';
 import { LoggerModule } from '@/common/logger/logger.module';
@@ -82,7 +81,6 @@ import { AppController } from './app.controller';
     LoggerServeModule,
     FileUploadModule,
     HealthModule,
-    DotenvValidatorModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

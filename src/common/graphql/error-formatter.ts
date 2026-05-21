@@ -5,6 +5,7 @@ import { GraphQLError } from 'graphql/error';
 import { MercuriusContext } from 'mercurius';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
+import { FALLBACK_REQUEST_ID } from '@/common/constants';
 
 const logger = new Logger('GraphQLErrorFormatter');
 
@@ -19,7 +20,7 @@ export function gqlErrorFormatter(
   }
 
   const req = (context as MercuriusContext & { req?: FastifyRequest }).req;
-  const requestId = req?.id || 'unknown';
+  const requestId = req?.id || FALLBACK_REQUEST_ID;
 
   const formattedErrors = errors.map((error) => {
     const originalError = error.originalError;

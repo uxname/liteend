@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { AuthService } from '@/common/auth/auth.service';
 import { Profile } from '@/modules/profile/types/profile.object-type';
 
 interface JwtPayload {
@@ -19,7 +19,7 @@ interface JwtPayload {
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
   ) {
     const issuer = configService.getOrThrow<string>('OIDC_ISSUER');
     const audience = configService.getOrThrow<string>('OIDC_AUDIENCE');
@@ -47,12 +47,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const oidcSub = payload.sub;
 
-    return this.prisma.profile.upsert({
-      where: { oidcSub },
-      create: {
-        oidcSub,
-      },
-      update: {},
-    });
+    return this.authService.findOrCreateProfile(oidcSub);
   }
 }

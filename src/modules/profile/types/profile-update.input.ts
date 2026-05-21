@@ -3,7 +3,11 @@ import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 const ProfileUpdateSchema = z.object({
-  avatarUrl: z.url({ message: 'Avatar URL must be a valid URL' }).optional(),
+  avatarUrl: z
+    .url({ message: 'Avatar URL must be a valid URL' })
+    .max(2048, { message: 'Avatar URL must not exceed 2048 characters' })
+    .trim()
+    .optional(),
 });
 
 class ProfileUpdateZodDto extends createZodDto(ProfileUpdateSchema) {}

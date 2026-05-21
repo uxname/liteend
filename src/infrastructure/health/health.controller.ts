@@ -7,6 +7,7 @@ import {
   MemoryHealthIndicator,
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
+import { DISK_THRESHOLD, HEAP_THRESHOLD_MB } from '@/common/constants';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { RedisHealthIndicator } from './indicators/redis.health';
 
@@ -27,11 +28,12 @@ export class HealthController {
     return this.health.check([
       () => this.db.pingCheck('database', this.prisma),
       () => this.redisIndicator.isHealthy(),
-      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024), // 150 MB threshold
+      () =>
+        this.memory.checkHeap('memory_heap', HEAP_THRESHOLD_MB * 1024 * 1024),
       () =>
         this.disk.checkStorage('storage', {
           path: '/',
-          thresholdPercent: 0.9, // alert when disk usage > 90%
+          thresholdPercent: DISK_THRESHOLD,
         }),
     ]);
   }

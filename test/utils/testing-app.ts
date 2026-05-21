@@ -74,10 +74,6 @@ function invariant<T>(value: T | undefined, message: string): T {
   return value;
 }
 
-export function getTestingApp(): NestFastifyApplication {
-  return invariant(cachedApp, 'Testing app is not initialized');
-}
-
 export function getFastifyInstance(): FastifyInstance {
   return invariant(cachedFastify, 'Fastify instance is not initialized');
 }

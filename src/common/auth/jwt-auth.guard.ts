@@ -8,8 +8,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { PinoLogger } from 'nestjs-pino';
 import { Profile } from '@/@generated/prisma/client';
-import { ProfileRole } from '@/@generated/prisma/enums';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { AuthService } from '@/common/auth/auth.service';
 
 interface RequestWithUser {
   user?: Profile;
@@ -20,7 +19,7 @@ interface RequestWithUser {
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(
     private readonly configService: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
     private readonly logger: PinoLogger,
   ) {
     super();
@@ -38,28 +37,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       ).headers?.['x-mock-sub'];
 
       if (mockSub) {
-        const user = await this.prisma.profile.findUnique({
-          where: { oidcSub: mockSub },
-        });
+        const user = await this.authService.findProfileBySub(mockSub);
         if (user) {
           this.syncUser(request, user);
           return true;
         }
       }
 
-      // Fallback: default user for tests without explicit loginAs
-      const defaultUser = await this.prisma.profile.upsert({
-        where: { oidcSub: 'mock-oidc-sub' },
-        create: {
-          oidcSub: 'mock-oidc-sub',
-          roles: [ProfileRole.USER, ProfileRole.ADMIN],
-          avatarUrl: 'https://i.pravatar.cc/300',
-        },
-        update: {
-          roles: [ProfileRole.USER, ProfileRole.ADMIN],
-          avatarUrl: 'https://i.pravatar.cc/300',
-        },
-      });
+      const defaultUser = await this.authService.findOrCreateDefaultMockUser();
 
       this.syncUser(request, defaultUser);
       return true;

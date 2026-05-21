@@ -1,12 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
 import fsAsync from 'node:fs/promises';
 import path from 'node:path';
-import { pipeline } from 'node:stream/promises';
 import { MultipartFile } from '@fastify/multipart';
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { lookup } from 'mrmime';
@@ -14,6 +13,7 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class FileUploadService {
+  private readonly logger = new Logger(FileUploadService.name);
   private readonly UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
   private readonly DEFAULT_MIME_TYPE = 'application/octet-stream';
   private readonly ALLOWED_MIME_TYPES = new Set([
@@ -61,9 +61,18 @@ export class FileUploadService {
     }
 
     const { fullPath, relativeDir, filename, extension } =
-      await this.generatePaths(part.filename);
+      await this.ensurePathsAndGenerate(part.filename);
 
-    await pipeline(part.file, fs.createWriteStream(fullPath));
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
+
+    try {
+      const buffer = await part.toBuffer();
+      await fsAsync.writeFile(fullPath, buffer, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
+
     const stats = await fsAsync.stat(fullPath);
 
     return {
@@ -81,6 +90,12 @@ export class FileUploadService {
   async saveMetadata(files: Array<any>, ip: string) {
     if (files.length === 0) return;
 
+    this.logger.log({
+      msg: 'Files uploaded',
+      count: files.length,
+      filenames: files.map((f) => f.originalFilename),
+    });
+
     await this.prisma.upload.createMany({
       data: files.map((f) => ({
         filepath: f.filepath,
@@ -93,7 +108,7 @@ export class FileUploadService {
     });
   }
 
-  private async generatePaths(originalFilename: string) {
+  private async ensurePathsAndGenerate(originalFilename: string) {
     const now = new Date();
     const relativeDir = path.join(
       now.getUTCFullYear().toString(),

@@ -3,7 +3,6 @@ import type { Mocked, MockedObjectDeep } from '@vitest/spy';
 import type { Job } from 'bullmq';
 import type { PubSub } from 'mercurius';
 import { vi } from 'vitest';
-import type { PrismaClient } from '@/@generated/prisma/client';
 import type { ProfileService } from '@/modules/profile/profile.service';
 
 export function mock<T>(): Mocked<T> {
@@ -70,6 +69,5 @@ export const createExecutionContextMock = () => mock<ExecutionContext>();
 
 export const createArgumentsHostMock = () => mock<ArgumentsHost>();
 
-export const createPrismaMock = () => mockDeep<PrismaClient>();
 export const createProfileServiceMock = () => mockDeep<ProfileService>();
 export const createPubSubMock = () => mock<PubSub>();

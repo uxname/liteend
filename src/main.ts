@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { Logger } from 'nestjs-pino';
+import { BODY_LIMIT } from '@/common/constants';
 import { AppModule } from './app.module';
 import { setupApp } from './bootstrap/setup-app';
 
@@ -21,7 +22,7 @@ process.on('uncaughtException', (error) => {
 async function bootstrap(): Promise<void> {
   const adapter = new FastifyAdapter({
     logger: false,
-    bodyLimit: 10485760,
+    bodyLimit: BODY_LIMIT,
     trustProxy: true,
   });
 
@@ -36,6 +37,8 @@ async function bootstrap(): Promise<void> {
   await setupApp(app);
 
   const configService = app.get(ConfigService);
+
+  app.enableVersioning();
 
   const port = configService.getOrThrow<number>('PORT');
   await app.listen(port, '0.0.0.0');

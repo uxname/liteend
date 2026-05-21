@@ -67,6 +67,49 @@ describe('FileUpload (e2e)', () => {
     client.logout();
   });
 
+  it('should GET an uploaded file and return correct MIME type', async () => {
+    const profile = await createProfile(prisma);
+    client.loginAs(profile);
+
+    const uploadResponse = await client.uploadFile(
+      '/upload',
+      'test-image.png',
+      PNG_1X1,
+      'image/png',
+    );
+    const body = uploadResponse.json() as Array<{
+      filename: string;
+      path: string;
+    }>;
+    const filePath = body[0]!.path;
+
+    const downloadResponse = await client.request({
+      method: 'GET',
+      url: filePath,
+    });
+
+    expect(downloadResponse.statusCode).toBe(200);
+    expect(downloadResponse.headers['content-type']).toBe('image/png');
+
+    const relativePath = filePath.replace(/^\/uploads\//, '');
+    const fullDiskPath = path.join(
+      process.cwd(),
+      'data',
+      'uploads',
+      relativePath,
+    );
+    fs.unlinkSync(fullDiskPath);
+    const upload = await prisma.upload.findFirst({
+      where: { filepath: relativePath },
+    });
+    if (upload) {
+      await prisma.upload.delete({ where: { id: upload.id } });
+    }
+    await prisma.profile.delete({ where: { id: profile.id } });
+
+    client.logout();
+  });
+
   it('should return 400 when the request is not multipart', async () => {
     const response = await client.request({
       method: 'POST',

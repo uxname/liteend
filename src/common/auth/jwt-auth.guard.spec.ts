@@ -4,7 +4,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { PinoLogger } from 'nestjs-pino';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { AuthService } from '@/common/auth/auth.service';
 import {
   createExecutionContextMock,
   mock,
@@ -41,14 +41,14 @@ const makeHttp = (req: unknown) => ({
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
   let configService: ConfigService;
-  let prisma: PrismaService;
+  let authService: AuthService;
   let logger: PinoLogger;
 
   beforeEach(() => {
     configService = mock<ConfigService>();
-    prisma = mockDeep<PrismaService>() as unknown as PrismaService;
+    authService = mockDeep<AuthService>() as unknown as AuthService;
     logger = mock<PinoLogger>();
-    guard = new JwtAuthGuard(configService, prisma, logger);
+    guard = new JwtAuthGuard(configService, authService, logger);
   });
 
   afterEach(() => {
@@ -59,7 +59,7 @@ describe('JwtAuthGuard', () => {
     it('should find user by oidcSub and return true', async () => {
       vi.mocked(configService.get).mockReturnValue('true');
       const profile = makeProfile();
-      vi.mocked(prisma.profile.findUnique).mockResolvedValue(profile);
+      vi.mocked(authService.findProfileBySub).mockResolvedValue(profile);
 
       const ctx = createExecutionContextMock();
       ctx.getType.mockReturnValue('http');
@@ -69,16 +69,16 @@ describe('JwtAuthGuard', () => {
 
       const result = await guard.canActivate(ctx as never);
       expect(result).toBe(true);
-      expect(prisma.profile.findUnique).toHaveBeenCalledWith({
-        where: { oidcSub: 'some-sub' },
-      });
+      expect(authService.findProfileBySub).toHaveBeenCalledWith('some-sub');
     });
 
-    it('should fall through to default user when findUnique returns null', async () => {
+    it('should fall through to default user when findProfileBySub returns null', async () => {
       vi.mocked(configService.get).mockReturnValue('true');
-      vi.mocked(prisma.profile.findUnique).mockResolvedValue(null);
+      vi.mocked(authService.findProfileBySub).mockResolvedValue(null);
       const defaultProfile = makeProfile();
-      vi.mocked(prisma.profile.upsert).mockResolvedValue(defaultProfile);
+      vi.mocked(authService.findOrCreateDefaultMockUser).mockResolvedValue(
+        defaultProfile,
+      );
 
       const ctx = createExecutionContextMock();
       ctx.getType.mockReturnValue('http');
@@ -88,13 +88,13 @@ describe('JwtAuthGuard', () => {
 
       const result = await guard.canActivate(ctx as never);
       expect(result).toBe(true);
-      expect(prisma.profile.upsert).toHaveBeenCalled();
+      expect(authService.findOrCreateDefaultMockUser).toHaveBeenCalled();
     });
 
     it('should sync user to req.raw when it exists', async () => {
       vi.mocked(configService.get).mockReturnValue('true');
       const profile = makeProfile();
-      vi.mocked(prisma.profile.findUnique).mockResolvedValue(profile);
+      vi.mocked(authService.findProfileBySub).mockResolvedValue(profile);
 
       const raw: Record<string, unknown> = {};
       const req = { headers: { 'x-mock-sub': 'some-sub' }, raw };
@@ -111,7 +111,9 @@ describe('JwtAuthGuard', () => {
     it('should upsert default user and return true', async () => {
       vi.mocked(configService.get).mockReturnValue('true');
       const profile = makeProfile();
-      vi.mocked(prisma.profile.upsert).mockResolvedValue(profile);
+      vi.mocked(authService.findOrCreateDefaultMockUser).mockResolvedValue(
+        profile,
+      );
 
       const ctx = createExecutionContextMock();
       ctx.getType.mockReturnValue('http');
@@ -119,9 +121,7 @@ describe('JwtAuthGuard', () => {
 
       const result = await guard.canActivate(ctx as never);
       expect(result).toBe(true);
-      expect(prisma.profile.upsert).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { oidcSub: 'mock-oidc-sub' } }),
-      );
+      expect(authService.findOrCreateDefaultMockUser).toHaveBeenCalled();
     });
   });
 
