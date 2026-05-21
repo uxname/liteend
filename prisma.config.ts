@@ -16,8 +16,7 @@ const hasIndividualVars =
 
 const DATABASE_URL = hasIndividualVars
   ? `postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?schema=public`
-  : (env('DATABASE_URL') ??
-    'postgresql://postgres:postgres@localhost:5432/postgres?schema=public');
+  : env('DATABASE_URL');
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',

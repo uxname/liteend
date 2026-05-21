@@ -19,8 +19,13 @@ export class PrismaService
 
     const DATABASE_URL = `postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?schema=public`;
 
-    const pool = new Pool({ connectionString: DATABASE_URL });
-    // TODO: remove cast when @prisma/adapter-pg updates bundled @types/pg (currently 8.11.11, conflicts with root @types/pg 8.20.0)
+    const pool = new Pool({
+      connectionString: DATABASE_URL,
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
+      max: 10,
+    });
+    // TODO(#1): remove cast when @prisma/adapter-pg updates bundled @types/pg
     const adapter = new PrismaPg(
       pool as unknown as ConstructorParameters<typeof PrismaPg>[0],
     );

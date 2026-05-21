@@ -8,8 +8,8 @@ const ProfileUpdateSchema = z.object({
 
 class ProfileUpdateZodDto extends createZodDto(ProfileUpdateSchema) {}
 
-@InputType()
+@InputType({ description: 'Input fields for updating a user profile' })
 export class ProfileUpdateInput extends ProfileUpdateZodDto {
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, description: 'New avatar image URL' })
   declare avatarUrl?: string;
 }

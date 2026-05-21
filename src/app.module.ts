@@ -94,6 +94,15 @@ import { AppController } from './app.controller';
           ),
           password: configService.getOrThrow<string>('REDIS_PASSWORD'),
         },
+        defaultJobOptions: {
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 1000,
+          },
+          removeOnComplete: 100,
+          removeOnFail: 50,
+        },
       }),
       inject: [ConfigService],
     }),

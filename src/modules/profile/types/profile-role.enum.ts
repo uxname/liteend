@@ -5,4 +5,7 @@ export enum ProfileRole {
   USER = 'USER',
 }
 
-registerEnumType(ProfileRole, { name: 'ProfileRole', description: undefined });
+registerEnumType(ProfileRole, {
+  name: 'ProfileRole',
+  description: 'User authorization roles',
+});

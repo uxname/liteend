@@ -37,7 +37,7 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| CON-01 | GraphQL типы без описаний | ❌ FAIL 🟠 | 13 из 14 элементов без `description`: Profile, ProfileUpdateInput, enums, резолверы | **1. Добавить `description` в декораторы** \\ 2. Добавить JSDoc \\ 3. Сгенерировать SDL-документацию | Нет |
+| CON-01 | GraphQL типы без описаний | ❌ FAIL 🟠 | 13 из 14 элементов без `description`: Profile, ProfileUpdateInput, enums, резолверы | **1. Добавить `description` в декораторы** \\ 2. Добавить JSDoc \\ 3. Сгенерировать SDL-документацию | ✅ Да |
 | OWA-07 | Утечка внутренних сообщений в GQL ошибках | ❌ FAIL 🟠 | `error-formatter.ts:117-120` — `originalError.message` для необработанных ошибок | **1. Заменить на `'Internal Server Error'`** \\ 2. Логировать оригинал в Pino \\ 3. Использовать machine-readable code | ✅ Да |
 | PERF-03 | Нет ограничения глубины GraphQL запросов | ❌ FAIL 🟠 | `app.module.ts:37-73` — нет `queryDepth`, `validationRules` | **1. Добавить `queryDepth: 8`** \\ 2. Использовать `graphql-query-complexity` \\ 3. Настроить cost-анализ | ✅ Да |
 | PERF-08 | GraphQL кэш отключён | ❌ FAIL 🟠 | `app.module.ts:45` — `cache: false` | **1. Включить `cache: true`** \\ 2. Использовать Redis cache store \\ 3. Настроить per-query кэширование | ✅ Да |
@@ -58,11 +58,11 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| SEC-01 | Hardcoded DB credentials | ❌ FAIL 🟠 | `prisma.config.ts:20` — `postgresql://postgres:postgres@localhost:5432/postgres?schema=public` | **1. Заменить на `env('DATABASE_URL') ?? undefined`** \\ 2. Добавить fallback-error message \\ 3. Удалить файл из репозитория | Нет |
-| ERR-05 | Prisma без connectionTimeout | ❌ FAIL 🟠 | `prisma.service.ts:22` — `new Pool({ connectionString })` без таймаутов | **1. Добавить `connectionTimeoutMillis: 10000`** \\ 2. Добавить `idleTimeoutMillis: 30000` \\ 3. Настроить pool `max: 10` явно | Нет |
+| SEC-01 | Hardcoded DB credentials | ❌ FAIL 🟠 | `prisma.config.ts:20` — `postgresql://postgres:postgres@localhost:5432/postgres?schema=public` | **1. Заменить на `env('DATABASE_URL') ?? undefined`** \\ 2. Добавить fallback-error message \\ 3. Удалить файл из репозитория | ✅ Да |
+| ERR-05 | Prisma без connectionTimeout | ❌ FAIL 🟠 | `prisma.service.ts:22` — `new Pool({ connectionString })` без таймаутов | **1. Добавить `connectionTimeoutMillis: 10000`** \\ 2. Добавить `idleTimeoutMillis: 30000` \\ 3. Настроить pool `max: 10` явно | ✅ Да |
 | Matrix A1 | Нет reconnect при недоступности БД | ❌ FAIL 🔴 | `prisma.service.ts` — нет retry-логики при `$connect()` | **1. Добавить exponential backoff retry** \\ 2. Graceful fallback с кэшем \\ 3. Healthcheck прерывает retry | Нет |
 | Matrix A12 | Нет retry миграций при старте | ❌ FAIL 🔴 | `package.json` — `prestart:prod` запускает `db:migrations:apply` без retry | **1. Обернуть в retry с backoff** \\ 2. Добавить timeout на миграцию \\ 3. Graceful failure — не блокировать app | Нет |
-| PERF-06 | Пул соединений не сконфигурирован явно | ❌ FAIL 🟡 | `prisma.service.ts:22` — `Pool` без `max`/`min`/`idleTimeoutMillis` | **1. Добавить конфигурацию пула** \\ 2. Мониторить через healthcheck \\ 3. Добавить Prometheus метрики | Нет |
+| PERF-06 | Пул соединений не сконфигурирован явно | ❌ FAIL 🟡 | `prisma.service.ts:22` — `Pool` без `max`/`min`/`idleTimeoutMillis` | **1. Добавить конфигурацию пула** \\ 2. Мониторить через healthcheck \\ 3. Добавить Prometheus метрики | ✅ Да |
 
 ---
 
@@ -83,7 +83,7 @@
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
 | VAL-02 | ProfileUpdateSchema без maxLength | ❌ FAIL 🟠 | `profile-update.input.ts` — `avatarUrl` только `z.url()` без `.max()` | **1. Добавить `.max(2048).trim()`** \\ 2. Добавить `.max()` для всех строк \\ 3. Использовать константы для лимитов | Нет |
-| LOG-02 | ProfileService без аудит-логов | ❌ FAIL 🟠 | `profile.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать updateProfile: userId, changedFields \\ 3. Добавить subscription-log | Нет |
+| LOG-02 | ProfileService без аудит-логов | ❌ FAIL 🟠 | `profile.service.ts` — 0 вызовов логгера | **1. Инжектить PinoLogger** \\ 2. Логировать updateProfile: userId, changedFields \\ 3. Добавить subscription-log | ✅ Да |
 | PERF-08 | Profile upsert при каждом JWT-запросе | ❌ FAIL 🟠 | `jwt.strategy.ts:50` — upsert профиля на каждый запрос | **1. Кэшировать в Redis с TTL** \\ 2. Использовать memoization \\ 3. Добавить batch-обновления | Нет |
 
 ---
@@ -94,8 +94,8 @@
 |----------|----------|--------|----------------|---------|------------|
 | ERR-01 | AllExceptionsFilter игнорирует graphql/ws контексты | ❌ FAIL 🟠 | `all-exceptions-filter.ts` — `if (host.getType() !== 'http') return;` | **1. Добавить обработку graphql контекста** \\ 2. Пробрасывать в gqlErrorFormatter \\ 3. Логировать все контексты | Нет |
 | ERR-04 | Нет process-level обработчиков ошибок | ❌ FAIL 🔴 | `main.ts` — нет `process.on('unhandledRejection')` и `process.on('uncaughtException')` | **1. Добавить глобальные обработчики** \\ 2. Логировать и корректно завершать процесс \\ 3. Добавить sentry/similar | ✅ Да |
-| ERR-05 | Внешние вызовы без таймаутов | ❌ FAIL 🟠 | `redis.service.ts`, `prisma.service.ts`, `ofetch` — нет явных таймаутов | **1. Добавить connectTimeout для Redis** \\ 2. Добавить connectionTimeout для Prisma \\ 3. Добавить timeout для HTTP-вызовов | Нет |
-| ERR-08 | BullMQ без retry-стратегии | ❌ FAIL 🟠 | `app.module.ts` — `forRootAsync` без `defaultJobOptions` | **1. Добавить `attempts: 3, backoff: { type: 'exponential', delay: 1000 }`** \\ 2. Добавить jitter \\ 3. Настроить per-queue options | Нет |
+| ERR-05 | Внешние вызовы без таймаутов | ❌ FAIL 🟠 | `redis.service.ts`, `prisma.service.ts`, `ofetch` — нет явных таймаутов | **1. Добавить connectTimeout для Redis** \\ 2. Добавить connectionTimeout для Prisma \\ 3. Добавить timeout для HTTP-вызовов | ✅ Да |
+| ERR-08 | BullMQ без retry-стратегии | ❌ FAIL 🟠 | `app.module.ts` — `forRootAsync` без `defaultJobOptions` | **1. Добавить `attempts: 3, backoff: { type: 'exponential', delay: 1000 }`** \\ 2. Добавить jitter \\ 3. Настроить per-queue options | ✅ Да |
 | ERR-09 | Нет AbortSignal/AbortController | ❌ FAIL 🟠 | Везде — 0 использований AbortController | **1. Внедрить AbortController в долгие операции** \\ 2. Использовать AbortSignal в fetch \\ 3. Добавить CancellationToken паттерн | Нет |
 
 ---
@@ -104,9 +104,9 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| Matrix A2 | Нет reconnect при падении Redis | ❌ FAIL 🔴 | `redis.service.ts` — `new Redis(...)` без `retryStrategy` | **1. Добавить `retryStrategy` с backoff** \\ 2. Настроить `lazyConnect: true` \\ 3. Graceful degradation | Нет |
-| ERR-05 | Redis без connectTimeout | ❌ FAIL 🟠 | `redis.service.ts:17` — нет `connectTimeout`, `maxRetriesPerRequest` | **1. Добавить `connectTimeout: 10000`** \\ 2. Настроить `maxRetriesPerRequest: null` \\ 3. Добавить `lazyConnect` | Нет |
-| PERF-06 | Redis без retryStrategy | ❌ FAIL 🟡 | `redis.service.ts` — ioredis defaults, нет экспоненциальной задержки | **1. Добавить `retryStrategy(times) => Math.min(times * 50, 2000)`** \\ 2. Настроить `enableReadyCheck` \\ 3. Подключаться в `onModuleInit` | Нет |
+| Matrix A2 | Нет reconnect при падении Redis | ❌ FAIL 🔴 | `redis.service.ts` — `new Redis(...)` без `retryStrategy` | **1. Добавить `retryStrategy` с backoff** \\ 2. Настроить `lazyConnect: true` \\ 3. Graceful degradation | ✅ Да |
+| ERR-05 | Redis без connectTimeout | ❌ FAIL 🟠 | `redis.service.ts:17` — нет `connectTimeout`, `maxRetriesPerRequest` | **1. Добавить `connectTimeout: 10000`** \\ 2. Настроить `maxRetriesPerRequest: null` \\ 3. Добавить `lazyConnect` | ✅ Да |
+| PERF-06 | Redis без retryStrategy | ❌ FAIL 🟡 | `redis.service.ts` — ioredis defaults, нет экспоненциальной задержки | **1. Добавить `retryStrategy(times) => Math.min(times * 50, 2000)`** \\ 2. Настроить `enableReadyCheck` \\ 3. Подключаться в `onModuleInit` | ✅ Да |
 
 ---
 
@@ -149,8 +149,8 @@
 
 | Check ID | Проверка | Статус | Доказательство | Решение | Исправлено |
 |----------|----------|--------|----------------|---------|------------|
-| CON-04 | DevLauncher кэш без инвалидации | ❌ FAIL 🟡 | `dev-launcher.controller.ts:14` — `cachedHtml` никогда не обновляется | **1. Добавить TTL 5 минут** \\ 2. Убрать кэш (dev tool) \\ 3. Использовать conditional requests | Нет |
-| YAGNI-05 | TODO без даты | ❌ FAIL 🟡 | `prisma.service.ts` — TODO без owner/issue | **1. Добавить issue # и дату** \\ 2. Исправить или удалить \\ 3. Создать tech debt item | Нет |
+| CON-04 | DevLauncher кэш без инвалидации | ❌ FAIL 🟡 | `dev-launcher.controller.ts:14` — `cachedHtml` никогда не обновляется | **1. Добавить TTL 5 минут** \\ 2. Убрать кэш (dev tool) \\ 3. Использовать conditional requests | ✅ Да |
+| YAGNI-05 | TODO без даты | ❌ FAIL 🟡 | `prisma.service.ts` — TODO без owner/issue | **1. Добавить issue # и дату** \\ 2. Исправить или удалить \\ 3. Создать tech debt item | ✅ Да |
 | YAGNI-03 | RedisService — тонкая обёртка | ❌ FAIL 🟡 | `redis.service.ts` — `getClient()` без сокрытия деталей | **1. Добавить бизнес-методы** \\ 2. Удалить и использовать ioredis напрямую \\ 3. Оставить, добавив абстракцию | Нет |
 | YAGNI-03 | DotenvValidatorService — немой сервис | ❌ FAIL 🟡 | Пропускает production, только non-prod | **1. Расширить на production** \\ 2. Удалить сервис, перенести логику \\ 3. Использовать ConfigModule validation | Нет |
 
@@ -162,7 +162,7 @@
 |----------|----------|--------|----------------|---------|------------|
 | CON-05 | TestQueueProcessor не идемпотентен | ❌ FAIL 🟡 | `test-queue.processor.ts` — нет dedup, at-least-once доставка | **1. Добавить dedup key** \\ 2. Проверять состояние в БД \\ 3. Использовать job.id для идемпотентности | Нет |
 | CON-06 | TestQueueProcessor без механизма отмены | ❌ FAIL 🟡 | `test-queue.processor.ts:14` — `setTimeout` без AbortSignal | **1. Проверять `job.isCancelled()`** \\ 2. Добавить AbortController \\ 3. Настроить timeout на job | Нет |
-| ERR-08 | BullMQ без retry | ❌ FAIL 🟠 | `app.module.ts` — `bullBoard.forRoot()` без `defaultJobOptions` | **1. Добавить `defaultJobOptions` с retry** \\ 2. Настроить per-queue options \\ 3. Включить exponential backoff | Нет |
+| ERR-08 | BullMQ без retry | ❌ FAIL 🟠 | `app.module.ts` — `bullBoard.forRoot()` без `defaultJobOptions` | **1. Добавить `defaultJobOptions` с retry** \\ 2. Настроить per-queue options \\ 3. Включить exponential backoff | ✅ Да |
 
 ---
 

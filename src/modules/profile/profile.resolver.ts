@@ -27,12 +27,17 @@ const EVENTS = {
 export class ProfileResolver {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Query(() => Profile, { name: 'me' })
+  @Query(() => Profile, {
+    name: 'me',
+    description: 'Get the currently authenticated profile',
+  })
   async me(@CurrentUser() user: CurrentUserType): Promise<Profile> {
     return user;
   }
 
-  @Mutation(() => Profile)
+  @Mutation(() => Profile, {
+    description: 'Update the current user profile fields',
+  })
   async updateProfile(
     @CurrentUser() user: CurrentUserType,
     @Args('input') input: ProfileUpdateInput,
@@ -55,6 +60,8 @@ export class ProfileResolver {
 
   @Subscription(() => Profile, {
     name: EVENTS.PROFILE_UPDATED,
+    description:
+      'Receive real-time updates when the current user profile changes',
     filter: (payload, _variables, context) => {
       const updatedProfileId = payload.profileUpdated.id;
       const currentUserId = context.req?.user?.id;

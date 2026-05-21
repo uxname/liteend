@@ -8,7 +8,7 @@
 | YAGNI-02 | Нет dead code | :warning: ISSUES FOUND | 90% | 8 точек dead code (см. ниже) | Удалить | Нет |
 | YAGNI-03 | Абстракции оправданы | :warning: ISSUES FOUND | 85% | 3 неоправданных абстракции (см. ниже) | Рефакторинг | Нет |
 | YAGNI-04 | Feature flags не зафиксированы | :white_check_mark: PROCEED | 100% | `OIDC_MOCK_ENABLED` читается из env | — | — |
-| YAGNI-05 | Технический долг актуален | :warning: ISSUES FOUND | 95% | 1 TODO без даты/прогресса (см. ниже) | Добавить дату/issue | Нет |
+| YAGNI-05 | Технический долг актуален | :warning: ISSUES FOUND | 95% | 1 TODO без даты/прогресса (см. ниже) | Добавить дату/issue | ✅ Да |
 
 ---
 

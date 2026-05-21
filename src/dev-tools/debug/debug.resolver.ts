@@ -44,7 +44,10 @@ export class DebugResolver {
     }
   }
 
-  @Query(() => String, { name: 'testTranslation' })
+  @Query(() => String, {
+    name: 'testTranslation',
+    description: 'Test i18n translation by username',
+  })
   testTranslation(
     @Args('username', { type: () => String }) username: string,
     @I18n() i18n: I18nContext<I18nTranslations>,
@@ -56,13 +59,19 @@ export class DebugResolver {
     });
   }
 
-  @Query(() => String, { name: 'echo' })
+  @Query(() => String, {
+    name: 'echo',
+    description: 'Echo back the input text (dev utility)',
+  })
   echo(@Args('text', { type: () => String }) text: string): string {
     DebugResolver.logger.log({ resolver: 'echo', text });
     return text;
   }
 
-  @Mutation(() => String, { name: 'echo' })
+  @Mutation(() => String, {
+    name: 'echo',
+    description: 'Echo mutation — returns the input text (dev utility)',
+  })
   echoMutation(@Args('text', { type: () => String }) text: string): string {
     return text;
   }

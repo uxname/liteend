@@ -24,7 +24,7 @@
 | Check ID | Проверка | Статус | Уверенность | Доказательство |
 |----------|----------|--------|-------------|----------------|
 | LOG-01 | HTTP запросы/ответы логируются (метод, статус, URL, длительность) | PASS | high | `pino-config.ts` lines 71-198 — `autoLogging: true`, custom req/res serializers, `customSuccessMessage` с responseTime, `GqlLoggingInterceptor` для GraphQL |
-| LOG-02 | Важные бизнес-события логируются (создание/удаление, аудит) | **FAIL** | high | `FileUploadService` (0 логов), `ProfileService` (0 логов), `ProfileResolver.updateProfile` — PubSub публикует, но не логирует событие; `FileUploadController` не логирует факт загрузки |
+| LOG-02 | Важные бизнес-события логируются (создание/удаление, аудит) | **FAIL** | high | `FileUploadService` (0 логов), `ProfileService` (добавлен логгер), `ProfileResolver.updateProfile` — PubSub публикует, но не логирует событие; `FileUploadController` не логирует факт загрузки |
 | LOG-03 | Чувствительные данные не попадают в логи | **MODERATE** | high | Pino redact (17 путей) — PASS; `TestQueueProcessor` логирует `JSON.stringify(job.data)` — потенциальный риск; `console.error` в `main.ts` строка 39 — не содержит sensitive |
 | LOG-04 | Уровни логирования корректны | PASS | high | `customLogLevel`: silent(304/ignored), error(500+), warn(400+), info(остальное); `AllExceptionsFilter` error(500+)/warn(client); `gqlErrorFormatter` error(server)/warn(client) |
 | LOG-05 | Нет избыточного логирования в hot path | PASS | high | No per-item logging in loops; `GqlLoggingInterceptor` truncates responses (4096 байт, 5 элементов); `AllExceptionsFilter` suppresses noisy 404s; pino-config ignores health/altair/favicon/swagger paths |
