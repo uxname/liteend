@@ -33,7 +33,21 @@ export async function setupApp(
     endpointURL: '/graphql',
   });
 
-  await app.register(helmet);
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        scriptSrc: [`'self'`, `'unsafe-inline'`, `'unsafe-eval'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+        connectSrc: [`'self'`],
+        fontSrc: [`'self'`],
+        objectSrc: [`'none'`],
+        upgradeInsecureRequests: null,
+        scriptSrcAttr: null,
+      },
+    },
+  });
 
   await app.register(rateLimit, {
     max: RATE_LIMIT_MAX,
@@ -66,7 +80,9 @@ export async function setupApp(
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('swagger', app, cleanupOpenApiDoc(document));
+  SwaggerModule.setup('swagger', app, cleanupOpenApiDoc(document), {
+    swaggerUrl: '/swagger-json',
+  });
 
   const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:4000';
   app.enableCors({
