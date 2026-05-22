@@ -42,6 +42,7 @@ export async function setupApp(
           `'unsafe-inline'`,
           `'unsafe-eval'`,
           'https://cdn.tailwindcss.com',
+          'https://esm.sh',
         ],
         styleSrc: [`'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com'],
         imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
