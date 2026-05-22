@@ -46,7 +46,7 @@ export async function setupApp(
         ],
         styleSrc: [`'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com'],
         imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
-        connectSrc: [`'self'`, 'https://fonts.gstatic.com'],
+        connectSrc: [`'self'`, 'https://fonts.gstatic.com', 'https://esm.sh'],
         fontSrc: [`'self'`, 'https://fonts.gstatic.com'],
         objectSrc: [`'none'`],
         upgradeInsecureRequests: null,
