@@ -18,16 +18,16 @@ It summarizes the commands, conventions, and constraints inferred from configura
 - **Lint + fix**: `npm run lint:fix`
 - **Lint + fix (unsafe)**: `npm run lint:fix:unsafe`
 - **Type check**: `npm run ts:check`
-- **Full check**: `npm run check` (type check + lint:fix + knip)
+- **Full check**: `npm run check` (type check + lint:fix + knip --production)
 
 ### IMPORTANT — Quality Gate Rule
 
 - **Always** use `npm run check` for the full quality gate.
-- **Never** call `npm run lint && npm run ts:check` separately — this skips knip, steiger, and biome auto-fix, which will cause pre-commit (lefthook) to fail. Rely on `npm run check` exclusively.
+- **Never** call `npm run lint && npm run ts:check` separately — this skips knip and biome auto-fix, causing pre-commit (lefthook) to fail. Rely on `npm run check` exclusively.
 
 **Pre-commit hooks** (`lefthook.yml`):
-- `pre-commit` (parallel): runs `npm run check` + `npm run test` (unit)
-- `pre-push`: runs `npm run test:cov` — blocks push if coverage drops below 80%
+- `pre-commit`: runs `gitleaks` (optional, silently skipped if not installed) + `npm run check`
+- `pre-push`: runs `npm run check` + `npm run test:all`
 
 Do not bypass hooks unless explicitly asked.
 
@@ -61,12 +61,14 @@ docker-compose up -d db redis
 
 **Prisma workflows:**
 
-- `npm run db:migrations:apply`
+- `npm run db:migrations:apply` (deploy + gen)
 - `npm run db:migrations:create`
-- `npm run db:gen`
+- `npm run db:push` (push + gen)
+- `npm run db:gen` (generate client)
 - `npm run db:reset`
 - `npm run db:schema:format`
 - `npm run db:seed`
+- `npm run db:studio` (Prisma Studio on port 5555)
 
 ## Code Style & Conventions
 
@@ -91,7 +93,7 @@ docker-compose up -d db redis
 - Services: `*.service.ts`
 - Controllers: `*.controller.ts`
 - Resolvers: `*.resolver.ts`
-- Feature modules live under `src/app/` and shared/common code under `src/common/`.
+- Feature modules live under `src/modules/`, infrastructure under `src/infrastructure/`, and shared/common code under `src/common/`.
 
 ### Architecture Boundaries
 
