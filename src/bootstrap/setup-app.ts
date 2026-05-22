@@ -92,7 +92,7 @@ export async function setupApp(
 
   const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:4000';
   app.enableCors({
-    origin: corsOrigin.split(','),
+    origin: corsOrigin.split(',').map((origin) => origin.trim()),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });

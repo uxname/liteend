@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Profile, ProfileRole } from '@/@generated/prisma/client';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { RedisService } from '@/common/redis/redis.service';
 import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
@@ -23,11 +24,18 @@ describe('ProfileService', () => {
     },
   };
 
+  const mockRedisService = {
+    getClient: vi.fn().mockReturnValue({
+      del: vi.fn().mockResolvedValue(1),
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProfileService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: RedisService, useValue: mockRedisService },
       ],
     }).compile();
 

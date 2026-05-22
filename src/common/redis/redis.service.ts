@@ -21,7 +21,6 @@ export class RedisService implements OnModuleDestroy {
       connectTimeout: 10000,
       maxRetriesPerRequest: null,
       retryStrategy: (times) => {
-        if (times > 10) return null;
         return Math.min(times * 200, 3000);
       },
       lazyConnect: true,
