@@ -30,7 +30,7 @@ describe('BullMQ Queue (e2e)', () => {
       if (!current) continue;
       const state = await current.getState();
       if (state === 'completed') {
-        completedJob = current;
+        completedJob = (await testQueue.getJob(job.id!)) ?? null;
         break;
       }
       if (state === 'failed') {
