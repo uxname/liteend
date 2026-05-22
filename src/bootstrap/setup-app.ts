@@ -37,11 +37,16 @@ export async function setupApp(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: [`'self'`],
-        scriptSrc: [`'self'`, `'unsafe-inline'`, `'unsafe-eval'`],
-        styleSrc: [`'self'`, `'unsafe-inline'`],
+        scriptSrc: [
+          `'self'`,
+          `'unsafe-inline'`,
+          `'unsafe-eval'`,
+          'https://cdn.tailwindcss.com',
+        ],
+        styleSrc: [`'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com'],
         imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
-        connectSrc: [`'self'`],
-        fontSrc: [`'self'`],
+        connectSrc: [`'self'`, 'https://fonts.gstatic.com'],
+        fontSrc: [`'self'`, 'https://fonts.gstatic.com'],
         objectSrc: [`'none'`],
         upgradeInsecureRequests: null,
         scriptSrcAttr: null,
