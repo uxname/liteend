@@ -1,6 +1,11 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import {
+  REDIS_CONNECT_TIMEOUT,
+  REDIS_RETRY_BASE_DELAY,
+  REDIS_RETRY_MAX_DELAY,
+} from '@/common/constants';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -18,10 +23,13 @@ export class RedisService implements OnModuleDestroy {
       host,
       port,
       password,
-      connectTimeout: 10000,
-      maxRetriesPerRequest: null,
+      connectTimeout: REDIS_CONNECT_TIMEOUT,
+      maxRetriesPerRequest: 20,
       retryStrategy: (times) => {
-        return Math.min(times * 200, 3000);
+        return (
+          Math.min(times * REDIS_RETRY_BASE_DELAY, REDIS_RETRY_MAX_DELAY) *
+          (0.5 + Math.random() * 0.5)
+        );
       },
       lazyConnect: true,
     });

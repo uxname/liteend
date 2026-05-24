@@ -9,34 +9,34 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { lookup } from 'mrmime';
+import { FILE_UPLOAD_TIMEOUT } from '@/common/constants';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
 export class FileUploadService {
   private readonly logger = new Logger(FileUploadService.name);
-  private readonly UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
-  private readonly DEFAULT_MIME_TYPE = 'application/octet-stream';
-  private readonly ALLOWED_MIME_TYPES = new Set([
+  private readonly uploadDir = path.join(process.cwd(), 'data', 'uploads');
+  private readonly defaultMimeType = 'application/octet-stream';
+  private readonly allowedMimeTypes = new Set([
     'image/png',
     'image/jpeg',
     'image/gif',
-    'image/svg+xml',
     'image/webp',
   ]);
 
   constructor(private readonly prisma: PrismaService) {}
 
   getMimeType(filename: string): string {
-    return lookup(filename) || this.DEFAULT_MIME_TYPE;
+    return lookup(filename) || this.defaultMimeType;
   }
 
   async getSafeFileInfo(relativePath: string): Promise<{
     fullPath: string;
     mimeType: string;
   }> {
-    const fullPath = path.join(this.UPLOAD_DIR, relativePath);
+    const fullPath = path.join(this.uploadDir, relativePath);
     const resolvedPath = path.resolve(fullPath);
-    const resolvedRoot = path.resolve(this.UPLOAD_DIR);
+    const resolvedRoot = path.resolve(this.uploadDir);
 
     if (!resolvedPath.startsWith(resolvedRoot)) {
       throw new ForbiddenException('Access denied');
@@ -55,8 +55,7 @@ export class FileUploadService {
   }
 
   async processFile(part: MultipartFile) {
-    if (!this.ALLOWED_MIME_TYPES.has(part.mimetype)) {
-      await part.toBuffer();
+    if (!this.allowedMimeTypes.has(part.mimetype)) {
       return null;
     }
 
@@ -64,7 +63,7 @@ export class FileUploadService {
       await this.ensurePathsAndGenerate(part.filename);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30_000);
+    const timeout = setTimeout(() => controller.abort(), FILE_UPLOAD_TIMEOUT);
 
     try {
       const buffer = await part.toBuffer();
@@ -117,7 +116,7 @@ export class FileUploadService {
       `${String(now.getUTCHours()).padStart(2, '0')}-${String(now.getUTCMinutes()).padStart(2, '0')}`,
     );
 
-    const fullDir = path.join(this.UPLOAD_DIR, relativeDir);
+    const fullDir = path.join(this.uploadDir, relativeDir);
     await fsAsync.mkdir(fullDir, { recursive: true });
 
     const extension = path.extname(originalFilename);

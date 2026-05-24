@@ -1,30 +1,25 @@
 import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-
+import type { RestoreEnvironmentVariables } from './env';
 import { Logger } from './logger';
 
 const logger = new Logger({ name: 'Restore' });
 
-interface EnvironmentVariables {
-  DATABASE_HOST: string;
-  DATABASE_PORT: string;
-  DATABASE_USER: string;
-  DATABASE_PASSWORD: string;
-  DATABASE_NAME: string;
-  BACKUP_DIR: string;
-}
-
-const environment: EnvironmentVariables = {
+const environment: RestoreEnvironmentVariables = {
   DATABASE_HOST: process.env.DATABASE_HOST || 'localhost',
   DATABASE_PORT: process.env.DATABASE_PORT || '5432',
   DATABASE_USER: process.env.DATABASE_USER || 'postgres',
-  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || 'postgres',
+  DATABASE_PASSWORD:
+    process.env.DATABASE_PASSWORD ??
+    (() => {
+      throw new Error('DATABASE_PASSWORD is required');
+    })(),
   DATABASE_NAME: process.env.DATABASE_NAME || 'postgres',
   BACKUP_DIR: process.env.BACKUP_DIR || './data/database_backups',
 };
 
-const safeEnvironment: EnvironmentVariables = {
+const safeEnvironment: RestoreEnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
 };

@@ -27,8 +27,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const nodeEnv = process.env.NODE_ENV;
     const isMockEnabled =
-      this.configService.get<string>('OIDC_MOCK_ENABLED') === 'true';
+      this.configService.get<string>('OIDC_MOCK_ENABLED') === 'true' &&
+      nodeEnv !== 'production';
     const request = this.getRequest(context) as RequestWithUser;
 
     if (isMockEnabled) {

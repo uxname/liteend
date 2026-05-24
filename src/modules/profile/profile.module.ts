@@ -6,6 +6,5 @@ import { ProfileService } from './profile.service';
 @Module({
   imports: [RedisModule],
   providers: [ProfileService, ProfileResolver],
-  exports: [ProfileService],
 })
 export class ProfileModule {}

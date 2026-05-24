@@ -39,4 +39,7 @@ model Upload {
   mimetype         String
 
   uploaderIp String
+
+  @@index([uploaderIp])
+  @@index([createdAt])
 }

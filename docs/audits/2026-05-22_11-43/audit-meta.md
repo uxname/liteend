@@ -136,7 +136,7 @@ Severity совпадает ✅, но проблема дублируется. �
 
 ---
 
-### META-14 ❌ 🟠 BullMQ concurrency — ПРОТИВОРЕЧИВЫЕ выводы
+### META-14 ❌ 🟠 → ✅ FIXED BullMQ concurrency — ПРОТИВОРЕЧИВЫЕ выводы
 | Аудит | ID | Вывод |
 |-------|----|-------|
 | Concurrency | CON-07 | ✅ PASS — concurrency=1 по умолчанию, это безопасно |
@@ -144,7 +144,7 @@ Severity совпадает ✅, но проблема дублируется. �
 
 **Проблема**: Один аудит говорит, что concurrency=1 OK, другой — что это FAIL. Выводы **противоречат** друг другу.
 
-**Нужно**: Согласовать — либо concurrency должен быть явным, либо это не проблема.
+**Решение**: Явно указан `concurrency: 5` в `@Processor('test', { concurrency: 5 })`. Оба аудита обновлены.
 
 ---
 
@@ -176,9 +176,12 @@ Severity совпадает ✅, но проблема дублируется. �
 ### META-16 ✅ UNVERIFIED находок мало
 Всего 2 `🔍 UNVERIFIED` находки (ERR-09, OWA-03). Это приемлемо для статического анализа.
 
-### META-17 🟡 Ни одна находка не исправлена
-Колонка "Исправлено" = "Нет" во всех 12 аудитах. Всего ~60 FAIL находок без единого фикса.
-Это нормально — аудит и исправление разделены по времени. Но важно отследить.
+### META-17 🟡 → ✅ Большая часть находок исправлена
+После цикла исправлений (2026-05-24):
+- **Исправлено:** ~30+ находок (основные: await pubSub, SVG XSS, TOCTOU, magic numbers, .catch, JSON.parse, OIDC mock guard, auth guards, dead deps, Dockerfile hardening, индексы БД, jitter, Redis circuit breaker, dedup интерфейсов, log levels, write-through cache)
+- **Не исправлено:** ~30 находок (требуют архитектурных изменений: cache stampede, стриминг файлов, requestId propagation, dev-модули conditional, enableVersioning, i18n, statement timeout, тесты auth.service и др.)
+
+Колонка "Исправлено" обновлена во всех аудит-документах.
 
 ---
 
@@ -199,7 +202,7 @@ Severity совпадает ✅, но проблема дублируется. �
 | META-11 | ❌ 🟡 | SVG XSS — неконсистентная severity |
 | META-12 | ❌ 🟡 | TOCTOU — неконсистентная severity |
 | META-13 | ❌ 🟠 | JSON.parse — дубликат между ERR и VAL |
-| META-14 | ❌ 🟠 | BullMQ — противоречивые выводы CON vs PERF |
+| META-14 | ✅ FIXED | BullMQ — противоречивые выводы CON vs PERF (concurrency: 5) |
 | META-15 | 🟡 | Dev-модули — неконсистентная severity |
 | META-16 | ✅ | Мало UNVERIFIED |
-| META-17 | 🟡 | Ничего не исправлено |
+| META-17 | ✅ | ~30 находок исправлено (детали выше) |

@@ -98,7 +98,7 @@ describe('FileUploadController', () => {
         mimeType: 'image/png',
       });
 
-      const fakeStream = { pipe: vi.fn() };
+      const fakeStream = { pipe: vi.fn(), on: vi.fn().mockReturnThis() };
       vi.spyOn(fs, 'createReadStream').mockReturnValue(fakeStream as never);
 
       const reply = {

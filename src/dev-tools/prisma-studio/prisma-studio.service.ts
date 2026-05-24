@@ -36,7 +36,7 @@ export class PrismaStudioService {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
-      this.logger.error('Unauthorized');
+      this.logger.warn('Unauthorized');
       response
         .code(HttpStatus.UNAUTHORIZED)
         .header('WWW-Authenticate', 'Basic realm="Restricted"')
@@ -46,7 +46,7 @@ export class PrismaStudioService {
 
     const auth = authHeader.split(' ')[1];
     if (!auth) {
-      this.logger.error('Authorization header missing');
+      this.logger.warn('Authorization header missing');
       response.code(HttpStatus.UNAUTHORIZED).send('Unauthorized');
       return;
     }
@@ -56,7 +56,7 @@ export class PrismaStudioService {
       .split(':');
 
     if (authLogin !== login || authPassword !== password) {
-      this.logger.error('Forbidden');
+      this.logger.warn('Forbidden');
       response.code(HttpStatus.FORBIDDEN).send('Forbidden');
       return;
     }

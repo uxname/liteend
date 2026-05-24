@@ -1,29 +1,20 @@
 import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-
+import type { BackupEnvironmentVariables } from './env';
 import { Logger } from './logger';
 
 const logger = new Logger({ name: 'Backup' });
 
-interface EnvironmentVariables {
-  DATABASE_HOST: string;
-  DATABASE_PORT: string;
-  DATABASE_USER: string;
-  DATABASE_PASSWORD: string;
-  DATABASE_NAME: string;
-  BACKUP_DIR: string;
-  BACKUP_INTERVAL: number;
-  BACKUP_ROTATION: number;
-  BACKUP_FORMAT: 'custom' | 'plain';
-  BACKUP_COMPRESS: boolean;
-}
-
-const environment: EnvironmentVariables = {
+const environment: BackupEnvironmentVariables = {
   DATABASE_HOST: process.env.DATABASE_HOST || 'localhost',
   DATABASE_PORT: process.env.DATABASE_PORT || '5432',
   DATABASE_USER: process.env.DATABASE_USER || 'postgres',
-  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || 'postgres',
+  DATABASE_PASSWORD:
+    process.env.DATABASE_PASSWORD ??
+    (() => {
+      throw new Error('DATABASE_PASSWORD is required');
+    })(),
   DATABASE_NAME: process.env.DATABASE_NAME || 'postgres',
   BACKUP_DIR: process.env.BACKUP_DIR || './data/database_backups',
   BACKUP_INTERVAL: Number.parseInt(
@@ -37,7 +28,7 @@ const environment: EnvironmentVariables = {
   BACKUP_COMPRESS: process.env.BACKUP_COMPRESS === 'true',
 };
 
-const safeEnvironment: EnvironmentVariables = {
+const safeEnvironment: BackupEnvironmentVariables = {
   ...environment,
   DATABASE_PASSWORD: '***',
 };

@@ -12,13 +12,10 @@ import {
 } from '@/common/auth/current-user.decorator';
 import { JwtOptionalAuthGuard } from '@/common/auth/jwt-optional-auth.guard';
 import { Roles } from '@/common/auth/roles.decorator';
+import { RolesGuard } from '@/common/auth/roles.guard';
+import { CommitInfo } from '@/common/git-commit-saver';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import packageJson from '../../../package.json';
-
-interface CommitInfo {
-  name: string;
-  hash: string;
-}
 
 const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
   process.cwd(),
@@ -26,7 +23,7 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
   'last-commit-info.json',
 );
 
-@UseGuards(JwtOptionalAuthGuard)
+@UseGuards(JwtOptionalAuthGuard, RolesGuard)
 @Roles(ProfileRole.ADMIN)
 @Resolver(() => Query)
 export class DebugResolver {
@@ -78,8 +75,6 @@ export class DebugResolver {
     return text;
   }
 
-  @UseGuards(JwtOptionalAuthGuard)
-  @Roles(ProfileRole.ADMIN, ProfileRole.USER)
   @Query(() => GraphQLJSON, { name: 'debug' })
   async debug(@CurrentUser() user: CurrentUserType): Promise<unknown> {
     const SECONDS_IN_DAY = 86_400;

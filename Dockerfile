@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build
+FROM node:22.15.1-alpine AS build
 RUN apk add python3 git openssl && rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY package*.json ./
@@ -6,7 +6,7 @@ RUN npm ci --ignore-scripts
 COPY . .
 RUN DATABASE_HOST=placeholder DATABASE_PORT=5432 DATABASE_USER=placeholder DATABASE_PASSWORD=placeholder DATABASE_NAME=placeholder npm run db:gen && npm run build && chmod +x ./healthcheck.sh
 
-FROM node:lts-alpine AS production
+FROM node:22.15.1-alpine AS production
 RUN apk add openssl && rm -rf /var/cache/apk/*
 WORKDIR /app
 ENV NODE_ENV=production

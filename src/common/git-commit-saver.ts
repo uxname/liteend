@@ -8,7 +8,7 @@ const LAST_COMMIT_INFO_FILE_PATH = path.resolve(
   'last-commit-info.json',
 );
 
-interface CommitInfo {
+export interface CommitInfo {
   name: string;
   hash: string;
 }

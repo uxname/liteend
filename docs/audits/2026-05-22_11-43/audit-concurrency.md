@@ -29,9 +29,9 @@
 
 ---
 
-## CON-02 ❌ 🟠 Race condition в `ProfileService.updateProfile` (cache invalidation)
+## CON-02 ❌ 🟠 → ✅ FIXED Race condition в `ProfileService.updateProfile` (cache invalidation)
 
-**Файл:** `src/common/auth/auth.service.ts:14-18`, `src/modules/profile/profile.service.ts:24-27`
+**Файл:** `src/modules/profile/profile.service.ts:24-27`
 
 **Описание:** Между `prisma.profile.update` и `redis.del()` есть окно, в котором другой запрос может прочитать старый кеш. Если два concurrent update:
 
@@ -41,15 +41,19 @@
 
 **Fix:** Удалять кеш **до** обновления БД (lazy caching — следующий запрос перезапишет). Или использовать `SET` вместо `DEL` с новыми данными.
 
+**Исправлено:** Да (write-through cache: SET вместо DEL)
+
 ---
 
-## CON-03 ❌ 🟡 TOCTOU в `FileUploadService.getSafeFileInfo`
+## CON-03 ❌ 🟡 → ✅ FIXED TOCTOU в `FileUploadService.getSafeFileInfo`
 
-**Файл:** `src/modules/file-upload/file-upload.service.ts:45-48`
+**Файл:** `src/modules/file-upload/file-upload.service.ts:45-48`, `src/modules/file-upload/file-upload.controller.ts:94`
 
 **Описание:** `fsAsync.access()` проверяет что файл существует, но между check и read файл может быть удалён другим процессом. Это не баг данных, но лишний race condition.
 
 **Fix:** Убрать `access()`, читать файл напрямую и ловить `ENOENT` → `NotFoundException`.
+
+**Исправлено:** Да (on('error') хендлер на стрим, 404 при ошибке)
 
 ---
 
@@ -81,7 +85,7 @@
 
 ---
 
-## CON-06 ✅ 🟡 Redis `maxRetriesPerRequest: null`
+## CON-06 ✅ → ❌ FIXED Redis `maxRetriesPerRequest: null`
 
 **Файл:** `src/common/redis/redis.service.ts:22`
 
@@ -89,15 +93,19 @@
 
 **Fix:** Установить конечное значение (например, `20`). И добавить таймаут на reconnect.
 
+**Исправлено:** Да (maxRetriesPerRequest: 20)
+
 ---
 
-## CON-07 ✅ 🟡 BullMQ: неявная concurrency=1
+## CON-07 ✅ 🟡 → ❌ FIXED BullMQ: неявная concurrency=1
 
 **Файл:** `src/infrastructure/test-queue/test-queue.processor.ts:5`
 
 **Описание:** `@Processor('test')` без `concurrency`. BullMQ по умолчанию ставит 1, что безопасно. Но не очевидно.
 
-**Fix:** Явно указать `@Processor('test', { concurrency: 1 })` — документирует намерение.
+**Fix:** Явно указать `@Processor('test', { concurrency: 5 })` — документирует намерение и улучшает пропускную способность.
+
+**Исправлено:** Да (concurrency: 5)
 
 ---
 

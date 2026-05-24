@@ -122,13 +122,11 @@ describe('TestQueueResolver', () => {
       );
     });
 
-    it('should return true for already active duplicate job', async () => {
-      mockQueue.getJob.mockResolvedValue({ isActive: () => true });
-
+    it('should rely on BullMQ deduplication for duplicate jobs', async () => {
       const result = await resolver.addTestJob('duplicate');
 
       expect(result).toBe(true);
-      expect(mockQueue.add).not.toHaveBeenCalled();
+      expect(mockQueue.add).toHaveBeenCalledOnce();
     });
 
     it('should handle queue add failure', async () => {

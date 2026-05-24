@@ -8,6 +8,14 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { PrismaClient } from '@/@generated/prisma/client';
+import {
+  DB_CONNECT_TIMEOUT,
+  DB_IDLE_TIMEOUT,
+  DB_MAX_RETRIES,
+  DB_POOL_MAX,
+  DB_RETRY_BASE_DELAY,
+  DB_RETRY_MAX_DELAY,
+} from '@/common/constants';
 
 @Injectable()
 export class PrismaService
@@ -28,9 +36,9 @@ export class PrismaService
 
     const pool = new Pool({
       connectionString: DATABASE_URL,
-      connectionTimeoutMillis: 10000,
-      idleTimeoutMillis: 30000,
-      max: 10,
+      connectionTimeoutMillis: DB_CONNECT_TIMEOUT,
+      idleTimeoutMillis: DB_IDLE_TIMEOUT,
+      max: DB_POOL_MAX,
     });
     // TODO(#1): remove cast when @prisma/adapter-pg updates bundled @types/pg
     const adapter = new PrismaPg(
@@ -41,16 +49,17 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    const maxRetries = 5;
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= DB_MAX_RETRIES; attempt++) {
       try {
         await this.$connect();
         return;
       } catch (error) {
-        if (attempt === maxRetries) throw error;
-        const delay = Math.min(attempt * 1000, 5000);
+        if (attempt === DB_MAX_RETRIES) throw error;
+        const delay =
+          Math.min(attempt * DB_RETRY_BASE_DELAY, DB_RETRY_MAX_DELAY) *
+          (0.5 + Math.random() * 0.5);
         this.logger.warn({
-          msg: `DB connection attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms`,
+          msg: `DB connection attempt ${attempt}/${DB_MAX_RETRIES} failed, retrying in ${Math.round(delay)}ms`,
           err: error instanceof Error ? error.message : error,
         });
         await new Promise((resolve) => setTimeout(resolve, delay));

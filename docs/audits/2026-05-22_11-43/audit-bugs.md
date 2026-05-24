@@ -5,14 +5,14 @@
 | Check ID | Статус | Уверенность | Доказательство | Решение | Исправлено |
 |----------|--------|-------------|----------------|---------|------------|
 | BUG-01 | ✅ PASS | High | `src/` — все `parseInt` с radix, все сравнения через `===` | — | — |
-| BUG-02 | ❌ FAIL 🟡 | High | `profile.resolver.ts:51` — `pubSub.publish()` без await | **1. Добавить `await` перед `pubSub.publish()`** \\ 2. Добавить `.catch()` для graceful degradation \\ 3. Обернуть в try/catch с логированием | Нет |
-| BUG-02 | ❌ FAIL 🟡 | High | `gql-logging.interceptor.ts:49-51` — `JSON.parse(truncated)` может упасть | **1. Убрать JSON-обрезку, рекурсия внизу уже обрабатывает все случаи** \\ 2. Обрезать на границе последнего ключа, а не по байтам \\ 3. Заменить на try/catch с fallback на строку | Нет |
+| BUG-02 | ❌ FAIL 🟡 | High | `profile.resolver.ts:51` — `pubSub.publish()` без await | **1. Добавить `await` перед `pubSub.publish()`** \\ 2. Добавить `.catch()` для graceful degradation \\ 3. Обернуть в try/catch с логированием | Да (await) |
+| BUG-02 | ❌ FAIL 🟡 | High | `gql-logging.interceptor.ts:49-51` — `JSON.parse(truncated)` может упасть | **1. Убрать JSON-обрезку, рекурсия внизу уже обрабатывает все случаи** \\ 2. Обрезать на границе последнего ключа, а не по байтам \\ 3. Заменить на try/catch с fallback на строку | Да (убрана JSON-обрезка) |
 | BUG-03 | ✅ PASS | High | `src/` — optional chaining (`?.`) используется везде, null-проверки есть | — | — |
 | BUG-04 | ✅ PASS | High | `src/` — sort/splice не мутируют аргументы в критических путях | — | — |
 | BUG-05 | ✅ PASS | Medium | `src/` — нет switch на enum-ах, union-types обрабатываются | — | — |
 | BUG-06 | ✅ PASS | High | `src/` — нет деления, NaN проверки через parseInt с || '0' | — | — |
-| BUG-07 | ❌ FAIL 🟢 | High | `test-queue.resolver.ts:17-18` — `getJob` с dedup-ID никогда не находит job | **1. Убрать `getJob` — BullMQ dedup работает сам** \\ 2. Передать `jobId` в `this.testQueue.add()` \\ 3. Оставить как dead code с TODO-комментарием | Нет |
-| BUG-07 | ❌ FAIL 🟢 | Medium | `file-upload.controller.ts:94` — TOCTOU: file access до createReadStream | **1. Добавить обработку ошибок на стрим: `.on('error', handler)`** \\ 2. Обернуть send в try/catch \\ 3. Проверять файл атомарно через open/read | Нет |
+| BUG-07 | ❌ FAIL 🟢 | High | `test-queue.resolver.ts:17-18` — `getJob` с dedup-ID никогда не находит job | **1. Убрать `getJob` — BullMQ dedup работает сам** \\ 2. Передать `jobId` в `this.testQueue.add()` \\ 3. Оставить как dead code с TODO-комментарием | Да (getJob удалён) |
+| BUG-07 | ❌ FAIL 🟢 | Medium | `file-upload.controller.ts:94` — TOCTOU: file access до createReadStream | **1. Добавить обработку ошибок на стрим: `.on('error', handler)`** \\ 2. Обернуть send в try/catch \\ 3. Проверять файл атомарно через open/read | Да (on('error') добавлен) |
 | BUG-08 | ✅ PASS | High | `src/` — нет float сравнений в критических путях | — | — |
 | BUG-09 | ✅ PASS | High | `src/` — все даты через `toISOString()`, `getUTC*()` — UTC корректно | — | — |
 | BUG-10 | ✅ PASS | High | `src/` — нет `new RegExp(userInput)` в критических путях | — | — |

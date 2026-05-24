@@ -13,18 +13,18 @@
 ## Дополнительные находки
 
 ### ARCH-08: FileUploadModule — некорректная конфигурация
-- **Статус**: ❌ FAIL 🟡
+- **Статус**: ❌ FAIL 🟡 → ✅ FIXED
 - **Файл**: `src/modules/file-upload/file-upload.module.ts:8`
 - **Описание**: `FileUploadController` указан одновременно в `providers` и `controllers`. В NestJS контроллеры должны быть только в `controllers`. Наличие в `providers` может привести к двойной инициализации или некорректному поведению.
 - **Решение**: Удалить `FileUploadController` из `providers: [FileUploadController, FileUploadService]`, оставить только `controllers: [FileUploadController]`.
-- **Исправлено**: Нет
+- **Исправлено**: Да
 
 ### ARCH-09: FileUploadModule экспортирует контроллер
 - **Статус**: ❌ FAIL 🟢
 - **Файл**: `src/modules/file-upload/file-upload.module.ts:10`
 - **Описание**: `exports: [FileUploadController]` — экспорт контроллера не нужен. Контроллеры обрабатывают HTTP-маршруты и не должны использоваться другими модулями как класс.
 - **Решение**: Удалить `exports: [FileUploadController]` или, если нужна функциональность, экспортировать сервис.
-- **Исправлено**: Нет
+- **Исправлено**: Да
 
 ### ARCH-10: Импорт package.json относительным путём
 - **Статус**: ❌ FAIL 🟢
@@ -54,7 +54,7 @@
 - **Файл**: `src/modules/profile/profile.module.ts:9`
 - **Описание**: `exports: [ProfileService]` — сервис экспортируется, но ни один другой модуль его не импортирует. `AuthService` работает с профилями напрямую через `PrismaService`, не используя `ProfileService`.
 - **Решение**: Удалить `exports: [ProfileService]` или добавить документацию, почему экспорт нужен для будущего использования.
-- **Исправлено**: Нет
+- **Исправлено**: Да
 
 ### ARCH-14: DebugResolver — бизнес-логика в presentation слое
 - **Статус**: ❌ FAIL 🟢

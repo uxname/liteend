@@ -13,16 +13,10 @@ export class TestQueueResolver {
   async addTestJob(
     @Args('message', { type: () => String }) message: string,
   ): Promise<boolean> {
-    const jobId = `dedup:test:${message}`;
-    const existing = await this.testQueue.getJob(jobId);
-    if (existing && (await existing.isActive())) {
-      return true;
-    }
-
     await this.testQueue.add(
       'test-job',
       { message, date: new Date().toISOString() },
-      { deduplication: { id: jobId, ttl: 60000 } },
+      { deduplication: { id: `dedup:test:${message}`, ttl: 60000 } },
     );
     return true;
   }

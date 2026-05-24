@@ -39,6 +39,8 @@ DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || 'postgres',
 
 **Рекомендация:** Убрать fallback — требовать явного указания `DATABASE_PASSWORD` через окружение. Либо выбросить ошибку, если переменная не задана.
 
+**Исправлено:** Да (fallback удалён, ошибка при отсутствии переменной)
+
 ---
 
 ### ❌ FAIL 🔴 — Git history содержит реальные OIDC-credentials

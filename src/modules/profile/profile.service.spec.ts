@@ -26,7 +26,7 @@ describe('ProfileService', () => {
 
   const mockRedisService = {
     getClient: vi.fn().mockReturnValue({
-      del: vi.fn().mockResolvedValue(1),
+      set: vi.fn().mockResolvedValue('OK'),
     }),
   };
 

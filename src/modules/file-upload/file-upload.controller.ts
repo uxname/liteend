@@ -46,7 +46,7 @@ export class FileUploadController {
   })
   @ApiOperation({ summary: 'Upload files' })
   @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: 200, description: 'Files uploaded successfully.' })
+  @ApiResponse({ status: 201, description: 'Files uploaded successfully.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async uploadFile(@Req() req: FastifyRequest, @RealIp() ip: string) {
@@ -79,6 +79,8 @@ export class FileUploadController {
   }
 
   @Get('/uploads/*')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get file' })
   @ApiParam({ name: '*', required: true, description: 'The file path.' })
   @ApiResponse({ status: 200, description: 'File retrieved.' })
@@ -91,6 +93,12 @@ export class FileUploadController {
       await this.fileUploadService.getSafeFileInfo(filePathParam);
 
     response.type(mimeType);
-    response.send(fs.createReadStream(fullPath));
+    response.send(
+      fs.createReadStream(fullPath).on('error', () => {
+        if (!response.sent) {
+          response.status(404).send('File not found');
+        }
+      }),
+    );
   }
 }

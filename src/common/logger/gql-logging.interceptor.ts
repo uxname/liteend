@@ -45,11 +45,6 @@ function truncateResponse(
   }
   if (typeof data === 'object') {
     const result: Record<string, unknown> = {};
-    const jsonStr = JSON.stringify(data);
-    if (jsonStr.length > maxBytes) {
-      const truncated = jsonStr.slice(0, maxBytes);
-      return JSON.parse(truncated) as object;
-    }
     for (const [key, value] of Object.entries(
       data as Record<string, unknown>,
     )) {
