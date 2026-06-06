@@ -78,9 +78,10 @@ export class FileUploadController {
     }));
   }
 
+  // Public on purpose: served images are referenced from <img src> (no Authorization
+  // header possible). Paths are content-addressed UUIDs and path-traversal is blocked
+  // in getSafeFileInfo, so listing/enumeration is not feasible.
   @Get('/uploads/*')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get file' })
   @ApiParam({ name: '*', required: true, description: 'The file path.' })
   @ApiResponse({ status: 200, description: 'File retrieved.' })

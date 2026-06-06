@@ -27,6 +27,8 @@ const makeProfile = (partial: Partial<Profile> = {}): Profile => ({
   oidcSub: 'mock-oidc-sub',
   roles: [ProfileRole.USER],
   avatarUrl: null,
+  displayName: null,
+  bio: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   ...partial,

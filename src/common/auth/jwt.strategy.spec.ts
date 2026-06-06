@@ -57,6 +57,8 @@ describe('JwtStrategy', () => {
         oidcSub: 'oauth2|12345',
         roles: [ProfileRole.USER],
         avatarUrl: null,
+        displayName: null,
+        bio: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -96,6 +98,8 @@ describe('JwtStrategy', () => {
         oidcSub: 'oauth2|12345',
         roles: [ProfileRole.USER, ProfileRole.ADMIN],
         avatarUrl: null,
+        displayName: null,
+        bio: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

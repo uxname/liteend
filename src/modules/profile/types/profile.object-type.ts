@@ -32,4 +32,10 @@ export class Profile {
 
   @Field(() => String, { nullable: true, description: 'Avatar image URL' })
   avatarUrl!: string | null;
+
+  @Field(() => String, { nullable: true, description: 'Public display name' })
+  displayName!: string | null;
+
+  @Field(() => String, { nullable: true, description: 'Short biography' })
+  bio!: string | null;
 }

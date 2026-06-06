@@ -12,6 +12,8 @@ describe('ProfileService', () => {
     oidcSub: 'oauth2|12345',
     roles: [ProfileRole.USER],
     avatarUrl: 'https://example.com/avatar.png',
+    displayName: null,
+    bio: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
