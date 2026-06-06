@@ -33,7 +33,13 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-/data/
+# Ignore runtime data (db, redis, logs, uploads, backups) but keep the
+# directory skeleton so the project is portable and dirs exist before
+# Docker bind-mounts them (prevents Docker from re-creating them as root).
+/data/*
+!/data/*/
+/data/*/*
+!/data/*/.gitkeep
 .env
 .env.*
 tsconfig.tsbuildinfo

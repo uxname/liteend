@@ -7,12 +7,19 @@ x-common-logging: &common-logging
 x-common-restart-policy: &common-restart-policy
   restart: unless-stopped
 
+# Containers that write into ./data run as the host user so those files are not
+# owned by root (no sudo, data stays portable). Defaults to 1000:1000 — the usual
+# single-user Linux UID. If `id -u` differs, override without editing this file:
+#   DOCKER_UID=$(id -u) DOCKER_GID=$(id -g) docker compose up -d
+# (or set DOCKER_UID / DOCKER_GID in .env).
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     <<: *common-restart-policy
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     env_file:
       - .env
     environment:
@@ -42,6 +49,7 @@ services:
   db:
     image: postgres:18.1-alpine
     <<: *common-restart-policy
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -77,6 +85,7 @@ services:
   redis:
     image: redis:8.4-alpine
     <<: *common-restart-policy
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     command: >
       redis-server --save 20 1 --loglevel warning
       --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}
@@ -114,6 +123,7 @@ services:
       context: .
       dockerfile: Dockerfile.database-backup
     <<: *common-restart-policy
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: ${DATABASE_PORT}
