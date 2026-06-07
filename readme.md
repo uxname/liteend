@@ -463,9 +463,10 @@ These are some of the most important variables in `.env.example` to configure:
 
 - `NODE_ENV`: Set to `development` or `production`.
 - `PORT`: The port the NestJS application will listen on.
-- `OIDC_ISSUER`: The URL of the OIDC provider (e.g., Logto).
-- `OIDC_AUDIENCE`: The API identifier defined in the OIDC provider.
-- `OIDC_JWKS_URI`: The URL to the JSON Web Key Set (JWKS) of the provider.
+- `OIDC_ISSUER`: The URL of the OIDC provider (e.g., Logto) — for Logto this is the endpoint plus `/oidc` (e.g. `https://auth.example.com/oidc`).
+- `OIDC_AUDIENCE`: The API resource identifier defined in the OIDC provider. The backend rejects any token whose `aud` claim does not equal this value.
+- `OIDC_JWKS_URI`: The URL to the JSON Web Key Set (JWKS) of the provider (e.g. `https://auth.example.com/oidc/jwks`).
+- `OIDC_MOCK_ENABLED`: `true` bypasses OIDC entirely and injects a hardcoded user with `ADMIN`/`USER` roles — handy for local dev without a provider. **Must be `false` in production** and whenever you want to test against a real provider.
 - `DATABASE_URL`: The full connection string for PostgreSQL.
 - `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: Individual database connection parameters.
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: Redis connection details.
@@ -477,6 +478,28 @@ These are some of the most important variables in `.env.example` to configure:
 - `LOGS_ADMIN_PANEL_USER`, `LOGS_ADMIN_PANEL_PASSWORD`: Credentials for the protected log viewer (`/logs`).
 
 *(Refer to `.env.example` for the full list and `src/config/` for validation schemas).*
+
+### OIDC / Logto Setup
+
+The backend validates incoming requests as **JWT access tokens**: it checks the signature
+against `OIDC_JWKS_URI`, verifies the `iss` matches `OIDC_ISSUER` and the `aud` matches
+`OIDC_AUDIENCE`, and reads the `sub` (see `src/common/auth/jwt.strategy.ts`). It does **not**
+gate on specific scopes or roles — any structurally valid token for the right audience is
+accepted.
+
+The catch is provider-side: providers like **[Logto](https://logto.io)** issue an **opaque**
+access token by default (a short random string, no dots) which this backend cannot verify →
+`401 Unauthorized`. To get a **JWT**, the token must be bound to an API resource whose identifier
+equals `OIDC_AUDIENCE`. In the Logto Console: **API Resources → Create**, set the **API Identifier**
+to exactly your `OIDC_AUDIENCE` (e.g. `http://localhost:4000`, no trailing slash), and enable its
+**Default API** toggle.
+
+The frontend ([LiteFront](https://github.com/uxname/litefront)) requests that resource via
+`VITE_OIDC_API_RESOURCE` (== `OIDC_AUDIENCE`), yielding a JWT with `aud` = `OIDC_AUDIENCE` that
+this backend accepts.
+
+> For local development without a provider, set `OIDC_MOCK_ENABLED=true` to skip all of the above
+> and run as a hardcoded `ADMIN`/`USER` user.
 
 ## Internationalization (i18n)
 
