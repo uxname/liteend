@@ -48,4 +48,3 @@ tsconfig.tsbuildinfo
 
 src/@generated/prisma/
 .kodu/context.txt
-.codegraph/daemon.pid

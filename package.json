@@ -96,7 +96,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@colbymchenry/codegraph": "^0.9.9",
     "@nestjs/cli": "^11.0.21",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.24",
