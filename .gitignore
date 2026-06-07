@@ -47,4 +47,3 @@ tsconfig.tsbuildinfo
 .worktrees
 
 src/@generated/prisma/
-.kodu/context.txt
