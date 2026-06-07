@@ -152,13 +152,6 @@ npx degit uxname/liteend my-app && cd my-app && git init && cp .env.example .env
    npm run db:migrations:apply
    ```
 
-7. **(Optional) Seed the database:**
-   If seed data is available, populate the database:
-
-   ```bash
-   npm run db:seed
-   ```
-
 ## Usage
 
 ### Development

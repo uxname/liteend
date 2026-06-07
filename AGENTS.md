@@ -67,7 +67,6 @@ docker-compose up -d db redis
 - `npm run db:gen` (generate client)
 - `npm run db:reset`
 - `npm run db:schema:format`
-- `npm run db:seed`
 - `npm run db:studio` (Prisma Studio on port 5555)
 
 ## Code Style & Conventions
